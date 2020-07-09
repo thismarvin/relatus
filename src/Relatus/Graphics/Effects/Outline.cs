@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Relatus.Core;
 using System;
@@ -7,7 +7,7 @@ using System.Text;
 
 namespace Relatus.Graphics.Effects
 {
-    class Outline : FX
+    public class Outline : FX
     {
         public Texture2D Texture { get; private set; }
         public Color Color { get; private set; }

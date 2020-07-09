@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Relatus.Core;
 using System;
@@ -7,7 +7,7 @@ using System.Text;
 
 namespace Relatus.Graphics
 {
-    class Sprite : RelatusObject
+    public class Sprite : RelatusObject
     {
         public float Rotation { get; set; }
         public string SpriteDataName { get; private set; }
@@ -21,8 +21,8 @@ namespace Relatus.Graphics
         public SamplerState SamplerState { get; set; }
         public Texture2D SpriteSheet { get; private set; }
 
-        private Microsoft.Xna.Framework.Rectangle sourceRectangle;
-        private Microsoft.Xna.Framework.Rectangle scissorRectangle;
+        private Rectangle sourceRectangle;
+        private Rectangle scissorRectangle;
         private bool customScissorRectangle;
         private int originalFrameX;
         private int originalFrameY;
@@ -70,26 +70,26 @@ namespace Relatus.Graphics
 
             SetBounds(X, Y, spriteData.Width, spriteData.Height);
 
-            sourceRectangle = new Microsoft.Xna.Framework.Rectangle(frameX, frameY, (int)Width, (int)Height);
+            sourceRectangle = new Rectangle(frameX, frameY, (int)Width, (int)Height);
         }
 
         public void IncrementFrameX(int pixels)
         {
             frameX += pixels;
-            sourceRectangle = new Microsoft.Xna.Framework.Rectangle(frameX, frameY, (int)Width, (int)Height);
+            sourceRectangle = new Rectangle(frameX, frameY, (int)Width, (int)Height);
         }
 
         public void IncrementFrameY(int pixels)
         {
             frameY += pixels;
-            sourceRectangle = new Microsoft.Xna.Framework.Rectangle(frameX, frameY, (int)Width, (int)Height);
+            sourceRectangle = new Rectangle(frameX, frameY, (int)Width, (int)Height);
         }
 
         public void SetFrame(int frame, int columns)
         {
             frameX = originalFrameX + frame % columns * (int)Width;
             frameY = originalFrameY + frame / columns * (int)Height;
-            sourceRectangle = new Microsoft.Xna.Framework.Rectangle(frameX, frameY, (int)Width, (int)Height);
+            sourceRectangle = new Rectangle(frameX, frameY, (int)Width, (int)Height);
         }
 
         public void SetSprite(string spriteDataName)

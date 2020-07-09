@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Relatus.ECS;
 using System;
@@ -7,7 +7,7 @@ using System.Text;
 
 namespace Relatus.Graphics
 {
-    struct VertexTransform : IVertexType
+    public struct VertexTransform : IVertexType
     {
         public Vector3 Scale { get; private set; }
         public Vector3 RotationOffset { get; private set; }

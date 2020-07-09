@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Graphics;
 using Relatus.Core;
 using System;
 using System.Collections.Generic;
@@ -26,7 +26,7 @@ namespace Relatus.Graphics
     /// An abstraction of a helper class used to manage the parameters and logic of a custom registered <see cref="Microsoft.Xna.Framework.Graphics.Effect"/>. 
     /// Refer to <see cref="Relatus.Graphics.EffectType"/> to see all implementations of this class by Morro.
     /// </summary>
-    abstract class FX : IDisposable
+    public abstract class FX : IDisposable
     {
         public Effect Effect { get; private set; }
         public string EffectType { get; private set; }

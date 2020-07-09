@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Relatus.Core;
 using Relatus.Maths;
 using System;
@@ -8,7 +8,7 @@ using System.Text;
 
 namespace Relatus.Graphics
 {
-    class Line
+    public class Line
     {
         public float LineWidth
         {
@@ -56,16 +56,16 @@ namespace Relatus.Graphics
 
             ProcessPoints();
 
-            line = new Polygon(x, y, width, height, "Morro_None")
+            line = new Polygon(x, y, width, height)
             {
-                ShapeData = CreateShapeData()
+                Geometry = CreateShapeData()
             };
         }
 
         public Line(Vector2[] points)
         {
             lineWidth = 1;
-            line = new Polygon(x, y, width, height, "Morro_None");
+            line = new Polygon(x, y, width, height);
 
             SetPoints(points);
         }
@@ -119,8 +119,8 @@ namespace Relatus.Graphics
             float yRemapped;
             for (int i = 0; i < TotalPoints; i++)
             {
-                xRemapped = (float)MoreMathHelper.RemapRange(points[i].X, xMin, xMax, 0, 1);
-                yRemapped = (float)MoreMathHelper.RemapRange(points[i].Y, yMin, yMax, 0, 1);
+                xRemapped = (float)MoreMaths.RemapRange(points[i].X, xMin, xMax, 0, 1);
+                yRemapped = (float)MoreMaths.RemapRange(points[i].Y, yMin, yMax, 0, 1);
 
                 remappedPoints[i] = new Vector2(xRemapped, yRemapped);
             }
@@ -297,15 +297,15 @@ namespace Relatus.Graphics
             return indices;
         }
 
-        private ShapeData CreateShapeData()
+        private GeometryData CreateShapeData()
         {
-            return new ShapeData(CreateVertices(), CreateIndices());
+            return new GeometryData(CreateVertices(), CreateIndices());
         }
 
         private void UpdateShapeData()
         {
             ProcessPoints();
-            line.ShapeData = CreateShapeData();
+            line.Geometry = CreateShapeData();
             line.SetBounds(x, y, width, height);
         }
 

@@ -1,10 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Relatus.Graphics
 {
-    class SpriteCollection : DrawCollection<Sprite>
+    public class SpriteCollection : DrawCollection<Sprite>
     {
         public SpriteCollection() : base(2048)
         {

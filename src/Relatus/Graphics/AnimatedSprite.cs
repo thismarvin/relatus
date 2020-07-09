@@ -1,4 +1,4 @@
-﻿using Relatus.Utilities;
+using Relatus.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -11,7 +11,7 @@ namespace Relatus.Graphics
         Loop
     }
 
-    class AnimatedSprite : Sprite
+    public class AnimatedSprite : Sprite
     {
         public int Columns { get; private set; }
         public int TotalFrames { get; private set; }

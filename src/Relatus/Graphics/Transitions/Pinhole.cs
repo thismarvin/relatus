@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Relatus.Core;
 using System;
 using System.Collections.Generic;
@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Relatus.Graphics.Transitions
 {
-    class Pinhole : Transition
+    public class Pinhole : Transition
     {
         const int PADDING = 64;
 

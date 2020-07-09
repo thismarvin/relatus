@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Relatus.Graphics.Effects
 {
-    class Dither : FX
+    public class Dither : FX
     {
         public Texture2D Texture { get; private set; }
 

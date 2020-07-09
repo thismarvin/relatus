@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Relatus.Maths;
 using System;
 using System.Collections.Generic;
@@ -6,24 +6,24 @@ using System.Text;
 
 namespace Relatus.Graphics
 {
-    static class PolygonHelper
+    public static class PolygonHelper
     {
         #region Collision Handling
-        public static ShapeSchema GetCollisionInformation(this Polygon polygon)
+        public static SchemaShape2D GetCollisionInformation(this Polygon polygon)
         {
             Vector2[] transformedVertices = CalculateTransformedVertices(polygon);
             LineSegment[] transformedLineSegments = CalculateTransformedLineSegments(polygon, transformedVertices);
 
-            return new ShapeSchema(transformedVertices, transformedLineSegments);
+            return new SchemaShape2D(transformedVertices, transformedLineSegments);
         }
 
         private static Vector2[] CalculateTransformedVertices(Polygon polygon)
         {
-            Vector2[] result = new Vector2[polygon.ShapeData.TotalVertices];
+            Vector2[] result = new Vector2[polygon.Geometry.TotalVertices];
 
-            for (int i = 0; i < polygon.ShapeData.TotalVertices; i++)
+            for (int i = 0; i < polygon.Geometry.TotalVertices; i++)
             {
-                result[i] = Vector2.Transform(new Vector2(polygon.ShapeData.Vertices[i].X, polygon.ShapeData.Vertices[i].Y), polygon.Transform);
+                result[i] = Vector2.Transform(new Vector2(polygon.Geometry.Vertices[i].X, polygon.Geometry.Vertices[i].Y), polygon.Transform);
             }
 
             return result;
@@ -31,7 +31,7 @@ namespace Relatus.Graphics
 
         private static LineSegment[] CalculateTransformedLineSegments(Polygon polygon, Vector2[] transformedVertices)
         {
-            int totalVertices = polygon.ShapeData.TotalVertices;
+            int totalVertices = polygon.Geometry.TotalVertices;
             LineSegment[] result = new LineSegment[totalVertices];
 
             result[0] = new LineSegment(transformedVertices[totalVertices - 1].X, transformedVertices[totalVertices - 1].Y, transformedVertices[0].X, transformedVertices[0].Y);

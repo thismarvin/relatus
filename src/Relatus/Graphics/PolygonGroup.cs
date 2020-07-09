@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Graphics;
 using Relatus.Core;
 using System;
 using System.Collections.Generic;
@@ -6,16 +6,16 @@ using System.Text;
 
 namespace Relatus.Graphics
 {
-    class PolygonGroup : DrawGroup<Polygon>, IDisposable
+    internal class PolygonGroup : DrawGroup<Polygon>, IDisposable
     {
-        private readonly ShapeData sharedShapeData;
+        private readonly GeometryData sharedShapeData;
         private readonly VertexTransformColor[] transforms;
 
         private DynamicVertexBuffer transformBuffer;
         private VertexBufferBinding[] vertexBufferBindings;
         private bool dataChanged;
 
-        public PolygonGroup(ShapeData sharedShapeData, int capacity) : base(capacity)
+        public PolygonGroup(GeometryData sharedShapeData, int capacity) : base(capacity)
         {
             this.sharedShapeData = sharedShapeData;
             transforms = new VertexTransformColor[capacity];
@@ -24,7 +24,7 @@ namespace Relatus.Graphics
 
         protected override bool ConditionToAdd(Polygon polygon)
         {
-            return polygon.ShapeData == sharedShapeData;
+            return polygon.Geometry == sharedShapeData;
         }
 
         public override bool Add(Polygon polygon)

@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Graphics;
 using Relatus.Core;
 using System;
 using System.Collections.Generic;
@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Relatus.Graphics
 {
-    class SpriteGroup : DrawGroup<Sprite>
+    internal class SpriteGroup : DrawGroup<Sprite>
     {
         private readonly BlendState sharedBlendState;
         private readonly SamplerState sharedSamplerState;

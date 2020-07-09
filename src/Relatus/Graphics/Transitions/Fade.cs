@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Relatus.Core;
 using System;
 using System.Collections.Generic;
@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Relatus.Graphics.Transitions
 {
-    class Fade : Transition
+    public class Fade : Transition
     {
         const int PADDING = 8;
 

@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Relatus.Core;
 using Relatus.Graphics.Effects;
 using Relatus.Graphics.Palettes;
@@ -25,7 +25,7 @@ namespace Relatus.Graphics
         Sparge,
     }
 
-    class Text : RelatusObject, IDisposable
+    public class Text : RelatusObject, IDisposable
     {
         public string Content { get; private set; }
         public Vector2 Scale { get; private set; }
@@ -198,7 +198,7 @@ namespace Relatus.Graphics
             exactBounds.RotationOffset = new Vector2(Width / 2, Height / 2);
             exactBounds.Rotation = Rotation;
 
-            ShapeSchema collisionInformation = exactBounds.GetCollisionInformation();
+            SchemaShape2D collisionInformation = exactBounds.GetCollisionInformation();
 
             float xMin = VertexFinder(collisionInformation.Vertices, "x", "minimum");
             float xMax = VertexFinder(collisionInformation.Vertices, "x", "maximum");

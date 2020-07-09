@@ -1,4 +1,4 @@
-﻿using Relatus.Core;
+using Relatus.Core;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -11,7 +11,7 @@ namespace Relatus.Graphics
         Exit
     }
 
-    abstract class Transition
+    public abstract class Transition
     {
         public bool Started { get; private set; }
         public bool Done { get; protected set; }
@@ -30,7 +30,7 @@ namespace Relatus.Graphics
         private readonly float deltaTime;
         private double accumulator;
 
-        public Transition(TransitionType type, float velocity, float acceleration)
+        internal Transition(TransitionType type, float velocity, float acceleration)
         {
             Type = type;
             Camera = CameraManager.GetCamera(CameraType.Static);

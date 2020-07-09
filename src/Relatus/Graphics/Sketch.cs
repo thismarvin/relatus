@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Relatus.Core;
 using System;
@@ -7,7 +7,7 @@ using System.Text;
 
 namespace Relatus.Graphics
 {
-    static class Sketch
+    public static class Sketch
     {
         private static readonly SpriteBatch spriteBatch;
         private static readonly Queue<Effect> shaders;

@@ -1,10 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Relatus.Graphics
 {
-    class AABB : Quad
+    public class AABB : Quad
     {
         public override float Rotation { get => base.Rotation; set => base.Rotation = 0; }
 

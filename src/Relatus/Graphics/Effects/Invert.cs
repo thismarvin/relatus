@@ -1,10 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Relatus.Graphics.Effects
 {
-    class Invert : FX
+    public class Invert : FX
     {
         public Invert() : base("Invert")
         {

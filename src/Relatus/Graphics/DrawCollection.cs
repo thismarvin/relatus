@@ -1,11 +1,11 @@
-﻿using Relatus.Core;
+using Relatus.Core;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Relatus.Graphics
 {
-    abstract class DrawCollection<T>
+    public abstract class DrawCollection<T>
     {
         private readonly int maximumGroupCapacity;
         protected DrawGroup<T>[] groups;

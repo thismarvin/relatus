@@ -1,10 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Relatus.Graphics
 {
-    class PolygonCollection : DrawCollection<Polygon>, IDisposable
+    public class PolygonCollection : DrawCollection<Polygon>, IDisposable
     {
         public PolygonCollection() : base(100000)
         {
@@ -12,7 +12,7 @@ namespace Relatus.Graphics
 
         protected override DrawGroup<Polygon> CreateDrawGroup(Polygon currentEntry, int capacity)
         {
-            return new PolygonGroup(currentEntry.ShapeData, capacity);
+            return new PolygonGroup(currentEntry.Geometry, capacity);
         }
 
         #region IDisposable Support

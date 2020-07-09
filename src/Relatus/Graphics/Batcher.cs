@@ -1,11 +1,11 @@
-﻿using Relatus.Core;
+using Relatus.Core;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Relatus.Graphics
 {
-    static class Batcher
+    public static class Batcher
     {
         /// <summary>
         /// Creates a temporary <see cref="SpriteCollection"/> that batches and draws a given array of sprites.

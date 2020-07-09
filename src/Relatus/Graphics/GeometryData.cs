@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Relatus.Core;
 using System;
@@ -7,7 +7,7 @@ using System.Text;
 
 namespace Relatus.Graphics
 {
-    class ShapeData : IDisposable
+    public class GeometryData : IDisposable
     {
         internal bool Managed { get; set; }
         public VertexBuffer Geometry { get; private set; }
@@ -16,7 +16,7 @@ namespace Relatus.Graphics
         public int TotalTriangles { get => Indices.IndexCount / 3; }
         public int TotalVertices { get => Geometry.VertexCount; }
         
-        public ShapeData(Vector3[] vertices, short[] indices)
+        public GeometryData(Vector3[] vertices, short[] indices)
         {
             Geometry = new VertexBuffer(Engine.Graphics.GraphicsDevice, typeof(VertexPosition), vertices.Length, BufferUsage.WriteOnly);
             Geometry.SetData(vertices);
@@ -27,7 +27,7 @@ namespace Relatus.Graphics
             Vertices = vertices;
         }
 
-        internal ShapeData(Vector3[] vertices, short[] indices, bool managed) : this(vertices, indices)
+        internal GeometryData(Vector3[] vertices, short[] indices, bool managed) : this(vertices, indices)
         {
             Managed = managed;
         }

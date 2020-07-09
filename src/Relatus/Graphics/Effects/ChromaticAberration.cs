@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Relatus.Core;
 using System;
@@ -7,7 +7,7 @@ using System.Text;
 
 namespace Relatus.Graphics.Effects
 {
-    class ChromaticAberration : FX
+    public class ChromaticAberration : FX
     {
         public Texture2D Texture { get; private set; }
         public Vector2 RedShift { get; private set; }

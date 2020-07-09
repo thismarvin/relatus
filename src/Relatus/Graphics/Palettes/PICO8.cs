@@ -1,11 +1,11 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Relatus.Graphics.Palettes
 {
-    static class PICO8
+    public static class PICO8
     {
         public static readonly Color MidnightBlack = new Color(0, 0, 0);
         public static readonly Color WolfGray = new Color(95, 87, 79);

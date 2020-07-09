@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Relatus.Core;
 using Relatus.Graphics.Effects;
@@ -8,7 +8,7 @@ using System.Text;
 
 namespace Relatus.Graphics
 {
-    static class SketchHelper
+    public static class SketchHelper
     {
 
         private static readonly SpriteBatch spriteBatch;

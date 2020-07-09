@@ -1,10 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Relatus.Graphics.Effects
 {
-    class Quantize : FX
+    public class Quantize : FX
     {
         public int TotalColors { get; private set; }
 

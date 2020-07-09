@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Relatus.Core;
 using System;
@@ -7,7 +7,7 @@ using System.Text;
 
 namespace Relatus.Graphics.Effects
 {
-    class DropShadow : FX
+    public class DropShadow : FX
     {
         public Texture2D Texture { get; private set; }
         public Vector2 Direction { get; private set; }

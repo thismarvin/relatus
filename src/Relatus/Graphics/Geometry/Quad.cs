@@ -1,11 +1,11 @@
-﻿using Relatus.Core;
+using Relatus.Core;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Relatus.Graphics
 {
-    class Quad : Polygon
+    public class Quad : Polygon
     {
         public float LineWidth
         {
@@ -13,15 +13,16 @@ namespace Relatus.Graphics
             set
             {
                 lineWidth = value;
-                ShapeData = GeometryManager.CreateHollowSquare(Width, Height, lineWidth);
+                Geometry = GeometryManager.CreateHollowSquare(Width, Height, lineWidth);
             }
         }
 
         private float lineWidth;
 
-        public Quad(float x, float y, float width, float height) : base(x, y, width, height, ShapeType.Square)
+        public Quad(float x, float y, float width, float height) : base(x, y, width, height)
         {
-
+            AttachGeometry(GeometryManager.GetShapeData(ShapeType.Square));
+            ApplyChanges();
         }
     }
 }
