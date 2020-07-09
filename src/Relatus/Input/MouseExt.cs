@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Relatus.Core;
 using Relatus.Maths;
@@ -11,7 +11,7 @@ namespace Relatus.Input
     /// <summary>
     /// An extension of the default <see cref="Mouse"/> class that provides additional functionality to interface with your mouse.
     /// </summary>
-    static class MoreMouse
+    public static class MouseExt
     {
         public static RectangleF DynamicBounds { get; private set; }
         public static RectangleF StaticBounds { get; private set; }
@@ -24,58 +24,64 @@ namespace Relatus.Input
         private static Vector2 sceneLocation;
         private static Vector2 windowLocation;
 
-        /// <summary>
-        /// Returns whether or not the left mouse button was just pressed.
-        /// </summary>
-        /// <returns>Whether or not the left mouse button was just pressed.</returns>
-        public static bool PressedLeftClick()
+        public static bool Pressing(params MouseButtons[] buttons)
         {
-            return previousMouseState.LeftButton != ButtonState.Pressed && PressingLeftClick();
+            for (int i = 0; i < buttons.Length; i++)
+            {
+                switch (buttons[i])
+                {
+                    case MouseButtons.Left:
+                        if (currentMouseState.LeftButton == ButtonState.Pressed)
+                        {
+                            return true;
+                        }
+                        break;
+                    case MouseButtons.Right:
+                        if (currentMouseState.RightButton == ButtonState.Pressed)
+                        {
+                            return true;
+                        }
+                        break;
+                    case MouseButtons.Middle:
+                        if (currentMouseState.MiddleButton == ButtonState.Pressed)
+                        {
+                            return true;
+                        }
+                        break;
+                }
+            }
+
+            return false;
         }
 
-        /// <summary>
-        /// Returns whether or not the left mouse button is currently being held down.
-        /// </summary>
-        /// <returns>Whether or not the left mouse button is currently being held down.</returns>
-        public static bool PressingLeftClick()
+        public static bool Pressed(params MouseButtons[] buttons)
         {
-            return currentMouseState.LeftButton == ButtonState.Pressed;
-        }
+            for (int i = 0; i < buttons.Length; i++)
+            {
+                switch (buttons[i])
+                {
+                    case MouseButtons.Left:
+                        if (previousMouseState.LeftButton != ButtonState.Pressed && currentMouseState.LeftButton == ButtonState.Pressed)
+                        {
+                            return true;
+                        }
+                        break;
+                    case MouseButtons.Right:
+                        if (previousMouseState.RightButton != ButtonState.Pressed && currentMouseState.RightButton == ButtonState.Pressed)
+                        {
+                            return true;
+                        }
+                        break;
+                    case MouseButtons.Middle:
+                        if (previousMouseState.MiddleButton != ButtonState.Pressed && currentMouseState.MiddleButton == ButtonState.Pressed)
+                        {
+                            return true;
+                        }
+                        break;
+                }
+            }
 
-        /// <summary>
-        /// Returns whether or not the right mouse button was just pressed.
-        /// </summary>
-        /// <returns>Whether or not the right mouse button was just pressed.</returns>
-        public static bool PressedRightClick()
-        {
-            return previousMouseState.RightButton != ButtonState.Pressed && PressingRightClick();
-        }
-
-        /// <summary>
-        /// Returns whether or not the right mouse button is currently being held down.
-        /// </summary>
-        /// <returns>Whether or not the right mouse button is currently being held down.</returns>
-        public static bool PressingRightClick()
-        {
-            return currentMouseState.RightButton == ButtonState.Pressed;
-        }
-
-        /// <summary>
-        /// Returns whether or not the middle mouse button was just pressed.
-        /// </summary>
-        /// <returns>Whether or not the middle mouse button was just pressed.</returns>
-        public static bool PressedMiddleButton()
-        {
-            return previousMouseState.MiddleButton != ButtonState.Pressed && PressingMiddleButton();
-        }
-
-        /// <summary>
-        /// Returns whether or not the middle mouse button is currently being held down.
-        /// </summary>
-        /// <returns>Whether or not the middle mouse button is currently being held down.</returns>
-        public static bool PressingMiddleButton()
-        {
-            return currentMouseState.MiddleButton == ButtonState.Pressed;
+            return false;
         }
 
         /// <summary>

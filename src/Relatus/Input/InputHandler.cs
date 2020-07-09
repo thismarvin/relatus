@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Relatus.Core;
 using System;
 using System.Collections.Generic;
@@ -9,15 +9,15 @@ namespace Relatus.Input
 {
     /// <summary>
     /// Provides all the functionality necessary to interface with an <see cref="InputProfile"/>.
-    /// (Supports <see cref="MoreKeyboard"/> and <see cref="MoreGamePad"/> input types simultaneously).
+    /// (Supports <see cref="KeyboardExt"/> and <see cref="SmartGamepad"/> input types simultaneously).
     /// </summary>
-    class InputHandler
+    public class InputHandler
     {
         public PlayerIndex PlayerIndex { get; private set; }
 
         private bool isBeingUpdated;
         private InputProfile inputProfile;
-        private readonly MoreGamePad gamePad;
+        private readonly SmartGamepad gamePad;
 
         /// <summary>
         /// Creates an instance of a <see cref="InputHandler"/> that is attached to a given <see cref="Microsoft.Xna.Framework.PlayerIndex"/>.
@@ -27,7 +27,7 @@ namespace Relatus.Input
         {
             PlayerIndex = playerIndex;
             inputProfile = InputManager.GetProfile("Basic");
-            gamePad = new MoreGamePad(PlayerIndex);
+            gamePad = new SmartGamepad(PlayerIndex);
         }
 
         /// <summary>
@@ -52,23 +52,17 @@ namespace Relatus.Input
 
             if (PlayerIndex == PlayerIndex.One)
             {
-                for (int i = 0; i < inputMapping.Keys.Length; i++)
+                if (KeyboardExt.Pressed(inputMapping.Keys) || MouseExt.Pressed(inputMapping.MouseButtons))
                 {
-                    if (MoreKeyboard.Pressed(inputMapping.Keys[i]))
-                    {
-                        return true;
-                    }
+                    return true;
                 }
             }
 
             if (gamePad.IsConnected)
             {
-                for (int i = 0; i < inputMapping.Buttons.Length; i++)
+                if (gamePad.Pressed(inputMapping.GamepadButtons))
                 {
-                    if (gamePad.Pressed(inputMapping.Buttons[i]))
-                    {
-                        return true;
-                    }
+                    return true;
                 }
             }
 
@@ -88,23 +82,17 @@ namespace Relatus.Input
 
             if (PlayerIndex == PlayerIndex.One)
             {
-                for (int i = 0; i < inputMapping.Keys.Length; i++)
+                if (KeyboardExt.Pressing(inputMapping.Keys) || MouseExt.Pressing(inputMapping.MouseButtons))
                 {
-                    if (MoreKeyboard.Pressing(inputMapping.Keys[i]))
-                    {
-                        return true;
-                    }
+                    return true;
                 }
             }
 
             if (gamePad.IsConnected)
             {
-                for (int i = 0; i < inputMapping.Buttons.Length; i++)
+                if (gamePad.Pressing(inputMapping.GamepadButtons))
                 {
-                    if (gamePad.Pressing(inputMapping.Buttons[i]))
-                    {
-                        return true;
-                    }
+                    return true;
                 }
             }
 

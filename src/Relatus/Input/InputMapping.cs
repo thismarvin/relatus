@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -8,28 +8,19 @@ namespace Relatus.Input
     /// <summary>
     /// A data structure that associates a name with a variety of <see cref="Microsoft.Xna.Framework.Input.Keys"/> and <see cref="Microsoft.Xna.Framework.Input.Buttons"/>.
     /// </summary>
-    class InputMapping
+    public class InputMapping
     {
         public string Name { get; private set; }
-        public Keys[] Keys { get; private set; }
-        public Buttons[] Buttons { get; private set; }
+        public Keys[] Keys { get; set; }
+        public Buttons[] GamepadButtons { get; set; }
+        public MouseButtons[] MouseButtons { get; set; }
 
-        public InputMapping(string name, Keys[] keys) : this(name, keys, new Buttons[0])
-        {
-
-        }
-
-        public InputMapping(string name, Keys[] keys, Buttons[] buttons)
+        public InputMapping(string name)
         {
             Name = name;
-            Keys = keys;
-            Buttons = buttons;
-        }
-
-        public void Remap(Keys[] keys, Buttons[] buttons)
-        {
-            Keys = keys;
-            Buttons = buttons;
+            Keys = new Keys[0];
+            GamepadButtons = new Buttons[0];
+            MouseButtons = new MouseButtons[0];
         }
     }
 }

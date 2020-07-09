@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Relatus.Core;
 using Relatus.Utilities;
@@ -11,7 +11,7 @@ namespace Relatus.Input
     /// <summary>
     /// An extension of the <see cref="GamePad"/> class that provides additional functionality to interface with a given gamepad.
     /// </summary>
-    class MoreGamePad
+    public class SmartGamepad
     {
         public PlayerIndex PlayerIndex { get; private set; }
         public bool Vibrating { get; private set; }
@@ -24,46 +24,54 @@ namespace Relatus.Input
         private readonly Timer vibrationTimer;
 
         /// <summary>
-        /// Creates an instance of a <see cref="MoreGamePad"/> that is attached to a given <see cref="Microsoft.Xna.Framework.PlayerIndex"/>.
+        /// Creates an instance of a <see cref="SmartGamepad"/> that is attached to a given <see cref="Microsoft.Xna.Framework.PlayerIndex"/>.
         /// </summary>
         /// <param name="playerIndex">The player index this gamepad will attach to.</param>
-        public MoreGamePad(PlayerIndex playerIndex)
+        public SmartGamepad(PlayerIndex playerIndex)
         {
             PlayerIndex = playerIndex;
             vibrationTimer = new Timer(0);
         }
 
         /// <summary>
-        /// Returns whether or not the give button was just pressed.
+        /// Returns whether or not the given button is currently being held down.
         /// </summary>
-        /// <param name="button">The gamepad button that should be tested.</param>
-        /// <returns>Whether or not the give button was just pressed.</returns>
-        public bool Pressed(Buttons button)
+        /// <param name="buttons">The buttons on the gamepad that should be tested.</param>
+        /// <returns>Whether or not the given button is currently being held down.
+        public bool Pressing(params Buttons[] buttons)
         {
             VerifyUpdateIsCalled();
 
-            if (!previousGamePadState.IsButtonDown(button) && currentGamePadState.IsButtonDown(button))
+            for (int i = 0; i < buttons.Length; i++)
             {
-                InputManager.InputMode = InputMode.Controller;
-                return true;
+                if (currentGamePadState.IsButtonDown(buttons[i]))
+                {
+                    InputManager.InputMode = InputMode.Controller;
+                    return true;
+                }
             }
+
             return false;
         }
 
         /// <summary>
-        /// Returns whether or not the given button is currently being held down.
+        /// Returns whether or not the give button was just pressed.
         /// </summary>
-        /// <param name="button">The gamepad button that should be tested.</param>
-        /// <returns>Whether or not the given button is currently being held down.
-        public bool Pressing(Buttons button)
+        /// <param name="buttons">The buttons on the gamepad that should be tested.</param>
+        /// <returns>Whether or not the give button was just pressed.</returns>
+        public bool Pressed(params Buttons[] buttons)
         {
             VerifyUpdateIsCalled();
 
-            if (currentGamePadState.IsButtonDown(button))
+            for (int i = 0; i < buttons.Length; i++)
             {
-                InputManager.InputMode = InputMode.Controller;
-                return true;
+                if (!previousGamePadState.IsButtonDown(buttons[i]) && currentGamePadState.IsButtonDown(buttons[i]))
+                {
+                    InputManager.InputMode = InputMode.Controller;
+                    return true;
+                }
             }
+
             return false;
         }
 

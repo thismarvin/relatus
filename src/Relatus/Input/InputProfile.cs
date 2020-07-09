@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Input;
 using Relatus.Core;
 using System;
 using System.Collections.Generic;
@@ -9,7 +9,7 @@ namespace Relatus.Input
     /// <summary>
     /// A data structure that manages a collection of <see cref="InputMapping"/>.
     /// </summary>
-    class InputProfile
+    public class InputProfile
     {
         public string Name { get; private set; }
 
@@ -22,21 +22,11 @@ namespace Relatus.Input
         }
 
         #region Handle Input Mappings
-        public void CreateMapping(string name, Keys[] keys)
+        public InputProfile RegisterMapping(InputMapping mapping)
         {
-            CreateMapping(name, keys, new Buttons[0]);
-        }
+            inputMappings.Register(mapping.Name, mapping);
 
-        /// <summary>
-        /// Create an <see cref="InputMapping"/> that is associated with this input profile.
-        /// </summary>
-        /// <param name="name">The name the new input mapping should have.</param>
-        /// <param name="keys">All the keys that should be associated with the new input mapping.</param>
-        /// <param name="buttons">All the buttons that should be associated with the new input mapping.</param>
-        public void CreateMapping(string name, Keys[] keys, Buttons[] buttons)
-        {
-            InputMapping inputMapping = new InputMapping(name, keys, buttons);
-            inputMappings.Register(inputMapping.Name, inputMapping);
+            return this;
         }
 
         /// <summary>
@@ -49,29 +39,36 @@ namespace Relatus.Input
             return inputMappings.Get(name);
         }
 
-        public void Remap(string name, Keys[] keys)
+        public InputProfile RemapKeys(string name, Keys[] keys)
         {
-            Remap(name, keys, new Buttons[0]);
+            inputMappings.Get(name).Keys = keys;
+
+            return this;
         }
 
-        /// <summary>
-        /// Remap an <see cref="InputMapping"/> that was previously created.
-        /// </summary>
-        /// <param name="name">The name that was given to the previously created input mapping.</param>
-        /// <param name="keys">All the keys that should be associated with the new input mapping.</param>
-        /// <param name="buttons">All the buttons that should be associated with the new input mapping.</param>
-        public void Remap(string name, Keys[] keys, Buttons[] buttons)
+        public InputProfile RemapGamepadButtons(string name, Buttons[] buttons)
         {
-            GetMapping(name).Remap(keys, buttons);
+            inputMappings.Get(name).GamepadButtons = buttons;
+
+            return this;
+        }
+
+        public InputProfile RemapMouseButtons(string name, MouseButtons[] mouseButtons)
+        {
+            inputMappings.Get(name).MouseButtons = mouseButtons;
+
+            return this;
         }
 
         /// <summary>
         /// Remove an already created <see cref="InputMapping"/>.
         /// </summary>
         /// <param name="name">The name that was given to the previously created input mapping.</param>
-        public void RemoveMapping(string name)
+        public InputProfile RemoveMapping(string name)
         {
             inputMappings.Remove(name);
+
+            return this;
         }
         #endregion
     }
