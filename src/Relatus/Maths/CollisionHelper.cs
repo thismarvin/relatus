@@ -1,7 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using Relatus.Core;
-using Relatus.ECS;
-using Relatus.Graphics;
+using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -9,7 +6,7 @@ using System.Text;
 namespace Relatus.Maths
 {
 
-    static class CollisionHelper
+    public static class CollisionHelper
     {
         private struct OverlapInformation
         {
@@ -25,7 +22,7 @@ namespace Relatus.Maths
             }
         }
 
-        public static Vector2 GetResolution(IShape a, IShape b)
+        public static Vector2 GetResolution(IShape2D a, IShape2D b)
         {
             RectangleF aAABB = CalculateAABB(a.Vertices);
             RectangleF bAABB = CalculateAABB(b.Vertices);
@@ -83,7 +80,7 @@ namespace Relatus.Maths
             return new RectangleF(xMin, yMax, xMax - xMin, yMax - yMin);
         }
 
-        private static OverlapInformation CalculateOverlap(IShape a, IShape b)
+        private static OverlapInformation CalculateOverlap(IShape2D a, IShape2D b)
         {
             LineSegment edge = new LineSegment(0, 0, 0, 0);
             float minOverlap = float.MaxValue;

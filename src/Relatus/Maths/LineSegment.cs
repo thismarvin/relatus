@@ -1,11 +1,11 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Relatus.Maths
 {
-    struct LineSegment
+    public struct LineSegment
     {
         public float X1 { get; private set; }
         public float Y1 { get; private set; }

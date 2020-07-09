@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -8,7 +8,7 @@ namespace Relatus.Maths
     /// <summary>
     /// Manages an instance of a <see cref="Random"/> class object, and adds additional random number generation related functionality.
     /// </summary>
-    static class MoreRandom
+    public static class MoreRandom
     {
         /// <summary>
         /// The game's main pseudo-random number generator that is seeded upon startup.

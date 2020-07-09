@@ -1,10 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Relatus.Maths
 {
-    static class MoreMathHelper
+    public static class MoreMaths
     {
         /// <summary>
         /// Given a number within a given range, remap said number to proportionally reflect a new range.

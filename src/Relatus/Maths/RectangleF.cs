@@ -1,11 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using Microsoft.Xna.Framework;
 
 namespace Relatus.Maths
 {
-    struct RectangleF
+    public struct RectangleF
     {
         public float X { get; private set; }
         public float Y { get; private set; }
@@ -81,7 +81,7 @@ namespace Relatus.Maths
                 )
             };
 
-            return CollisionHelper.GetResolution(new ShapeSchema(aVertices, aEdges), new ShapeSchema(bVertices, bEdges));
+            return CollisionHelper.GetResolution(new SchemaShape2D(aVertices, aEdges), new SchemaShape2D(bVertices, bEdges));
         }
 
         public override string ToString()
