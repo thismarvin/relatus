@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Relatus.Core;
 using System;
 using System.Collections.Generic;
@@ -9,9 +9,9 @@ namespace Relatus.Utilities
     /// <summary>
     /// Counts down from a given duration. (Elapsed time is calculated using <see cref="GameTime"/>).
     /// </summary>
-    class Timer
+    public class Timer
     {
-        public bool Enabled { get; private set; }
+        public bool Enabled { get; set; }
         public float Duration { get; set; }
         public bool Done { get; private set; }
         public float ElapsedTime { get; private set; }
@@ -28,31 +28,37 @@ namespace Relatus.Utilities
         /// <summary>
         /// Enable the timer.
         /// </summary>
-        public void Start()
+        public Timer Start()
         {
             Enabled = true;
+
+            return this;
         }
 
         /// <summary>
         /// Disable the timer.
         /// </summary>
-        public void Stop()
+        public Timer Stop()
         {
             Enabled = false;
+
+            return this;
         }
 
         /// <summary>
         /// Resets the timer.
         /// </summary>
-        public void Reset()
+        public Timer Reset()
         {
             ElapsedTime = 0;
             Done = false;
+
+            return this;
         }
 
         public void Update()
         {
-            if (Done)
+            if (Done || !Enabled)
                 return;
 
             ElapsedTime += Engine.DeltaTime * 1000;

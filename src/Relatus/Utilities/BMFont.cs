@@ -1,4 +1,4 @@
-﻿using Relatus.Core;
+using Relatus.Core;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Relatus.Utilities
 {
-    internal class BMFont
+    public class BMFont
     {
         public string FontFace { get; private set; }
         public int Size { get; private set; }
@@ -16,7 +16,7 @@ namespace Relatus.Utilities
         private readonly Dictionary<int, string> pages;
         private readonly Dictionary<int, BMFontCharacter> characters;
 
-        public BMFont()
+        internal BMFont()
         {
             pages = new Dictionary<int, string>();
             characters = new Dictionary<int, BMFontCharacter>();

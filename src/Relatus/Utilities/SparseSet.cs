@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
@@ -8,7 +8,7 @@ namespace Relatus.Utilities
     /// <summary>
     /// A data structure that stores a set of <see cref="uint"/> that all fall within a given range.
     /// </summary>
-    class SparseSet : IEnumerable<uint>
+    public class SparseSet : IEnumerable<uint>
     {
         public int Count { get => (int)n; }
 
