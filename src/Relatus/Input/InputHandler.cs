@@ -40,6 +40,15 @@ namespace Relatus.Input
         }
 
         /// <summary>
+        /// Load a given <see cref="InputProfile"/>.
+        /// </summary>
+        /// <param name="profile">The input profile to load.</param>
+        public void LoadProfile(InputProfile profile)
+        {
+            inputProfile = profile;
+        }
+
+        /// <summary>
         /// Returns whether or not the given <see cref="InputMapping"/> was just activated.
         /// </summary>
         /// <param name="name">The name of the input mapping, that was saved within the current <see cref="InputProfile"/>, that should be tested.</param>
