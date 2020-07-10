@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Relatus.Graphics;
 using System;
@@ -20,19 +20,19 @@ namespace Relatus.Core
     }
 
     /// <summary>
-    /// Handles the entire life cycle of any registered <see cref="ShapeData"/>, and provides functionality to create
+    /// Handles the entire life cycle of any registered <see cref="GeometryData"/>, and provides functionality to create
     /// additional basic shape data.
     /// </summary>
-    static class GeometryManager
+    public static class GeometryManager
     {
         public static Effect PolygonShader { get; private set; }
 
-        private static readonly ResourceHandler<ShapeData> shapes;
+        private static readonly ResourceHandler<GeometryData> shapes;
 
         static GeometryManager()
         {
             PolygonShader = AssetManager.GetEffect("PolygonShader").Clone();
-            shapes = new ResourceHandler<ShapeData>();
+            shapes = new ResourceHandler<GeometryData>();
 
             RegisterTriangle();
             RegisterRightTriangle();
@@ -43,37 +43,37 @@ namespace Relatus.Core
 
         #region Handle Shape Data
         /// <summary>
-        /// Register <see cref="ShapeData"/> to be managed by Morro.
+        /// Register <see cref="GeometryData"/> to be managed by Morro.
         /// </summary>
         /// <param name="name">The name that the shape data being registered will be referenced as.</param>
         /// <param name="shapeData">The shape data you want to be registered.</param>
-        public static void RegisterShapeData(string name, ShapeData shapeData)
+        public static void RegisterShapeData(string name, GeometryData shapeData)
         {
             shapes.Register(name, shapeData);
         }
 
         /// <summary>
-        /// Get <see cref="ShapeData"/> that was previously registered.
+        /// Get <see cref="GeometryData"/> that was previously registered.
         /// </summary>
         /// <param name="name">The name given to shape data that was already registered.</param>
         /// <returns>The registered shape data with the given name.</returns>
-        public static ShapeData GetShapeData(string name)
+        public static GeometryData GetShapeData(string name)
         {
             return shapes.Get(name);
         }
 
         /// <summary>
-        /// Get <see cref="ShapeData"/> that was registered by Morro.
+        /// Get <see cref="GeometryData"/> that was registered by Morro.
         /// </summary>
         /// <param name="shapeType">The basic shape data you want to get.</param>
         /// <returns>The registered shape data with the given name.</returns>
-        public static ShapeData GetShapeData(ShapeType shapeType)
+        public static GeometryData GetShapeData(ShapeType shapeType)
         {
             return GetShapeData($"Morro_{shapeType.ToString()}");
         }
 
         /// <summary>
-        /// Remove registered <see cref="ShapeData"/>.
+        /// Remove registered <see cref="GeometryData"/>.
         /// </summary>
         /// <param name="name">The name given to shape data that was already registered.</param>
         public static void RemoveShapeData(string name)
@@ -96,7 +96,7 @@ namespace Relatus.Core
         /// </summary>
         /// <param name="totalVertices">The total amount of vertices the regular polygon will have.</param>
         /// <returns>Generated shape data of your regular polygon.</returns>
-        public static ShapeData CreateRegularPolygon(int totalVertices)
+        public static GeometryData CreateRegularPolygon(int totalVertices)
         {
             if (totalVertices <= 2)
                 throw new RelatusException("A polygon must have at least 3 vertices.", new ArgumentException());
@@ -124,7 +124,7 @@ namespace Relatus.Core
                 j++;
             }
 
-            return new ShapeData(vertices.ToArray(), indices.ToArray());
+            return new GeometryData(vertices.ToArray(), indices.ToArray());
         }
 
         /// <summary>
@@ -135,7 +135,7 @@ namespace Relatus.Core
         /// <param name="height">The desired height of the polygon. (In order for the line width to be accurate, it must be scaled by the desired height).</param>
         /// <param name="lineWidth">The desired line width of the polygon.</param>
         /// <returns>Generated shape data of your hollow regular polygon.</returns>
-        public static ShapeData CreateHollowRegularPolygon(int totalVertices, float width, float height, float lineWidth)
+        public static GeometryData CreateHollowRegularPolygon(int totalVertices, float width, float height, float lineWidth)
         {
             if (totalVertices <= 2)
                 throw new RelatusException("A polygon must have at least 3 vertices.", new ArgumentException());
@@ -183,7 +183,7 @@ namespace Relatus.Core
 
             short[] indices = CreateHollowIndices(_totalVertices, totalIndices);
 
-            return new ShapeData(vertices, indices);
+            return new GeometryData(vertices, indices);
         }
 
         /// <summary>
@@ -193,7 +193,7 @@ namespace Relatus.Core
         /// <param name="height">The desired height of the polygon. (In order for the line width to be accurate, it must be scaled by the desired height).</param>
         /// <param name="lineWidth">The desired line width of the polygon.</param>
         /// <returns>Generated shape data of your hollow square.</returns>
-        public static ShapeData CreateHollowSquare(float width, float height, float lineWidth)
+        public static GeometryData CreateHollowSquare(float width, float height, float lineWidth)
         {
             int initialTotalVertices = 4;
             int totalVertices = initialTotalVertices * 2;
@@ -218,7 +218,7 @@ namespace Relatus.Core
 
             short[] indices = CreateHollowIndices(totalVertices, totalIndices);
 
-            return new ShapeData(vertices, indices);
+            return new GeometryData(vertices, indices);
         }
 
         /// <summary>
@@ -227,14 +227,14 @@ namespace Relatus.Core
         /// <param name="radius">The desired radius of the circle. (In order for the line width to be accurate, it must be scaled by the desired radius).</param>
         /// <param name="lineWidth">The desired line width of the circle.</param>
         /// <returns>Generated shape data of your hollow circle.</returns>
-        public static ShapeData CreateHollowCircle(float radius, float lineWidth)
+        public static GeometryData CreateHollowCircle(float radius, float lineWidth)
         {
             return CreateHollowRegularPolygon(90, radius * 2, radius * 2, lineWidth);
         }
 
         internal static void UnloadContent()
         {
-            foreach (ShapeData shapeData in shapes)
+            foreach (GeometryData shapeData in shapes)
             {
                 shapeData.Dispose();
             }
@@ -278,14 +278,14 @@ namespace Relatus.Core
 
         private static void RegisterTriangle()
         {
-            ShapeData shapeData = CreateRegularPolygon(3);
+            GeometryData shapeData = CreateRegularPolygon(3);
             shapeData.Managed = true;
             RegisterShapeData("Morro_Triangle", shapeData);
         }
 
         private static void RegisterRightTriangle()
         {
-            ShapeData rightTriangleData = new ShapeData
+            GeometryData rightTriangleData = new GeometryData
             (
                 new Vector3[]
                 {
@@ -305,7 +305,7 @@ namespace Relatus.Core
 
         private static void RegisterSquare()
         {
-            ShapeData squareData = new ShapeData
+            GeometryData squareData = new GeometryData
             (
                 new Vector3[]
                 {
@@ -327,7 +327,7 @@ namespace Relatus.Core
 
         private static void RegisterCircle()
         {
-            ShapeData shapeData = CreateRegularPolygon(90);
+            GeometryData shapeData = CreateRegularPolygon(90);
             shapeData.Managed = true;
             RegisterShapeData("Morro_Circle", shapeData);
         }
@@ -366,7 +366,7 @@ namespace Relatus.Core
                 j++;
             }
 
-            RegisterShapeData("Morro_Star", new ShapeData(vertices.ToArray(), indices.ToArray(), true));
+            RegisterShapeData("Morro_Star", new GeometryData(vertices.ToArray(), indices.ToArray(), true));
         }
     }
 }

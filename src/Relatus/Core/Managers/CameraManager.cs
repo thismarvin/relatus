@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -27,7 +27,7 @@ namespace Relatus.Core
     /// <summary>
     /// Upholds the accuracy of a <see cref="Camera"/>, and maintains a list of basic cameras.
     /// </summary>
-    static class CameraManager
+    public static class CameraManager
     {
         private static readonly ResourceHandler<Camera> cameras;
 

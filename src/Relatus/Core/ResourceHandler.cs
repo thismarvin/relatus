@@ -1,11 +1,11 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Relatus.Core
 {
-    class ResourceHandler<T> : IDisposable, IEnumerable<T>
+    internal class ResourceHandler<T> : IDisposable, IEnumerable<T>
     {
         public int Count { get => data.Count; }
 

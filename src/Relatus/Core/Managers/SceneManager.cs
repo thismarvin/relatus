@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Input;
 using Relatus.ECS;
 using Relatus.Graphics;
 using System;
@@ -10,7 +10,7 @@ namespace Relatus.Core
     /// <summary>
     /// Handles the entire life cycle of any registered <see cref="Scene"/>'s.
     /// </summary>
-    static class SceneManager
+    public static class SceneManager
     {
         public static Scene CurrentScene { get; private set; }
         public static Scene NextScene { get; private set; }
@@ -179,7 +179,7 @@ namespace Relatus.Core
             UpdateTransitions();
             UpdateCurrentScene();
 
-            if (DebugManager.Debugging && Input.MoreKeyboard.Pressed(Keys.R))
+            if (DebugManager.Debugging && Input.KeyboardExt.Pressed(Keys.R))
             {
                 CurrentScene?.LoadScene();
             }

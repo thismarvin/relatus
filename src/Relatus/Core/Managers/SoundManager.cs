@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Relatus.Maths;
 using System;
@@ -10,7 +10,7 @@ namespace Relatus.Core
     /// <summary>
     /// Provides functionality to play registered <see cref="SoundEffect"/>'s, and handles any additional logic necessary to achieve said functionality.
     /// </summary>
-    static class SoundManager
+    public static class SoundManager
     {
         public static float MasterVolume
         {
@@ -61,7 +61,7 @@ namespace Relatus.Core
         /// <param name="distance">How far away the <see cref="SoundEffect"/> is from the listener.</param>
         public static void PlaySoundEffect3D(string sound, float volume, float theta, float azimuth, float distance)
         {
-            PlaySoundEffect3D(sound, volume, Vector3.Zero, VectorHelper.SphericalToCartesian(distance, theta, azimuth));
+            PlaySoundEffect3D(sound, volume, Vector3.Zero, Vector3Ext.SphericalToCartesian(distance, theta, azimuth));
         }
 
         /// <summary>

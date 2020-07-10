@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework.Audio;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Relatus.Graphics;
 using Relatus.Utilities;
@@ -11,7 +11,7 @@ namespace Relatus.Core
     /// <summary>
     /// Handles the entire life cycle of all of the following registered assets: <see cref="Texture2D"/>, <see cref="Effect"/>, <see cref="SoundEffect"/>, and <see cref="BMFont"/>.
     /// </summary>
-    static class AssetManager
+    public static class AssetManager
     {
         private static readonly ResourceHandler<Texture2D> textures;
         private static readonly ResourceHandler<Effect> effects;

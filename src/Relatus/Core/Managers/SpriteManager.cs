@@ -1,4 +1,4 @@
-﻿using Relatus.Graphics;
+using Relatus.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -8,7 +8,7 @@ namespace Relatus.Core
     /// <summary>
     /// Handles the entire life cycle of any registered <see cref="SpriteData"/>.
     /// </summary>
-    static class SpriteManager
+    public static class SpriteManager
     {
         private static readonly ResourceHandler<SpriteData> spriteDataLookup;
 

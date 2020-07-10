@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Relatus.Debug;
 using System;
@@ -11,7 +11,7 @@ namespace Relatus.Core
     /// Responsible for maintaining and displaying <see cref="DebugEntry"/>'s.
     /// (On PC, in-game debugging can be toggled by pressing F3).
     /// </summary>
-    static class DebugManager
+    public static class DebugManager
     {
         public static bool Debugging { get; set; }
         public static bool ShowWireFrame { get; set; }
@@ -78,7 +78,7 @@ namespace Relatus.Core
 
         private static void UpdateInput()
         {
-            if (Input.MoreKeyboard.Pressed(Keys.F3))
+            if (Input.KeyboardExt.Pressed(Keys.F3))
             {
                 Debugging = !Debugging;
             }
@@ -86,7 +86,7 @@ namespace Relatus.Core
             if (!Debugging)
                 return;
 
-            if (Input.MoreKeyboard.Pressing(Keys.LeftShift) && Input.MoreKeyboard.Pressed(Keys.D1))
+            if (Input.KeyboardExt.Pressing(Keys.LeftShift) && Input.KeyboardExt.Pressed(Keys.D1))
             {
                 ShowWireFrame = !ShowWireFrame;
             }

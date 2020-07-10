@@ -1,11 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System.Text;
 
 namespace Relatus.Core
 {
-    class MethodExpectedException : Exception
+    internal class MethodExpectedException : Exception
     {
         public MethodExpectedException() : base("A particular method was expected to be called, but it appears it never was.")
         {

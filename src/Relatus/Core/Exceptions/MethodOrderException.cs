@@ -1,11 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System.Text;
 
 namespace Relatus.Core
 {
-    class MethodOrderException : Exception
+    internal class MethodOrderException : Exception
     {
         public MethodOrderException() : base("A method was called in the incorrect order. A particular method may have been required before calling this method.")
         {

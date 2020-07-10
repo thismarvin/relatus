@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Relatus.Graphics;
@@ -22,7 +22,7 @@ namespace Relatus.Core
     /// <summary>
     /// Maintains anything and everything related to the <see cref="GameWindow"/>, and provides functionality to safely manipulate the window.
     /// </summary>
-    static class WindowManager
+    public static class WindowManager
     {
         public static int PixelWidth { get; private set; }
         public static int PixelHeight { get; private set; }
@@ -351,13 +351,13 @@ namespace Relatus.Core
 
         private static void UpdateInput()
         {
-            if (Input.MoreKeyboard.Pressed(Keys.F11))
+            if (Input.KeyboardExt.Pressed(Keys.F11))
             {
                 ToggleFullScreen();
             }
 
 #if !__IOS__ && !__TVOS__
-            if (Input.MoreKeyboard.Pressed(Keys.Escape))
+            if (Input.KeyboardExt.Pressed(Keys.Escape))
             {
                 Engine.Instance.Exit();
             }

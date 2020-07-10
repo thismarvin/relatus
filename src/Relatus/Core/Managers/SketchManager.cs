@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Relatus.Graphics;
 using System;
@@ -7,7 +7,7 @@ using System.Text;
 
 namespace Relatus.Core
 {
-    public enum StageType
+    internal enum StageType
     {
         Setup,
         Begin,
@@ -15,7 +15,7 @@ namespace Relatus.Core
         Post,
     }
 
-    static class SketchManager
+    public static class SketchManager
     {
         private static readonly SpriteBatch spriteBatch;
         private static readonly List<RenderTarget2D> renderTargets;

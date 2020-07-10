@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Relatus.Maths;
 using Relatus.Utilities;
 using System;
@@ -7,7 +7,7 @@ using System.Text;
 
 namespace Relatus.Core
 {
-    class Camera
+    public class Camera
     {
         public string Name { get; private set; }
         public Matrix Transform { get; private set; }

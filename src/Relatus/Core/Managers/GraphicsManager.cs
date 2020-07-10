@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
@@ -9,7 +9,7 @@ namespace Relatus.Core
     /// <summary>
     /// Handles the entire life cycle of a set of various graphics realted objects.
     /// </summary>
-    static class GraphicsManager
+    public static class GraphicsManager
     {
         public static RasterizerState DefaultRasterizerState { get; private set; }
         public static RasterizerState ScissorRasterizerState { get; private set; }
