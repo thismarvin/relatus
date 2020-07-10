@@ -29,7 +29,7 @@ namespace Relatus.ECS
         /// <param name="geometry">The shape data that this system will focus on and draw.</param>
         /// <param name="shapeTag">The type of the custom <see cref="IComponent"/> that acts as a tag specifically for this system.</param>
         /// <param name="tasks">The total amount of tasks to divide the update cycle into. Assigning more than one task allows entities to be updated asynchronously.</param>
-        internal SimpleShapeSystem(Scene scene, GeometryData geometry, Type shapeTag, uint tasks) : base(scene, tasks)
+        public SimpleShapeSystem(Scene scene, GeometryData geometry, Type shapeTag, uint tasks) : base(scene, tasks)
         {
             Require(typeof(CPosition), typeof(CDimension), typeof(CTransform), typeof(CColor), shapeTag);
 
