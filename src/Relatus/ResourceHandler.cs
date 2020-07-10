@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Relatus.Core
+namespace Relatus
 {
     internal class ResourceHandler<T> : IDisposable, IEnumerable<T>
     {

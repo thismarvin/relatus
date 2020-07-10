@@ -1,7 +1,7 @@
+using Relatus.Maths;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using Relatus.Maths;
 
 namespace Relatus.ECS
 {

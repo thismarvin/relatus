@@ -1,5 +1,4 @@
 using Microsoft.Xna.Framework;
-using Relatus.Core;
 using Relatus.Graphics.Effects;
 using Relatus.Graphics.Palettes;
 using Relatus.Maths;

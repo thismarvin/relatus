@@ -1,6 +1,5 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Relatus.Core;
 using Relatus.Graphics.Effects;
 using System;
 using System.Collections.Generic;

@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Relatus.Core
+namespace Relatus
 {
     /// <summary>
     /// Basic camera types that are registered by default.

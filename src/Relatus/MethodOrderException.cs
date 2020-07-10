@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System.Text;
 
-namespace Relatus.Core
+namespace Relatus
 {
     internal class MethodOrderException : Exception
     {

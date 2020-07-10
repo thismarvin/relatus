@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Relatus.Core
+namespace Relatus
 {
     /// <summary>
     /// Handles the entire life cycle of a set of various graphics realted objects.

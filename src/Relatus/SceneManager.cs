@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Relatus.Core
+namespace Relatus
 {
     /// <summary>
     /// Handles the entire life cycle of any registered <see cref="Scene"/>'s.

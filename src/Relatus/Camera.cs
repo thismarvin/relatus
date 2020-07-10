@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Relatus.Core
+namespace Relatus
 {
     public class Camera
     {

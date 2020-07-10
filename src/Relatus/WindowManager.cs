@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Relatus.Core
+namespace Relatus
 {
     /// <summary>
     /// The current orientation of the window.

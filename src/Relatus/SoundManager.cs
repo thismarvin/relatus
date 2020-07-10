@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Relatus.Core
+namespace Relatus
 {
     /// <summary>
     /// Provides functionality to play registered <see cref="SoundEffect"/>'s, and handles any additional logic necessary to achieve said functionality.

@@ -1,4 +1,3 @@
-using Relatus.Core;
 using Relatus.Graphics;
 using Relatus.Graphics.Transitions;
 using Relatus.Maths;

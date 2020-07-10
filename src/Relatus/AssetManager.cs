@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Relatus.Core
+namespace Relatus
 {
     /// <summary>
     /// Handles the entire life cycle of all of the following registered assets: <see cref="Texture2D"/>, <see cref="Effect"/>, <see cref="SoundEffect"/>, and <see cref="BMFont"/>.

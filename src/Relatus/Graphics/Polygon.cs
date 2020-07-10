@@ -1,6 +1,5 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Relatus.Core;
 using Relatus.ECS;
 using Relatus.Maths;
 using System;

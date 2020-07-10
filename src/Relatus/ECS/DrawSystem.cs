@@ -1,5 +1,3 @@
-using Microsoft.Xna.Framework.Graphics;
-using Relatus.Core;
 using System;
 using System.Collections.Generic;
 using System.Text;
