@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Relatus.Core;
 using Relatus.Graphics;
 using System;
@@ -8,7 +8,7 @@ using System.Text;
 
 namespace Relatus.Debug
 {
-    class DebugEntry : IDisposable
+    public class DebugEntry : IDisposable
     {
         #region Properties
         /// <summary>
