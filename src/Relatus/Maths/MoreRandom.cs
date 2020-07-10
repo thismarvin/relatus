@@ -20,6 +20,11 @@ namespace Relatus.Maths
             RNG = new Random(DateTime.Now.Millisecond);
         }
 
+        public static int Next(int lowerBound, int upperBound)
+        {
+            return RNG.Next(lowerBound, upperBound);
+        }
+
         public static double NextDouble(double lowerBound, double upperBound)
         {
             return lowerBound + RNG.NextDouble() * (upperBound - lowerBound);
