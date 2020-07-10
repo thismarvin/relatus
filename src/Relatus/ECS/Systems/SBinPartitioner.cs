@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -7,7 +7,7 @@ namespace Relatus.ECS
     /// <summary>
     /// An implementation of a <see cref="PartitioningSystem"/> that implements a <see cref="Bin{T}"/>.
     /// </summary>
-    class SBinPartitioner : PartitioningSystem
+    public class SBinPartitioner : PartitioningSystem
     {
         /// <summary>
         /// Creates an implementation of a <see cref="PartitioningSystem"/> that implements a <see cref="Bin{T}"/>.

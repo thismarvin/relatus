@@ -1,4 +1,4 @@
-﻿using Relatus.Core;
+using Relatus.Core;
 using Relatus.Utilities;
 using System;
 using System.Collections.Generic;
@@ -10,7 +10,7 @@ namespace Relatus.ECS
     /// <summary>
     /// Handles all functionality related to maintaining and managing <see cref="MorroSystem"/>'s.
     /// </summary>
-    class SystemManager
+    public class SystemManager
     {
         public int Capacity { get; private set; }
         public int TotalSystemsRegistered { get; private set; }

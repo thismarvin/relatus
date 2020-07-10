@@ -1,10 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Relatus.ECS
 {
-    class CDimension : IComponent
+    public class CDimension : IComponent
     {
         public float Width { get; set; }
         public float Height { get; set; }

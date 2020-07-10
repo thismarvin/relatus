@@ -1,4 +1,4 @@
-﻿using Relatus.Core;
+using Relatus.Core;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -14,7 +14,7 @@ namespace Relatus.ECS
         VelocityVerlet
     }
 
-    class SPhysics : UpdateSystem
+    public class SPhysics : UpdateSystem
     {
         private readonly float target;
         private readonly Integrator integrator;

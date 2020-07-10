@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -8,7 +8,7 @@ namespace Relatus.ECS
     /// An abstraction of a <see cref="MorroSystem"/> that can process or manipulate <see cref="IComponent"/> data on every frame or a fixed basis.
     /// Note that an <see cref="UpdateSystem"/> is always executed before a <see cref="DrawSystem"/>.
     /// </summary>
-    abstract class UpdateSystem : MorroSystem, IUpdateableSystem
+    public abstract class UpdateSystem : MorroSystem, IUpdateableSystem
     {
         private readonly UpdateSystemHandler updateSystemHandler;
 

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -7,12 +7,12 @@ namespace Relatus.ECS
     /// <summary>
     /// Provides functionality to send an event.
     /// </summary>
-    interface IEventAnnouncer
+    public interface IEventAnnouncer
     {
         EventHandler<EventArgs> Announcement { get; set; }
     }
 
-    static class IEventAnnouncerHelper
+    public static class IEventAnnouncerHelper
     {
         public static void AnnounceEvent(this IEventAnnouncer announcer)
         {

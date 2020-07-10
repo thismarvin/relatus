@@ -1,10 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Relatus.ECS
 {
-    class CPosition : IComponent
+    public class CPosition : IComponent
     {
         public float X { get; set; }
         public float Y { get; set; }

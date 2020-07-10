@@ -1,4 +1,4 @@
-﻿using Relatus.Core;
+using Relatus.Core;
 using Relatus.Graphics;
 using Relatus.Graphics.Transitions;
 using Relatus.Maths;
@@ -24,13 +24,7 @@ namespace Relatus.ECS
             set => systemManager.DisableAsynchronousUpdates = !value;
         }
 
-        private Camera camera;
-
-        public Camera Camera { get => camera; }
-
-
-
-        
+        public Camera Camera { get; set; }
         public Transition EnterTransition { get; set; }
         public Transition ExitTransition { get; set; }
         public string Name { get; private set; }
@@ -55,7 +49,7 @@ namespace Relatus.ECS
         /// <param name="entityCapacity">The total of amount of entities supported by this scene.</param>
         /// <param name="componentCapacity">The total of amount of unique <see cref="IComponent"/> types supported by this scene.</param>
         /// <param name="systemCapacity">The total of amount of unique <see cref="MorroSystem"/> types supported by this scene.</param>
-        internal Scene(string name, int entityCapacity = 100, int componentCapacity = 64, int systemCapacity = 64)
+        public Scene(string name, int entityCapacity = 100, int componentCapacity = 64, int systemCapacity = 64)
         {
             Name = name;
             SceneBounds = new RectangleF(0, 0, WindowManager.PixelWidth, WindowManager.PixelHeight);

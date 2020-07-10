@@ -1,4 +1,4 @@
-﻿using Relatus.Core;
+using Relatus.Core;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Relatus.ECS
 {
-    class UpdateSystemHandler
+    public class UpdateSystemHandler
     {
         public uint TotalTasks { get; set; }
         public bool FixedUpdateEnabled { get; set; }

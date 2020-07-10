@@ -1,11 +1,11 @@
-﻿using Relatus.Maths;
+using Relatus.Maths;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Relatus.ECS
 {
-    abstract class PartitioningSystem : UpdateSystem
+    public abstract class PartitioningSystem : UpdateSystem
     {
         private IComponent[] positions;
         private IComponent[] dimensions;

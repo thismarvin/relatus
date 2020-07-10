@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Graphics;
 using Relatus.Core;
 using Relatus.Graphics;
 using System;
@@ -8,32 +8,32 @@ using System.Text;
 namespace Relatus.ECS
 {
     /// <summary>
-    /// A type of <see cref="HybridSystem"/> that helps process, manipulate, and draw <see cref="ShapeData"/>.
+    /// A type of <see cref="HybridSystem"/> that helps process, manipulate, and draw <see cref="GeometryData"/>.
     /// </summary>
-    abstract class SimpleShapeSystem : HybridSystem
+    public abstract class SimpleShapeSystem : HybridSystem
     {
         protected IComponent[] positions;
         protected IComponent[] dimensions;
         protected IComponent[] transforms;
         protected IComponent[] colors;
 
-        protected ShapeData shapeData;
+        protected GeometryData geometry;
         protected VertexTransformColor[] vertexBuffer;
 
         /// <summary>
-        /// Create a <see cref="HybridSystem"/> that helps process, manipulate, and draw <see cref="ShapeData"/>.
+        /// Create a <see cref="HybridSystem"/> that helps process, manipulate, and draw <see cref="GeometryData"/>.
         /// By default, this system will handle any entity that includes the following components: <see cref="CPosition"/>, <see cref="CDimension"/>, <see cref="CTransform"/>, <see cref="CColor"/>,
         /// and a custom <see cref="IComponent"/> that acts as a tag specifically for this system.
         /// </summary>
         /// <param name="scene">The scene this system will exist in.</param>
-        /// <param name="shapeData">The shape data that this system will focus on and draw.</param>
+        /// <param name="geometry">The shape data that this system will focus on and draw.</param>
         /// <param name="shapeTag">The type of the custom <see cref="IComponent"/> that acts as a tag specifically for this system.</param>
         /// <param name="tasks">The total amount of tasks to divide the update cycle into. Assigning more than one task allows entities to be updated asynchronously.</param>
-        internal SimpleShapeSystem(Scene scene, ShapeData shapeData, Type shapeTag, uint tasks) : base(scene, tasks)
+        internal SimpleShapeSystem(Scene scene, GeometryData geometry, Type shapeTag, uint tasks) : base(scene, tasks)
         {
             Require(typeof(CPosition), typeof(CDimension), typeof(CTransform), typeof(CColor), shapeTag);
 
-            this.shapeData = shapeData;
+            this.geometry = geometry;
             vertexBuffer = new VertexTransformColor[scene.EntityCapacity];
         }
 
@@ -74,15 +74,15 @@ namespace Relatus.ECS
                 transformsBuffer.SetData(vertexBuffer);
 
                 Engine.Graphics.GraphicsDevice.RasterizerState = GraphicsManager.RasterizerState;
-                Engine.Graphics.GraphicsDevice.SetVertexBuffers(new VertexBufferBinding(shapeData.Geometry), new VertexBufferBinding(transformsBuffer, 0, 1));
-                Engine.Graphics.GraphicsDevice.Indices = shapeData.Indices;
+                Engine.Graphics.GraphicsDevice.SetVertexBuffers(new VertexBufferBinding(geometry.Geometry), new VertexBufferBinding(transformsBuffer, 0, 1));
+                Engine.Graphics.GraphicsDevice.Indices = geometry.Indices;
 
                 GeometryManager.SetupPolygonShader(camera);
 
                 foreach (EffectPass pass in GeometryManager.PolygonShader.Techniques[1].Passes)
                 {
                     pass.Apply();
-                    Engine.Graphics.GraphicsDevice.DrawInstancedPrimitives(PrimitiveType.TriangleList, 0, 0, shapeData.TotalTriangles, vertexBuffer.Length);
+                    Engine.Graphics.GraphicsDevice.DrawInstancedPrimitives(PrimitiveType.TriangleList, 0, 0, geometry.TotalTriangles, vertexBuffer.Length);
                 }
             }
         }

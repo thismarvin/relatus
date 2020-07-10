@@ -1,4 +1,4 @@
-﻿using Relatus.Maths;
+using Relatus.Maths;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -8,7 +8,7 @@ namespace Relatus.ECS
     /// <summary>
     /// Provides functionality to be processed by any given <see cref="Partitioner{T}"/>.
     /// </summary>
-    interface IPartitionable
+    public interface IPartitionable
     {
         int Identifier { get; set; }
         RectangleF Bounds { get; set; }

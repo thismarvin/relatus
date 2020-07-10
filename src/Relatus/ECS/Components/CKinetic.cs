@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Relatus.Core;
 using System;
 using System.Collections.Generic;
@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Relatus.ECS
 {
-    class CKinetic : IComponent
+    public class CKinetic : IComponent
     {
         public Vector2 Velocity { get; set; }
         public Vector2 Acceleration { get; set; }        

@@ -1,4 +1,4 @@
-﻿using Relatus.Core;
+using Relatus.Core;
 using Relatus.Maths;
 using System;
 using System.Collections.Generic;
@@ -19,7 +19,7 @@ namespace Relatus.ECS
     /// An abstraction of a class that implements spatial partitioning capabilities.
     /// </summary>
     /// <typeparam name="T">The element stored within the partitioner.</typeparam>
-    abstract class Partitioner<T> where T : IPartitionable
+    public abstract class Partitioner<T> where T : IPartitionable
     {
         public RectangleF Boundary
         {

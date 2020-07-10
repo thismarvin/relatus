@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -7,7 +7,7 @@ namespace Relatus.ECS
     /// <summary>
     /// An implementation of a <see cref="PartitioningSystem"/> that implements a <see cref="Quadtree{T}"/>.
     /// </summary>
-    class SQuadtreePartitioner : PartitioningSystem
+    public class SQuadtreePartitioner : PartitioningSystem
     {
         /// <summary>
         /// Creates an implementation of a <see cref="PartitioningSystem"/> that implements a <see cref="Quadtree{T}"/>.

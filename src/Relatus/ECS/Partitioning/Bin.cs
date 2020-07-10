@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Relatus.Core;
 using Relatus.Maths;
 using System;
@@ -11,7 +11,7 @@ namespace Relatus.ECS
     /// An implementation of a <see cref="Partitioner{T}"/> that uses a hashing algorithm to store and retrieve <see cref="IPartitionable"/> entries.
     /// </summary>
     /// <typeparam name="T">The element stored within the partitioner.</typeparam>
-    class Bin<T> : Partitioner<T> where T : IPartitionable
+    public class Bin<T> : Partitioner<T> where T : IPartitionable
     {
         private HashSet<T>[] buckets;
         private readonly int powerOfTwo;

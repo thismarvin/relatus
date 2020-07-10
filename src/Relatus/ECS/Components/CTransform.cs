@@ -1,11 +1,11 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Relatus.ECS
 {
-    class CTransform : IComponent
+    public class CTransform : IComponent
     {
         public Vector3 Scale { get; set; }
         public float Rotation { get; set; }

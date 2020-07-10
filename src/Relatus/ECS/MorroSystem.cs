@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -7,7 +7,7 @@ namespace Relatus.ECS
     /// <summary>
     /// Processes a particular set of <see cref="IComponent"/> data, and performs specialized logic on said data.
     /// </summary>
-    abstract class MorroSystem : IMorroSystem
+    public abstract class MorroSystem : IMorroSystem
     {
         public bool Enabled { get; set; }
         public HashSet<Type> RequiredComponents { get; private set; }

@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Graphics;
 using Relatus.Core;
 using Relatus.Graphics;
 using System;
@@ -7,7 +7,7 @@ using System.Text;
 
 namespace Relatus.ECS
 {
-    class CSprite : IComponent
+    public class CSprite : IComponent
     {
         public Texture2D SpriteSheet { get; set; }
         public Microsoft.Xna.Framework.Rectangle Source { get; set; }

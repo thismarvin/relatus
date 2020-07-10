@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Relatus.Core;
 using Relatus.Graphics;
 using Relatus.Maths;
@@ -8,14 +8,14 @@ using System.Text;
 
 namespace Relatus.ECS
 {
-    struct CBoxCollider : IComponent
+    public struct CBoxCollider : IComponent
     {
  
     }
 
-    static class CBoxColliderHelper
+    internal static class CBoxColliderHelper
     {
-        public static ShapeData ShapeData { get; private set; }
+        public static GeometryData ShapeData { get; private set; }
 
         static CBoxColliderHelper()
         {

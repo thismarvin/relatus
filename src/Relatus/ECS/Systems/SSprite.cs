@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Relatus.Core;
 using System;
@@ -7,7 +7,7 @@ using System.Text;
 
 namespace Relatus.ECS
 {
-    class SSprite : DrawSystem
+    public class SSprite : DrawSystem
     {
         private IComponent[] sprites;
         private IComponent[] positions;

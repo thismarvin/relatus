@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Graphics;
 using Relatus.Core;
 using System;
 using System.Collections.Generic;
@@ -9,7 +9,7 @@ namespace Relatus.ECS
     /// <summary>
     /// An abstraction of a <see cref="MorroSystem"/> that can process <see cref="IComponent"/> data and preform draw logic every frame.
     /// </summary>
-    abstract class DrawSystem : MorroSystem, IDrawableSystem
+    public abstract class DrawSystem : MorroSystem, IDrawableSystem
     {
         public int Priority { get; set; }
 

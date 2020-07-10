@@ -1,4 +1,4 @@
-﻿using Relatus.Utilities;
+using Relatus.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -8,7 +8,7 @@ namespace Relatus.ECS
     /// <summary>
     /// Handles all functionality related to creating and modifying entities.
     /// </summary>
-    class EntityManager
+    public class EntityManager
     {
         public int Capacity { get; private set; }
 

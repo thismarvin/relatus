@@ -1,11 +1,11 @@
-﻿using Relatus.Core;
+using Relatus.Core;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Relatus.ECS
 {
-    class DrawSystemHandler
+    public class DrawSystemHandler
     {
         private readonly MorroSystem parent;
         private readonly Action<int, Camera> onDraw;

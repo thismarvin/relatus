@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using Relatus.Maths;
@@ -9,7 +9,7 @@ namespace Relatus.ECS
     /// An implementation of a <see cref="Partitioner{T}"/> that uses a recursive tree structure to store and retrieve <see cref="IPartitionable"/> entries.
     /// </summary>
     /// <typeparam name="T">The element stored within the partitioner.</typeparam>
-    class Quadtree<T> : Partitioner<T> where T : IPartitionable
+    public class Quadtree<T> : Partitioner<T> where T : IPartitionable
     {
         private readonly int capacity;
         private bool divided;

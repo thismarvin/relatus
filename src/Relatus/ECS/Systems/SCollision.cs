@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Relatus.Core;
 using Relatus.Maths;
 using System;
@@ -7,7 +7,7 @@ using System.Text;
 
 namespace Relatus.ECS
 {
-    class SCollision : UpdateSystem
+    public class SCollision : UpdateSystem
     {
         private IComponent[] positions;
         private IComponent[] dimensions;
@@ -36,10 +36,10 @@ namespace Relatus.ECS
             if (queryResult.Count == 0)
                 return;
 
-            ShapeSchema collisionInformation = ShapeSchemaHelper.CreateShapeSchema(CBoxColliderHelper.ShapeData, position, dimension, transform);
+            SchemaShape2D collisionInformation = SchemaShape2DHelper.CreateShapeSchema(CBoxColliderHelper.ShapeData, position, dimension, transform);
             Shape shape = new Shape(collisionInformation);
 
-            ShapeSchema theirCollisionInformation;
+            SchemaShape2D theirCollisionInformation;
             Shape theirShape;
             CPosition theirPosition;
             CDimension theirDimension;
@@ -57,7 +57,7 @@ namespace Relatus.ECS
                 theirDimension = (CDimension)dimensions[queryResult[i]];
                 theirTransform = (CTransform)transforms[queryResult[i]];
 
-                theirCollisionInformation = ShapeSchemaHelper.CreateShapeSchema(CBoxColliderHelper.ShapeData, theirPosition, theirDimension, theirTransform);
+                theirCollisionInformation = SchemaShape2DHelper.CreateShapeSchema(CBoxColliderHelper.ShapeData, theirPosition, theirDimension, theirTransform);
                 theirShape = new Shape(theirCollisionInformation);
 
                 ProcessResolution(CollisionHelper.GetResolution(shape, theirShape));
@@ -89,13 +89,13 @@ namespace Relatus.ECS
             base.Update();
         }
 
-        private class Shape : IShape
+        private class Shape : IShape2D
         {
             public RectangleF Bounds { get; set; }
             public Vector2[] Vertices { get; set; }
             public LineSegment[] Edges { get; set; }
 
-            public Shape(ShapeSchema shapeScheme)
+            public Shape(SchemaShape2D shapeScheme)
             {
                 Vertices = shapeScheme.Vertices;
                 Edges = shapeScheme.Edges;

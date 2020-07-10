@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -7,7 +7,7 @@ namespace Relatus.ECS
     /// <summary>
     /// Handles all functionality related to sending events between <see cref="IEventAnnouncer"/> and <see cref="IEventListener"/> capable <see cref="MorroSystem"/>'s.
     /// </summary>
-    class EventManager
+    public class EventManager
     {
         private readonly SystemManager systemManager;
 

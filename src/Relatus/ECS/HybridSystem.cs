@@ -1,4 +1,4 @@
-﻿using Relatus.Core;
+using Relatus.Core;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -8,7 +8,7 @@ namespace Relatus.ECS
     /// <summary>
     /// An abstraction of a <see cref="MorroSystem"/> that combines the functionality of an <see cref="UpdateSystem"/> and a <see cref="DrawSystem"/>.
     /// </summary>
-    abstract class HybridSystem : MorroSystem, IUpdateableSystem, IDrawableSystem
+    public abstract class HybridSystem : MorroSystem, IUpdateableSystem, IDrawableSystem
     {
         public int Priority { get; set; }
 
