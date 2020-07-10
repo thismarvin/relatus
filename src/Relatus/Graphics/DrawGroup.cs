@@ -5,13 +5,13 @@ using System.Text;
 
 namespace Relatus.Graphics
 {
-    internal abstract class DrawGroup<T>
+    public abstract class DrawGroup<T>
     {
         protected readonly int capacity;
         protected T[] group;
         protected int groupIndex;
 
-        public DrawGroup(int capacity)
+        internal DrawGroup(int capacity)
         {
             this.capacity = capacity;
             group = new T[this.capacity];

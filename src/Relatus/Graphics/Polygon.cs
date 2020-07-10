@@ -157,6 +157,7 @@ namespace Relatus.Graphics
 
         public Polygon ApplyChanges()
         {
+            transformChanged = false;
             UpdateModelBuffer();
 
             return this;

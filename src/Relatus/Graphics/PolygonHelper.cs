@@ -6,10 +6,10 @@ using System.Text;
 
 namespace Relatus.Graphics
 {
-    public static class PolygonHelper
+    internal static class PolygonHelper
     {
         #region Collision Handling
-        public static SchemaShape2D GetCollisionInformation(this Polygon polygon)
+        internal static SchemaShape2D GetCollisionInformation(this Polygon polygon)
         {
             Vector2[] transformedVertices = CalculateTransformedVertices(polygon);
             LineSegment[] transformedLineSegments = CalculateTransformedLineSegments(polygon, transformedVertices);
@@ -20,10 +20,11 @@ namespace Relatus.Graphics
         private static Vector2[] CalculateTransformedVertices(Polygon polygon)
         {
             Vector2[] result = new Vector2[polygon.Geometry.TotalVertices];
+            Matrix polygonTransform = polygon.CalculateTransform();
 
             for (int i = 0; i < polygon.Geometry.TotalVertices; i++)
             {
-                result[i] = Vector2.Transform(new Vector2(polygon.Geometry.Vertices[i].X, polygon.Geometry.Vertices[i].Y), polygon.Transform);
+                result[i] = Vector2.Transform(new Vector2(polygon.Geometry.Vertices[i].X, polygon.Geometry.Vertices[i].Y), polygonTransform);
             }
 
             return result;

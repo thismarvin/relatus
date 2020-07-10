@@ -23,6 +23,7 @@ namespace Relatus.Graphics.Transitions
         public Pinhole(TransitionType type, float speed, float acceleration) : base(type, speed, acceleration)
         {
             pinhole = new Circle(0, 0, 1) { Color = Color.Black };
+            pinhole.ApplyChanges();
         }
 
         protected override void SetupTransition()
@@ -30,6 +31,7 @@ namespace Relatus.Graphics.Transitions
             lineWidth = Type == TransitionType.Enter ? radius : 1;
             //pinhole.ShapeData = Geometry.CreateHollowCircle(pinhole.Radius, lineWidth);
             pinhole.LineWidth = lineWidth;
+            pinhole.ApplyChanges();
             
         }
 
@@ -39,6 +41,7 @@ namespace Relatus.Graphics.Transitions
             radius += PADDING;
             pinhole.Radius = radius;
             pinhole.SetCenter(Camera.Center.X, Camera.Center.Y);
+            pinhole.ApplyChanges();
         }
 
         protected override void UpdateLogic()
@@ -66,6 +69,7 @@ namespace Relatus.Graphics.Transitions
 
             //pinhole.ShapeData = Geometry.CreateHollowCircle(pinhole.Radius, lineWidth);
             pinhole.LineWidth = lineWidth;
+            pinhole.ApplyChanges();
         }
 
         protected override void DrawTransition()

@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Relatus.Graphics
 {
-    internal struct SpriteData
+    public struct SpriteData
     {
         public int X { get; private set; }
         public int Y { get; private set; }
