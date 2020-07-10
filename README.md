@@ -1,2 +1,3 @@
-# mimoso
-morro but better
+# relatus
+
+a reimplementation of morro
