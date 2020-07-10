@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework.Content.Pipeline;
+using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler;
 using System;
 using System.Collections.Generic;
@@ -33,7 +33,7 @@ namespace Relatus.Content.Pipeline.BMFonts.Pipeline
 
         public override string GetRuntimeReader(TargetPlatform targetPlatform)
         {
-            return string.Format(CultureInfo.InvariantCulture, "Mimoso.Utilities.Readers.BMFontReader, Mimoso.{0}", targetPlatform.ToString());
+            return "Relatus.Utilities.Readers.BMFontReader, Relatus";
         }
     }
 }
