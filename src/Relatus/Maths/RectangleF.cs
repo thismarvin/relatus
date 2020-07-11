@@ -35,7 +35,7 @@ namespace Relatus.Maths
             return (Left >= rectangle.Left && Right <= rectangle.Right && Top >= rectangle.Top && Bottom <= rectangle.Bottom);
         }
 
-        public Vector2 GetResolution(Rectangle rectangle)
+        public Vector2 GetResolution(RectangleF rectangle)
         {
             Vector2[] aVertices = new Vector2[4]{
                 new Vector2(Left, Top),
