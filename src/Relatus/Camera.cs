@@ -49,7 +49,7 @@ namespace Relatus
 
         public Camera(string name) : this(0, 0, name)
         {
-
+            
         }
 
         public Camera(float x, float y, string name)

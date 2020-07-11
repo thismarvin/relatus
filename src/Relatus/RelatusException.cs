@@ -10,7 +10,7 @@ namespace Relatus
         {
         }
 
-        public RelatusException(string message) : base("Something went wrong within the Mimoso Engine.")
+        public RelatusException(string message) : base(message)
         {
         }
 

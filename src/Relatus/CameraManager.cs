@@ -35,9 +35,9 @@ namespace Relatus
         {
             cameras = new ResourceHandler<Camera>();
 
-            RegisterCamera(new Camera($"Morro_{CameraType.Static.ToString()}"));
-            RegisterCamera(new Camera($"Morro_{CameraType.TopLeftAlign.ToString()}"));
-            RegisterCamera(new Camera($"Morro_{CameraType.TopRightAlign.ToString()}"));
+            RegisterCamera(new Camera($"Relatus_{CameraType.Static}"));
+            RegisterCamera(new Camera($"Relatus_{CameraType.TopLeftAlign}"));
+            RegisterCamera(new Camera($"Relatus_{CameraType.TopRightAlign}"));
 
             WindowManager.WindowChanged += HandleWindowChange;
         }
@@ -69,7 +69,7 @@ namespace Relatus
         /// <returns>The registered camera with the given name.</returns>
         public static Camera GetCamera(CameraType cameraType)
         {
-            return GetCamera($"Morro_{cameraType.ToString()}");
+            return GetCamera($"Morro_{cameraType}");
         }
 
         /// <summary>

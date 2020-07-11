@@ -60,7 +60,7 @@ namespace Relatus.Graphics
             CreateText();
         }
 
-        public Text(float x, float y, string content, FontType fontType) : this(x, y, content, $"Morro_{fontType.ToString()}")
+        public Text(float x, float y, string content, FontType fontType) : this(x, y, content, $"Relatus_{fontType}")
         {
 
         }

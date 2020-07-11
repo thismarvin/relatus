@@ -69,7 +69,7 @@ namespace Relatus
         /// <returns>The registered shape data with the given name.</returns>
         public static GeometryData GetShapeData(ShapeType shapeType)
         {
-            return GetShapeData($"Morro_{shapeType.ToString()}");
+            return GetShapeData($"Relatus_{shapeType}");
         }
 
         /// <summary>

@@ -237,7 +237,7 @@ namespace Relatus.Graphics
         {
             if (transformChanged)
             {
-                throw new RelatusException("The polygon's transform was modified, but ApplyChanges() was never called.");
+                throw new RelatusException("The polygon's transform was modified, but ApplyChanges() was never called.", new MethodExpectedException());
             }
 
             spriteBatch.GraphicsDevice.RasterizerState = GraphicsManager.RasterizerState;
