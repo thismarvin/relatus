@@ -28,18 +28,22 @@ namespace Relatus
             Depth = 1;
         }
 
-        public virtual void SetPosition(float x, float y)
+        public virtual RelatusObject SetPosition(float x, float y)
         {
             X = x;
             Y = y;
+
+            return this;
         }
 
-        public virtual void SetBounds(float x, float y, int width, int height)
+        public virtual RelatusObject SetBounds(float x, float y, int width, int height)
         {
             X = x;
             Y = y;
             Width = width;
             Height = height;
+
+            return this;
         }
 
         public int CompareTo(RelatusObject relatusObject)

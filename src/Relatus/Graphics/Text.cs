@@ -65,14 +65,16 @@ namespace Relatus.Graphics
 
         }
 
-        public override void SetPosition(float x, float y)
+        public override RelatusObject SetPosition(float x, float y)
         {
             if (X == x && Y == y)
-                return;
+                return this;
 
             base.SetPosition(x, y);
 
             UpdateText();
+
+            return this;
         }
 
         public void SetContent(string content)
