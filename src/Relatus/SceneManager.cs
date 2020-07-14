@@ -31,7 +31,7 @@ namespace Relatus
         /// Register a <see cref="Scene"/> to be managed by Relatus.
         /// </summary>
         /// <param name="scene">The scene you want to be registered.</param>
-        public static void RegisterScene(Scene scene)
+        public static void Register(Scene scene)
         {
             scenes.Register(scene.Name, scene);
         }
@@ -41,7 +41,7 @@ namespace Relatus
         /// </summary>
         /// <param name="name">The name given to the scene that was previously registered.</param>
         /// <returns>The registered scene with the given name.</returns>
-        public static Scene GetScene(string name)
+        public static Scene Get(string name)
         {
             return scenes.Get(name);
         }
@@ -50,7 +50,7 @@ namespace Relatus
         /// Remove a registered <see cref="Scene"/>.
         /// </summary>
         /// <param name="name">The name given to the scene that was previously registered.</param>
-        public static void RemoveScene(string name)
+        public static void Remove(string name)
         {
             scenes.Remove(name);
         }
@@ -60,12 +60,12 @@ namespace Relatus
         /// Queue a <see cref="Scene"/>, and start the <see cref="Transition"/> between the current scene and the given scene.
         /// </summary>
         /// <param name="name">The name given to the scene that was previously registered.</param>
-        public static void QueueScene(string name)
+        public static void Queue(string name)
         {
             if (transitionInProgress)
                 return;
 
-            NextScene = GetScene(name);
+            NextScene = Get(name);
             SetupTransitions();
         }
 
@@ -86,14 +86,6 @@ namespace Relatus
             transitionInProgress = true;
         }
 
-        private static void UnloadCurrentScene()
-        {
-            if (CurrentScene == null)
-                return;
-
-            CurrentScene.UnloadScene();
-        }
-
         private static void LoadNextScene()
         {
             CurrentScene = NextScene;
@@ -112,7 +104,6 @@ namespace Relatus
                 {
                     LoadNextScene();
                     enterTransition.Begin();
-
                     exitCompleted = true;
                 }
                 else
@@ -121,13 +112,12 @@ namespace Relatus
 
                     if (exitTransition.Done)
                     {
-                        UnloadCurrentScene();
+                        CurrentScene?.UnloadScene();
                         exitTransition.Reset();
                         exitTransition = null;
 
                         LoadNextScene();
                         enterTransition.Begin();
-
                         exitCompleted = true;
                     }
                 }
@@ -142,17 +132,11 @@ namespace Relatus
                     {
                         enterTransition.Reset();
                         enterTransition = null;
-
                         transitionInProgress = false;
                         exitCompleted = false;
                     }
                 }
             }
-        }
-
-        private static void UpdateCurrentScene()
-        {
-            CurrentScene?.Update();
         }
 
         private static void DrawTransitions()
@@ -177,7 +161,7 @@ namespace Relatus
         internal static void Update()
         {
             UpdateTransitions();
-            UpdateCurrentScene();
+            CurrentScene?.Update();
 
             if (DebugManager.Debugging && Input.KeyboardExt.Pressed(Keys.R))
             {
