@@ -13,15 +13,14 @@ namespace Relatus
         /// The static camera will never move, and is used for drawing anything that must always be visible on the screen (e.g. menus, transitions, etc.).
         /// </summary>
         Static,
-
         /// <summary>
         /// The TopLeftAlign camera will also never move, but if WideScreenSupported is true, anything drawn will become top-left aligned to use the extra window space.
         /// </summary>
-        TopLeftAlign,
+        TopLeftAligned,
         /// <summary>
         /// The RightAlign camera will also never move, but if WideScreenSupported is true, anything drawn will become top-right aligned to use the extra window space.
         /// </summary>
-        TopRightAlign,
+        TopRightAligned,
     }
 
     /// <summary>
@@ -35,9 +34,9 @@ namespace Relatus
         {
             cameras = new ResourceHandler<Camera>();
 
-            RegisterCamera(new Camera($"Relatus_{CameraType.Static}"));
-            RegisterCamera(new Camera($"Relatus_{CameraType.TopLeftAlign}"));
-            RegisterCamera(new Camera($"Relatus_{CameraType.TopRightAlign}"));
+            Register(new Camera($"Relatus_{CameraType.Static}"));
+            Register(new Camera($"Relatus_{CameraType.TopLeftAligned}"));
+            Register(new Camera($"Relatus_{CameraType.TopRightAligned}"));
 
             WindowManager.WindowChanged += HandleWindowChange;
         }
@@ -47,7 +46,7 @@ namespace Relatus
         /// Register a <see cref="Camera"/> to be managed by Relatus.
         /// </summary>
         /// <param name="camera">The camera you want to be registered.</param>
-        public static void RegisterCamera(Camera camera)
+        public static void Register(Camera camera)
         {
             cameras.Register(camera.Name, camera);
         }
@@ -57,7 +56,7 @@ namespace Relatus
         /// </summary>
         /// <param name="name">The name given to the camera that was previously registered.</param>
         /// <returns>The registered camera with the given name.</returns>
-        public static Camera GetCamera(string name)
+        public static Camera Get(string name)
         {
             return cameras.Get(name);
         }
@@ -67,16 +66,16 @@ namespace Relatus
         /// </summary>
         /// <param name="cameraType">The basic camera you want to get.</param>
         /// <returns>The registered camera with the given name.</returns>
-        public static Camera GetCamera(CameraType cameraType)
+        public static Camera Get(CameraType cameraType)
         {
-            return GetCamera($"Relatus_{cameraType}");
+            return Get($"Relatus_{cameraType}");
         }
 
         /// <summary>
         /// Remove a registered <see cref="Camera"/>.
         /// </summary>
         /// <param name="name">The name given to the camera that was previously registered.</param>
-        public static void RemoveCamera(string name)
+        public static void Remove(string name)
         {
             cameras.Remove(name);
         }
@@ -99,16 +98,16 @@ namespace Relatus
         {
             if (WindowManager.WideScreenSupported)
             {
-                GetCamera(CameraType.TopLeftAlign).SetTopLeft(WindowManager.PillarBox, WindowManager.LetterBox);
-                GetCamera(CameraType.TopRightAlign).SetTopLeft(-WindowManager.PillarBox, -WindowManager.LetterBox);
+                Get(CameraType.TopLeftAligned).SetTopLeft(WindowManager.PillarBox, WindowManager.LetterBox);
+                Get(CameraType.TopRightAligned).SetTopLeft(-WindowManager.PillarBox, -WindowManager.LetterBox);
             }
             else
             {
-                GetCamera(CameraType.TopLeftAlign).SetTopLeft(0, 0);
-                GetCamera(CameraType.TopRightAlign).SetTopLeft(0, 0);
+                Get(CameraType.TopLeftAligned).SetTopLeft(0, 0);
+                Get(CameraType.TopRightAligned).SetTopLeft(0, 0);
             }
 
-            GetCamera(CameraType.Static).SetTopLeft(0, 0);
+            Get(CameraType.Static).SetTopLeft(0, 0);
         }
 
         private static void UpdateCameras()

@@ -112,8 +112,8 @@ namespace Relatus.Input
                 sceneLocation.Y = currentMouseState.Y / SceneManager.CurrentScene.Camera.Zoom + SceneManager.CurrentScene.Camera.TopLeft.Y - WindowManager.LetterBox;
             }
 
-            windowLocation.X = currentMouseState.X / CameraManager.GetCamera(CameraType.Static).Zoom - WindowManager.PillarBox;
-            windowLocation.Y = currentMouseState.Y / CameraManager.GetCamera(CameraType.Static).Zoom - WindowManager.LetterBox;
+            windowLocation.X = currentMouseState.X / CameraManager.Get(CameraType.Static).Zoom - WindowManager.PillarBox;
+            windowLocation.Y = currentMouseState.Y / CameraManager.Get(CameraType.Static).Zoom - WindowManager.LetterBox;
 
             DynamicBounds = new RectangleF(sceneLocation.X, sceneLocation.Y, 1, 1);
             StaticBounds = new RectangleF(windowLocation.X, windowLocation.Y, 1, 1);

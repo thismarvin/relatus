@@ -56,7 +56,7 @@ namespace Relatus
 
             Camera = new Camera(Name);
             Camera.SetMovementRestriction(0, 0, SceneBounds.Width, SceneBounds.Height);
-            CameraManager.RegisterCamera(Camera);
+            CameraManager.Register(Camera);
 
             EnterTransition = new Pinhole(TransitionType.Enter);
             ExitTransition = new Fade(TransitionType.Exit);

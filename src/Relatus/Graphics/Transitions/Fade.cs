@@ -78,7 +78,7 @@ namespace Relatus.Graphics.Transitions
 
         protected override void DrawTransition()
         {
-            fade.Draw(CameraManager.GetCamera(CameraType.Static));
+            fade.Draw(CameraManager.Get(CameraType.Static));
         }
     }
 }

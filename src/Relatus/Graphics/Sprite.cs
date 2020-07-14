@@ -118,7 +118,7 @@ namespace Relatus.Graphics
 
         public void Draw(CameraType cameraType)
         {
-            Draw(CameraManager.GetCamera(cameraType));
+            Draw(CameraManager.Get(cameraType));
         }
 
         public virtual void Draw(Camera camera)

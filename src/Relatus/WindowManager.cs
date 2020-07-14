@@ -347,7 +347,7 @@ namespace Relatus
         {
             if (!WideScreenSupported)
             {
-                polygonCollection.Draw(CameraManager.GetCamera(CameraType.Static));
+                polygonCollection.Draw(CameraManager.Get(CameraType.Static));
             }
         }
     }

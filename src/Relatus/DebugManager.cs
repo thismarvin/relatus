@@ -106,7 +106,7 @@ namespace Relatus
 
             foreach (DebugEntry debugEntry in debugEntries)
             {
-                debugEntry.Draw(CameraManager.GetCamera(CameraType.TopLeftAlign));
+                debugEntry.Draw(CameraManager.Get(CameraType.TopLeftAligned));
             }
         }
 

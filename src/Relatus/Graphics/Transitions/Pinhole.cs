@@ -73,7 +73,7 @@ namespace Relatus.Graphics.Transitions
 
         protected override void DrawTransition()
         {
-            pinhole.Draw(CameraManager.GetCamera(CameraType.Static));
+            pinhole.Draw(CameraManager.Get(CameraType.Static));
         }
     }
 }

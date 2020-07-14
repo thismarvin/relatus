@@ -32,7 +32,7 @@ namespace Relatus.Graphics
         internal Transition(TransitionType type, float velocity, float acceleration)
         {
             Type = type;
-            Camera = CameraManager.GetCamera(CameraType.Static);
+            Camera = CameraManager.Get(CameraType.Static);
 
             initialVelocity = velocity;
             this.velocity = initialVelocity;
