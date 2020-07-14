@@ -26,19 +26,19 @@ namespace Relatus
         {
             debugEntries = new ResourceHandler<DebugEntry>();
 
-            fps = new DebugEntry("Morro_FPS", "{0} FPS");
+            fps = new DebugEntry("Relatus_FPS", "{0} FPS");
             RegisterDebugEntry(fps);
 
-            scene = new DebugEntry("Morro_Scene", "SCENE: {0}");
+            scene = new DebugEntry("Relatus_Scene", "SCENE: {0}");
             RegisterDebugEntry(scene);
 
-            entity = new DebugEntry("Morro_Entities", "E: {0}");
+            entity = new DebugEntry("Relatus_Entities", "E: {0}");
             RegisterDebugEntry(entity);
         }
 
         #region Handle DebugEntries
         /// <summary>
-        /// Register a <see cref="DebugEntry"/> to be managed by Morro.
+        /// Register a <see cref="DebugEntry"/> to be managed by Relatus.
         /// </summary>
         /// <param name="debugEntry">The debug entry you want to register.</param>
         public static void RegisterDebugEntry(DebugEntry debugEntry)

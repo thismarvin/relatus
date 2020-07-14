@@ -147,7 +147,7 @@ namespace Relatus
         /// <returns>The loaded <see cref="BMFont"/> associated with the given name.</returns>
         public static BMFont GetFont(FontType fontType)
         {
-            return fonts.Get($"Morro_{fontType}");
+            return fonts.Get($"Relatus_{fontType}");
         }
 
         /// <summary>
@@ -174,8 +174,8 @@ namespace Relatus
             LoadEffect("BMFontShader", "Assets/Effects/BMFontShader");
             LoadEffect("PolygonShader", "Assets/Effects/Polygon");
 
-            LoadFont("Morro_Probity", "Assets/Fonts/probity");
-            LoadFont("Morro_Sparge", "Assets/Fonts/sparge");
+            LoadFont("Relatus_Probity", "Assets/Fonts/probity");
+            LoadFont("Relatus_Sparge", "Assets/Fonts/sparge");
         }
 
         internal static void UnloadContent()

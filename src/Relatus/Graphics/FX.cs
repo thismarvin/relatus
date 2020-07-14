@@ -6,7 +6,7 @@ using System.Text;
 namespace Relatus.Graphics
 {
     /// <summary>
-    /// All of the basic <see cref="FX"/>'s included with Morro.
+    /// All of the basic <see cref="FX"/>'s included with Relatus.
     /// </summary>
     public enum EffectType
     {
@@ -22,8 +22,8 @@ namespace Relatus.Graphics
     }
 
     /// <summary>
-    /// An abstraction of a helper class used to manage the parameters and logic of a custom registered <see cref="Microsoft.Xna.Framework.Graphics.Effect"/>. 
-    /// Refer to <see cref="Relatus.Graphics.EffectType"/> to see all implementations of this class by Morro.
+    /// An abstraction of a helper class used to manage the parameters and logic of a custom registered <see cref="Microsoft.Xna.Framework.Graphics.Effect"/>.
+    /// Refer to <see cref="Relatus.Graphics.EffectType"/> to see all implementations of this class by Relatus.
     /// </summary>
     public abstract class FX : IDisposable
     {

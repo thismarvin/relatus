@@ -28,7 +28,7 @@ namespace Relatus
 
         #region Handle Scenes
         /// <summary>
-        /// Register a <see cref="Scene"/> to be managed by Morro.
+        /// Register a <see cref="Scene"/> to be managed by Relatus.
         /// </summary>
         /// <param name="scene">The scene you want to be registered.</param>
         public static void RegisterScene(Scene scene)

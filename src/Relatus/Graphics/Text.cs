@@ -10,7 +10,7 @@ using System.Text;
 namespace Relatus.Graphics
 {
     /// <summary>
-    /// A handful of default <see cref="BMFont"/>'s included with Morro.
+    /// A handful of default <see cref="BMFont"/>'s included with Relatus.
     /// </summary>
     public enum FontType
     {

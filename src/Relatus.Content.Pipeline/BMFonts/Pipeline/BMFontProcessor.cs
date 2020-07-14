@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Relatus.Content.Pipeline.BMFonts.Pipeline
 {
-    [ContentProcessor(DisplayName = "BMFont Processor - Morro")]
+    [ContentProcessor(DisplayName = "BMFont Processor - Relatus")]
     class BMFontProcessor : ContentProcessor<BMFont, ProcessedBMFont>
     {
         public override ProcessedBMFont Process(BMFont input, ContentProcessorContext context)

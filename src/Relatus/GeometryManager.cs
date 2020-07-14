@@ -43,7 +43,7 @@ namespace Relatus
 
         #region Handle Shape Data
         /// <summary>
-        /// Register <see cref="GeometryData"/> to be managed by Morro.
+        /// Register <see cref="GeometryData"/> to be managed by Relatus.
         /// </summary>
         /// <param name="name">The name that the shape data being registered will be referenced as.</param>
         /// <param name="shapeData">The shape data you want to be registered.</param>
@@ -63,7 +63,7 @@ namespace Relatus
         }
 
         /// <summary>
-        /// Get <see cref="GeometryData"/> that was registered by Morro.
+        /// Get <see cref="GeometryData"/> that was registered by Relatus.
         /// </summary>
         /// <param name="shapeType">The basic shape data you want to get.</param>
         /// <returns>The registered shape data with the given name.</returns>
@@ -280,7 +280,7 @@ namespace Relatus
         {
             GeometryData shapeData = CreateRegularPolygon(3);
             shapeData.Managed = true;
-            RegisterShapeData("Morro_Triangle", shapeData);
+            RegisterShapeData("Relatus_Triangle", shapeData);
         }
 
         private static void RegisterRightTriangle()
@@ -300,7 +300,7 @@ namespace Relatus
                 true
             );
 
-            RegisterShapeData("Morro_RightTriangle", rightTriangleData);
+            RegisterShapeData("Relatus_RightTriangle", rightTriangleData);
         }
 
         private static void RegisterSquare()
@@ -322,14 +322,14 @@ namespace Relatus
                 true
             );
 
-            RegisterShapeData("Morro_Square", squareData);
+            RegisterShapeData("Relatus_Square", squareData);
         }
 
         private static void RegisterCircle()
         {
             GeometryData shapeData = CreateRegularPolygon(90);
             shapeData.Managed = true;
-            RegisterShapeData("Morro_Circle", shapeData);
+            RegisterShapeData("Relatus_Circle", shapeData);
         }
 
         private static void RegisterStar()
@@ -366,7 +366,7 @@ namespace Relatus
                 j++;
             }
 
-            RegisterShapeData("Morro_Star", new GeometryData(vertices.ToArray(), indices.ToArray(), true));
+            RegisterShapeData("Relatus_Star", new GeometryData(vertices.ToArray(), indices.ToArray(), true));
         }
     }
 }

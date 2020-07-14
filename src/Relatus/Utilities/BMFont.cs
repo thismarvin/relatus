@@ -84,7 +84,6 @@ namespace Relatus.Utilities
         {
             if (!characters.ContainsKey(character))
             {
-                //throw new MorroException("That character code was not included in the BMFont file.", new KeyNotFoundException());
                 return new BMFontCharacter(0, 0, 0, Size);
             }
 

@@ -69,7 +69,7 @@ namespace Relatus.Graphics
 
         /// <summary>
         /// Attaches an effect that will be applied to the entire upcoming layer
-        /// (refer to <see cref="EffectType"/> for all implementations of <see cref="FX"/> by Morro).
+        /// (refer to <see cref="EffectType"/> for all implementations of <see cref="FX"/> by Relatus).
         /// More than one effect can be attached to a Sketch at a time.
         /// Effects are applied in the same order as they are attached.
         /// This method should be called before <see cref="Begin()"/>.

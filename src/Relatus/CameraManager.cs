@@ -44,7 +44,7 @@ namespace Relatus
 
         #region Handle Cameras
         /// <summary>
-        /// Register a <see cref="Camera"/> to be managed by Morro.
+        /// Register a <see cref="Camera"/> to be managed by Relatus.
         /// </summary>
         /// <param name="camera">The camera you want to be registered.</param>
         public static void RegisterCamera(Camera camera)
@@ -63,13 +63,13 @@ namespace Relatus
         }
 
         /// <summary>
-        /// Get a <see cref="Camera"/> that was registered by Morro.
+        /// Get a <see cref="Camera"/> that was registered by Relatus.
         /// </summary>
         /// <param name="cameraType">The basic camera you want to get.</param>
         /// <returns>The registered camera with the given name.</returns>
         public static Camera GetCamera(CameraType cameraType)
         {
-            return GetCamera($"Morro_{cameraType}");
+            return GetCamera($"Relatus_{cameraType}");
         }
 
         /// <summary>

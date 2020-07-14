@@ -22,7 +22,7 @@ namespace Relatus
 
         #region Handle Sprite Data
         /// <summary>
-        /// Register new <see cref="SpriteData"/> to be managed by Morro.
+        /// Register new <see cref="SpriteData"/> to be managed by Relatus.
         /// </summary>
         /// <param name="name">The name the new sprite data should have.</param>
         /// <param name="x">The pixel coordinate's x-value, relative the spritesheet's top-left, that the sprite should start at.</param>
