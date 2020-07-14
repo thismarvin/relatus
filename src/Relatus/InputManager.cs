@@ -12,6 +12,7 @@ namespace Relatus
     /// </summary>
     public enum InputMode
     {
+        None,
         Keyboard,
         Controller
     }
@@ -22,19 +23,20 @@ namespace Relatus
     public static class InputManager
     {
         public static InputMode InputMode { get; internal set; }
-        public static InputHandler BasicInputHandler { get; private set; }
 
         private static readonly ResourceHandler<InputProfile> profiles;
 
         static InputManager()
         {
-            InputMode = InputMode.Keyboard;
+            InputMode = InputMode.None;
             profiles = new ResourceHandler<InputProfile>();
 
-            LoadProfiles();
-
-            BasicInputHandler = new InputHandler(PlayerIndex.One);
-            BasicInputHandler.LoadProfile("Basic");
+            //InputProfile basic = new InputProfile("Basic")
+            //    .RegisterMapping(new InputMapping("Up") { Keys = new Keys[] { Keys.W, Keys.Up }, GamepadButtons = new Buttons[] { Buttons.DPadUp, Buttons.LeftThumbstickUp, Buttons.RightThumbstickUp } })
+            //    .RegisterMapping(new InputMapping("Down") { Keys = new Keys[] { Keys.S, Keys.Down }, GamepadButtons = new Buttons[] { Buttons.DPadDown, Buttons.LeftThumbstickDown, Buttons.RightThumbstickDown } })
+            //    .RegisterMapping(new InputMapping("Left") { Keys = new Keys[] { Keys.A, Keys.Left }, GamepadButtons = new Buttons[] { Buttons.DPadLeft, Buttons.LeftThumbstickLeft, Buttons.RightThumbstickLeft } })
+            //    .RegisterMapping(new InputMapping("Right") { Keys = new Keys[] { Keys.D, Keys.Right }, GamepadButtons = new Buttons[] { Buttons.DPadRight, Buttons.LeftThumbstickRight, Buttons.RightThumbstickRight } })
+            //    .RegisterMapping(new InputMapping("Start") { Keys = new Keys[] { Keys.Enter }, GamepadButtons = new Buttons[] { Buttons.Start } });
         }
 
         #region Hangle Input Profiles
@@ -67,29 +69,10 @@ namespace Relatus
         }
         #endregion
 
-        private static void LoadProfiles()
-        {
-            SaveProfile(BasicInputProfile());
-        }
-
-        private static InputProfile BasicInputProfile()
-        {
-            InputProfile basic = new InputProfile("Basic")
-                .RegisterMapping(new InputMapping("Up") { Keys = new Keys[] { Keys.W, Keys.Up }, GamepadButtons = new Buttons[] { Buttons.DPadUp, Buttons.LeftThumbstickUp, Buttons.RightThumbstickUp } })
-                .RegisterMapping(new InputMapping("Down") { Keys = new Keys[] { Keys.S, Keys.Down }, GamepadButtons = new Buttons[] { Buttons.DPadDown, Buttons.LeftThumbstickDown, Buttons.RightThumbstickDown } })
-                .RegisterMapping(new InputMapping("Left") { Keys = new Keys[] { Keys.A, Keys.Left }, GamepadButtons = new Buttons[] { Buttons.DPadLeft, Buttons.LeftThumbstickLeft, Buttons.RightThumbstickLeft } })
-                .RegisterMapping(new InputMapping("Right") { Keys = new Keys[] { Keys.D, Keys.Right }, GamepadButtons = new Buttons[] { Buttons.DPadRight, Buttons.LeftThumbstickRight, Buttons.RightThumbstickRight } })
-                .RegisterMapping(new InputMapping("Start") { Keys = new Keys[] { Keys.Enter }, GamepadButtons = new Buttons[] { Buttons.Start } });
-
-            return basic;
-        }
-
         internal static void Update()
         {
             KeyboardExt.Update();
             MouseExt.Update();
-
-            BasicInputHandler.Update();
         }
     }
 }
