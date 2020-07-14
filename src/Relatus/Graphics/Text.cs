@@ -1,5 +1,4 @@
 using Microsoft.Xna.Framework;
-using Relatus.Graphics.Effects;
 using Relatus.Graphics.Palettes;
 using Relatus.Maths;
 using Relatus.Utilities;
@@ -115,9 +114,10 @@ namespace Relatus.Graphics
 
         public void SetStyling(Color textColor, Color outlineColor, Color aaColor)
         {
-            shader.SetTextColor(textColor);
-            shader.SetOutlineColor(outlineColor);
-            shader.SetAAColor(aaColor);
+            shader
+                .SetTextColor(textColor)
+                .SetOutlineColor(outlineColor)
+                .SetAAColor(aaColor);
         }
 
         private void CreateText()
