@@ -11,47 +11,46 @@ using System.Text;
 namespace Relatus
 {
     /// <summary>
-    /// The current orientation of the window.
-    /// </summary>
-    public enum OrientationType
-    {
-        Landscape,
-        Portrait
-    }
-
-    /// <summary>
     /// Maintains anything and everything related to the <see cref="GameWindow"/>, and provides functionality to safely manipulate the window.
     /// </summary>
     public static class WindowManager
     {
-        public static int PixelWidth { get; private set; }
-        public static int PixelHeight { get; private set; }
-        public static float Scale { get; private set; }
-        public static RectangleF Bounds { get; private set; }
-
-        public static int DisplayWidth { get; private set; }
-        public static int DisplayHeight { get; private set; }
-        public static int DefaultWindowWidth { get; private set; }
-        public static int DefaultWindowHeight { get; private set; }
-        public static int WindowWidth { get => Engine.Graphics.PreferredBackBufferWidth; }
-        public static int WindowHeight { get => Engine.Graphics.PreferredBackBufferHeight; }
-        public static RenderTarget2D RenderTarget { get; private set; }
-        public static OrientationType Orientation { get; private set; }
-        public static string Title { get; set; }
-        public static bool Fullscreen { get; private set; }
-        public static bool IsWideScreen { get; private set; }
-        public static bool WideScreenSupported { get; private set; }
-
         public static float FPS { get; private set; }
-
-        private static readonly Queue<float> sampleFPS;
-
+        public static bool Fullscreen { get; private set; }
         public static float LetterBox { get; private set; }
         public static float PillarBox { get; private set; }
+        public static int PixelHeight { get; private set; }
+        public static int PixelWidth { get; private set; }
+        public static float Scale { get; private set; }
+        public static bool WideScreenSupported { get; private set; }
 
-        private static AABB[] boxing;
+        public static float AspectRatio { get => GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.AspectRatio; }
+        /// <summary>
+        /// The width of the entire display/screen.
+        /// </summary>
+        public static int DisplayWidth { get => GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width; }
+        /// <summary>
+        /// The height of the entire display/screen.
+        /// </summary>
+        public static int DisplayHeight { get => GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height; }
+        public static bool IsWideScreen { get => GraphicsAdapter.DefaultAdapter.IsWideScreen; }
+        public static DisplayOrientation Orientation { get => Engine.Instance.Window.CurrentOrientation; }
+        public static string Title { get => Engine.Instance.Window.Title; }
+        public static GameWindow Window { get => Engine.Instance.Window; }
+        /// <summary>
+        /// The current height of the window.
+        /// </summary>
+        public static int WindowHeight { get => Engine.Graphics.PreferredBackBufferHeight; }
+        /// <summary>
+        /// The current width of the window.
+        /// </summary>
+        public static int WindowWidth { get => Engine.Graphics.PreferredBackBufferWidth; }
+
         private static readonly PolygonCollection polygonCollection;
-
+        private static readonly Queue<float> sampleFPS;
+        private static AABB[] boxing;
+        private static int defaultWindowWidth;
+        private static int defaultWindowHeight;
         private static bool manipulatingScreen;
 
         public static EventHandler<EventArgs> WindowChanged { get; set; }
@@ -68,7 +67,7 @@ namespace Relatus
             Engine.Instance.Window.ClientSizeChanged += HandleWindowResize;
 
             InitializeWindow();
-            SetTitle("morroEngine");
+            SetTitle("Relatus_Engine");
 
             /// When a MonoGame Windows Project application is fullscreen and the game's window has not been moved since startup,
             /// Microsoft.Xna.Framework.Input.Mouse.GetState().Y is offset unless the following line of code is included.
@@ -105,18 +104,18 @@ namespace Relatus
         /// <param name="windowHeight">The desired height of the window.</param>
         public static void SetDefaultWindowResolution(int windowWidth, int windowHeight)
         {
-            if (DefaultWindowWidth == windowWidth && DefaultWindowHeight == windowHeight)
+            if (defaultWindowWidth == windowWidth && defaultWindowHeight == windowHeight)
                 return;
 
 #if __IOS__ || __ANDROID__
             return;
 #else
-            DefaultWindowWidth = windowWidth;
-            DefaultWindowHeight = windowHeight;
+            defaultWindowWidth = windowWidth;
+            defaultWindowHeight = windowHeight;
 
             // Set Screen Dimensions.
-            Engine.Graphics.PreferredBackBufferWidth = DefaultWindowWidth;
-            Engine.Graphics.PreferredBackBufferHeight = DefaultWindowHeight;
+            Engine.Graphics.PreferredBackBufferWidth = defaultWindowWidth;
+            Engine.Graphics.PreferredBackBufferHeight = defaultWindowHeight;
 #endif
             Engine.Graphics.ApplyChanges();
 
@@ -129,8 +128,7 @@ namespace Relatus
         /// <param name="title">The title of the window.</param>
         public static void SetTitle(string title)
         {
-            Title = title;
-            Engine.Instance.Window.Title = Title;
+            Engine.Instance.Window.Title = title;
         }
 
         /// <summary>
@@ -171,15 +169,11 @@ namespace Relatus
             PixelWidth = 320;
             PixelHeight = 180;
 
-            DefaultWindowWidth = PixelWidth * 2;
-            DefaultWindowHeight = PixelHeight * 2;
-            DisplayWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
-            DisplayHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
+            defaultWindowWidth = PixelWidth * 2;
+            defaultWindowHeight = PixelHeight * 2;
 
-            Orientation = OrientationType.Landscape;
             Engine.Graphics.SupportedOrientations = DisplayOrientation.LandscapeLeft | DisplayOrientation.LandscapeRight;
 
-            IsWideScreen = GraphicsAdapter.DefaultAdapter.IsWideScreen;
             SetupOrientation();
             SetupBoxing();
 
@@ -188,8 +182,8 @@ namespace Relatus
             Engine.Graphics.PreferredBackBufferWidth = DisplayWidth;
             Engine.Graphics.PreferredBackBufferHeight = DisplayHeight;
 #else
-            Engine.Graphics.PreferredBackBufferWidth = DefaultWindowWidth;
-            Engine.Graphics.PreferredBackBufferHeight = DefaultWindowHeight;
+            Engine.Graphics.PreferredBackBufferWidth = defaultWindowWidth;
+            Engine.Graphics.PreferredBackBufferHeight = defaultWindowHeight;
 #endif
             Engine.Instance.IsFixedTimeStep = false;
             Engine.Graphics.SynchronizeWithVerticalRetrace = true;
@@ -201,17 +195,13 @@ namespace Relatus
 
         private static void SetupOrientation()
         {
-            Orientation = PixelWidth > PixelHeight ? OrientationType.Landscape : OrientationType.Portrait;
-
-            // Set Supported Orientations.
-            switch (Orientation)
+            if (PixelWidth > PixelHeight)
             {
-                case OrientationType.Landscape:
-                    Engine.Graphics.SupportedOrientations = DisplayOrientation.LandscapeLeft | DisplayOrientation.LandscapeRight;
-                    break;
-                case OrientationType.Portrait:
-                    Engine.Graphics.SupportedOrientations = DisplayOrientation.Portrait;
-                    break;
+                Engine.Graphics.SupportedOrientations = DisplayOrientation.LandscapeLeft | DisplayOrientation.LandscapeRight;
+            }
+            else
+            {
+                Engine.Graphics.SupportedOrientations = DisplayOrientation.Portrait | DisplayOrientation.PortraitDown;
             }
         }
 
@@ -236,7 +226,8 @@ namespace Relatus
 
             switch (Orientation)
             {
-                case OrientationType.Landscape:
+                case DisplayOrientation.LandscapeRight:
+                case DisplayOrientation.LandscapeLeft:
                     Scale = (float)WindowHeight / PixelHeight;
 
                     // Check if letterboxing is required.
@@ -246,7 +237,8 @@ namespace Relatus
                     }
                     break;
 
-                case OrientationType.Portrait:
+                case DisplayOrientation.Portrait:
+                case DisplayOrientation.PortraitDown:
                     Scale = (float)WindowWidth / PixelWidth;
 
                     // Check if letterboxing is required.
@@ -256,41 +248,12 @@ namespace Relatus
                     }
                     break;
             }
-
-            Bounds = new RectangleF(0, 0, PixelWidth, PixelHeight);
         }
 
         private static void CalculateBoxing()
         {
             LetterBox = (WindowHeight / Scale - PixelHeight) / 2;
             PillarBox = (WindowWidth / Scale - PixelWidth) / 2;
-        }
-
-        private static void CalculateRenderTarget()
-        {
-            RenderTarget?.Dispose();
-            RenderTarget = new RenderTarget2D(Engine.Graphics.GraphicsDevice, WindowWidth, WindowHeight);
-        }
-
-        private static void HandleResolutionChange()
-        {
-            CalculateScale();
-            CalculateBoxing();
-            CalculateRenderTarget();
-
-            RaiseWindowChangedEvent();
-        }
-
-        private static void ActivateFullScreen()
-        {
-            Engine.Graphics.PreferredBackBufferHeight = DisplayHeight;
-            Engine.Graphics.PreferredBackBufferWidth = DisplayWidth;
-        }
-
-        private static void DeactivateFullScreen()
-        {
-            Engine.Graphics.PreferredBackBufferHeight = DefaultWindowHeight;
-            Engine.Graphics.PreferredBackBufferWidth = DefaultWindowWidth;
         }
 
         private static void ToggleFullScreen()
@@ -300,15 +263,25 @@ namespace Relatus
             HandleFullscreenChange();
         }
 
+        private static void HandleResolutionChange()
+        {
+            CalculateScale();
+            CalculateBoxing();
+
+            RaiseWindowChangedEvent();
+        }
+
         private static void HandleFullscreenChange()
         {
             if (Fullscreen)
             {
-                ActivateFullScreen();
+                Engine.Graphics.PreferredBackBufferHeight = DisplayHeight;
+                Engine.Graphics.PreferredBackBufferWidth = DisplayWidth;
             }
             else
             {
-                DeactivateFullScreen();
+                Engine.Graphics.PreferredBackBufferHeight = defaultWindowHeight;
+                Engine.Graphics.PreferredBackBufferWidth = defaultWindowWidth;
             }
 
             Engine.Graphics.ToggleFullScreen();
@@ -335,7 +308,7 @@ namespace Relatus
             manipulatingScreen = false;
         }
 
-        private static void CalculateFPS()
+        private static void UpdateFPS()
         {
             if (Engine.DeltaTime != 0)
             {
@@ -367,7 +340,7 @@ namespace Relatus
         internal static void Update()
         {
             UpdateInput();
-            CalculateFPS();
+            UpdateFPS();
         }
 
         internal static void Draw()

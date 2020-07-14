@@ -9,8 +9,7 @@ namespace Relatus
     public class Engine : Game
     {
         public static GraphicsDeviceManager Graphics { get; private set; }
-        public static Engine Instance { get; private set; }
-        public static RenderTarget2D RenderTarget { get => WindowManager.RenderTarget; }
+        internal static Engine Instance { get; private set; }
         public static float DeltaTime { get; private set; }
         public static TimeSpan TotalGameTime { get; private set; }
 
