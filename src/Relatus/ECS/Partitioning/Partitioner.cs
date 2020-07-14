@@ -6,15 +6,6 @@ using System.Text;
 namespace Relatus.ECS
 {
     /// <summary>
-    /// A handful of <see cref="Partitioner{T}"/>'s that have been implemented within Morro.
-    /// </summary>
-    public enum PartitionerType
-    {
-        Bin,
-        Quadtree
-    }
-
-    /// <summary>
     /// An abstraction of a class that implements spatial partitioning capabilities.
     /// </summary>
     /// <typeparam name="T">The element stored within the partitioner.</typeparam>
