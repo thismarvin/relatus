@@ -1,3 +1,4 @@
+using Relatus.ECS;
 using Relatus.Graphics;
 using Relatus.Graphics.Transitions;
 using Relatus.Maths;
@@ -6,7 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Relatus.ECS
+namespace Relatus
 {
     /// <summary>
     /// An abstract class that represents a collection of data, logic, and content for a given environment.

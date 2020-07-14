@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Relatus.Utilities
+namespace Relatus
 {
     /// <summary>
     /// Counts down from a given duration. (Elapsed time is calculated using <see cref="GameTime"/>).
