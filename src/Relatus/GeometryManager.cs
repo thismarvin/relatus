@@ -31,7 +31,7 @@ namespace Relatus
 
         static GeometryManager()
         {
-            PolygonShader = AssetManager.GetEffect("PolygonShader").Clone();
+            PolygonShader = AssetManager.GetEffect("Relatus_PolygonShader").Clone();
             shapes = new ResourceHandler<GeometryData>();
 
             RegisterTriangle();

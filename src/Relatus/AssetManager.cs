@@ -162,17 +162,8 @@ namespace Relatus
 
         internal static void LoadContent()
         {
-            LoadEffect("Blur", "Assets/Effects/Blur");
-            LoadEffect("ChromaticAberration", "Assets/Effects/ChromaticAberration");
-            LoadEffect("Dither", "Assets/Effects/Dither");
-            LoadEffect("DropShadow", "Assets/Effects/DropShadow");
-            LoadEffect("Grayscale", "Assets/Effects/Grayscale");
-            LoadEffect("Invert", "Assets/Effects/Invert");
-            LoadEffect("Outline", "Assets/Effects/Outline");
-            LoadEffect("Palette", "Assets/Effects/Palette");
-            LoadEffect("Quantize", "Assets/Effects/Quantize");
-            LoadEffect("BMFontShader", "Assets/Effects/BMFontShader");
-            LoadEffect("PolygonShader", "Assets/Effects/Polygon");
+            LoadEffect("Relatus_BMFontShader", "Assets/Effects/BMFontShader");
+            LoadEffect("Relatus_PolygonShader", "Assets/Effects/Polygon");
 
             LoadFont("Relatus_Probity", "Assets/Fonts/probity");
             LoadFont("Relatus_Sparge", "Assets/Fonts/sparge");
