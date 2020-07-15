@@ -8,21 +8,6 @@ using System.Text;
 
 namespace Relatus.Graphics
 {
-    /// <summary>
-    /// A handful of default <see cref="BMFont"/>'s included with Relatus.
-    /// </summary>
-    public enum FontType
-    {
-        /// <summary>
-        /// An 8px tall bitmap font.
-        /// </summary>
-        Probity,
-        /// <summary>
-        /// A 16px tall bitmap font.
-        /// </summary>
-        Sparge,
-    }
-
     public class Text : RelatusObject, IDisposable
     {
         public string Content { get; private set; }
@@ -41,10 +26,10 @@ namespace Relatus.Graphics
 
         private readonly SpriteCollection spriteCollection;
 
-        public Text(float x, float y, string content, string fontName) : base(x, y, 1, 1)
+        public Text(float x, float y, string content, BMFont font) : base(x, y, 1, 1)
         {
             Content = content;
-            font = AssetManager.GetFont(fontName);
+            this.font = font;
             Scale = new Vector2(1, 1);
             transform = Matrix.Identity;
 
@@ -57,11 +42,6 @@ namespace Relatus.Graphics
             spriteCollection = new SpriteCollection();
 
             CreateText();
-        }
-
-        public Text(float x, float y, string content, FontType fontType) : this(x, y, content, $"Relatus_{fontType}")
-        {
-
         }
 
         public override RelatusObject SetPosition(float x, float y)
