@@ -15,9 +15,6 @@ namespace Relatus
         static SpriteManager()
         {
             spriteDataLookup = new ResourceHandler<SpriteData>();
-
-            RegisterSpriteData("Probity", 0, 0, 8, 8, "Probity");
-            RegisterSpriteData("Sparge", 0, 0, 16, 16, "Sparge");
         }
 
         #region Handle Sprite Data

@@ -141,16 +141,6 @@ namespace Relatus
         }
 
         /// <summary>
-        /// Get a <see cref="BMFont"/> that was already loaded into memory.
-        /// </summary>
-        /// <param name="fontType">The basic font type you want to get.</param>
-        /// <returns>The loaded <see cref="BMFont"/> associated with the given name.</returns>
-        public static BMFont GetFont(FontType fontType)
-        {
-            return fonts.Get($"Relatus_{fontType}");
-        }
-
-        /// <summary>
         /// Unload an already loaded <see cref="BMFont"/> from memory.
         /// </summary>
         /// <param name="name">The name assigned to a previously loaded font.</param>
@@ -166,7 +156,6 @@ namespace Relatus
             LoadEffect("Relatus_PolygonShader", "Assets/Effects/Polygon");
 
             LoadFont("Relatus_Probity", "Assets/Fonts/probity");
-            LoadFont("Relatus_Sparge", "Assets/Fonts/sparge");
         }
 
         internal static void UnloadContent()
