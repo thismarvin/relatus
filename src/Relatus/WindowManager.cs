@@ -224,29 +224,25 @@ namespace Relatus
         {
             Scale = 0;
 
-            switch (Orientation)
+            if (PixelWidth > PixelHeight)
             {
-                case DisplayOrientation.LandscapeRight:
-                case DisplayOrientation.LandscapeLeft:
-                    Scale = (float)WindowHeight / PixelHeight;
+                Scale = (float)WindowHeight / PixelHeight;
 
-                    // Check if letterboxing is required.
-                    if (PixelWidth * Scale > WindowWidth)
-                    {
-                        Scale = (float)WindowWidth / PixelWidth;
-                    }
-                    break;
-
-                case DisplayOrientation.Portrait:
-                case DisplayOrientation.PortraitDown:
+                // Check if letterboxing is required.
+                if (PixelWidth * Scale > WindowWidth)
+                {
                     Scale = (float)WindowWidth / PixelWidth;
+                }
+            }
+            else
+            {
+                Scale = (float)WindowWidth / PixelWidth;
 
-                    // Check if letterboxing is required.
-                    if (PixelHeight * Scale > WindowHeight)
-                    {
-                        Scale = (float)WindowHeight / PixelHeight;
-                    }
-                    break;
+                // Check if letterboxing is required.
+                if (PixelHeight * Scale > WindowHeight)
+                {
+                    Scale = (float)WindowHeight / PixelHeight;
+                }
             }
         }
 
