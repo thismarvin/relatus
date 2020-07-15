@@ -83,12 +83,12 @@ namespace Relatus
         #endregion
 
         /// <summary>
-        /// Sets <see cref="PolygonShader"/>'s "WorldViewProjection" parameter to the camera's <see cref="Camera.WorldViewProjection"/>.
+        /// Sets <see cref="PolygonShader"/>'s "WorldViewProjection" parameter to the camera's <see cref="Camera.WVP"/>.
         /// </summary>
         /// <param name="camera">The target camera.</param>
         public static void SetupPolygonShader(Camera camera)
         {
-            PolygonShader.Parameters["WorldViewProjection"].SetValue(camera.WorldViewProjection);
+            PolygonShader.Parameters["WorldViewProjection"].SetValue(camera.WVP);
         }
 
         /// <summary>
