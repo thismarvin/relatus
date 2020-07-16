@@ -39,7 +39,7 @@ namespace Relatus.Graphics.Transitions
             radius = (int)Camera.Bounds.Width > (int)Camera.Bounds.Height ? (int)Camera.Bounds.Width / 2 : (int)Camera.Bounds.Height / 2;
             radius += PADDING;
             pinhole.Radius = radius;
-            pinhole.SetCenter(Camera.Center.X, Camera.Center.Y);
+            //pinhole.SetCenter(Camera.Center.X, Camera.Center.Y);
             pinhole.ApplyChanges();
         }
 

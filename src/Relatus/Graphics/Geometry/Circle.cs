@@ -30,7 +30,7 @@ namespace Relatus.Graphics
         private float radius;
         private float lineWidth;
 
-        public Circle(float x, float y, float radius) : base(x, y, radius * 2, radius * 2)
+        public Circle(float x, float y, float radius) : base(x, y, 0, radius * 2, radius * 2)
         {
             this.radius = radius;
             AttachGeometry(GeometryManager.GetShapeData(ShapeType.Circle));

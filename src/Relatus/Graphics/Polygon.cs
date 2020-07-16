@@ -29,6 +29,15 @@ namespace Relatus.Graphics
                 transformChanged = true;
             }
         }
+        public float Z
+        {
+            get => z;
+            set
+            {
+                z = value;
+                transformChanged = true;
+            }
+        }
         public float Width
         {
             get => width;
@@ -104,16 +113,17 @@ namespace Relatus.Graphics
                 }
 
                 geometry = value;
+                transformChanged = true;
             }
         }
         #endregion
 
-        public Vector2 Position { get => new Vector2(X, Y); }
-        public Vector2 Center { get => new Vector2(X + Width / 2, Y + Height / 2); }
+        public Vector3 Position { get => new Vector3(X, Y, Z); }
         public RectangleF Bounds { get => new RectangleF(X, Y, Width, Height); }
 
         private float x;
         private float y;
+        private float z;
         private float width;
         private float height;
         private Color color;
@@ -138,10 +148,11 @@ namespace Relatus.Graphics
             spriteBatch = GraphicsManager.SpriteBatch;
         }
 
-        public Polygon(float x, float y, float width, float height)
+        public Polygon(float x, float y, float z, float width, float height)
         {
             this.x = x;
             this.y = y;
+            this.z = z;
             this.width = width;
             this.height = height;
 
@@ -162,19 +173,15 @@ namespace Relatus.Graphics
             return this;
         }
 
-        public virtual Polygon SetPosition(float x, float y)
+        public virtual Polygon SetPosition(float x, float y, float z)
         {
             this.x = x;
             this.y = y;
+            this.z = z;
 
             transformChanged = true;
 
             return this;
-        }
-
-        public virtual Polygon SetCenter(float x, float y)
-        {
-            return SetPosition(x - Width / 2, y - Height / 2);
         }
 
         public virtual Polygon SetBounds(float x, float y, float width, float height)
@@ -216,7 +223,7 @@ namespace Relatus.Graphics
 
         internal VertexTransformColor GetVertexTransformColor()
         {
-            return new VertexTransformColor(new CPosition(X, Y), new CDimension(Width, Height), new CTransform(Scale, Rotation, RotationOffset, Translation), new CColor(Color));
+            return new VertexTransformColor(new CPosition(X, Y, Z), new CDimension(Width, Height), new CTransform(Scale, Rotation, RotationOffset, Translation), new CColor(Color));
         }
 
         private void UpdateModelBuffer()

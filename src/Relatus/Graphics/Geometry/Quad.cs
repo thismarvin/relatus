@@ -18,7 +18,7 @@ namespace Relatus.Graphics
 
         private float lineWidth;
 
-        public Quad(float x, float y, float width, float height) : base(x, y, width, height)
+        public Quad(float x, float y, float width, float height) : base(x, y, 0, width, height)
         {
             AttachGeometry(GeometryManager.GetShapeData(ShapeType.Square));
             ApplyChanges();

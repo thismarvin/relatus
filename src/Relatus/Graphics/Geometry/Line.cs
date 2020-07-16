@@ -55,7 +55,7 @@ namespace Relatus.Graphics
 
             ProcessPoints();
 
-            line = new Polygon(x, y, width, height)
+            line = new Polygon(x, y, 0, width, height)
             {
                 Geometry = CreateShapeData()
             };
@@ -64,7 +64,7 @@ namespace Relatus.Graphics
         public Line(Vector2[] points)
         {
             lineWidth = 1;
-            line = new Polygon(x, y, width, height);
+            line = new Polygon(x, y, 0, width, height);
 
             SetPoints(points);
         }
