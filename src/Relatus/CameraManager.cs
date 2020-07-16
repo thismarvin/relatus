@@ -34,11 +34,9 @@ namespace Relatus
         {
             cameras = new ResourceHandler<Camera>();
 
-            Register(new Camera($"Relatus_{CameraType.Static}"));
-            Register(new Camera($"Relatus_{CameraType.TopLeftAligned}"));
-            Register(new Camera($"Relatus_{CameraType.TopRightAligned}"));
-
-            WindowManager.WindowChanged += HandleWindowChange;
+            Register(Camera.CreateOrthographic($"Relatus_{CameraType.Static}", WindowManager.PixelWidth, WindowManager.PixelHeight, 1, 17));
+            Register(Camera.CreateOrthographic($"Relatus_{CameraType.TopLeftAligned}", WindowManager.PixelWidth, WindowManager.PixelHeight, 1, 17));
+            Register(Camera.CreateOrthographic($"Relatus_{CameraType.TopRightAligned}", WindowManager.PixelWidth, WindowManager.PixelHeight, 1, 17));
         }
 
         #region Handle Cameras
@@ -81,47 +79,25 @@ namespace Relatus
         }
         #endregion
 
-        private static void HandleWindowChange(object sender, EventArgs e)
-        {
-            ResetCameras();
-        }
-
-        private static void ResetCameras()
-        {
-            foreach (Camera camera in cameras)
-            {
-                camera.Reset();
-            }
-        }
-
         private static void ManageManagedCameras()
         {
             if (WindowManager.WideScreenSupported)
             {
-                Get(CameraType.TopLeftAligned).SetTopLeft(WindowManager.PillarBox, WindowManager.LetterBox);
-                Get(CameraType.TopRightAligned).SetTopLeft(-WindowManager.PillarBox, -WindowManager.LetterBox);
+                Get(CameraType.TopLeftAligned).SetPosition(WindowManager.PillarBox, WindowManager.LetterBox, 1);
+                Get(CameraType.TopRightAligned).SetPosition(-WindowManager.PillarBox, -WindowManager.LetterBox, 1);
             }
             else
             {
-                Get(CameraType.TopLeftAligned).SetTopLeft(0, 0);
-                Get(CameraType.TopRightAligned).SetTopLeft(0, 0);
+                Get(CameraType.TopLeftAligned).SetPosition(0, 0, 1);
+                Get(CameraType.TopRightAligned).SetPosition(0, 0, 1);
             }
 
-            Get(CameraType.Static).SetTopLeft(0, 0);
-        }
-
-        private static void UpdateCameras()
-        {
-            foreach (Camera camera in cameras)
-            {
-                camera.Update();
-            }
+            Get(CameraType.Static).SetPosition(0, 0, 1);
         }
 
         internal static void Update()
         {
             ManageManagedCameras();
-            UpdateCameras();
         }
     }
 }
