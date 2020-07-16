@@ -15,10 +15,11 @@ namespace Relatus.ECS
 
         }
 
-        public CPosition(float x, float y)
+        public CPosition(float x, float y, float z)
         {
             X = x;
             Y = y;
+            Z = z;
         }
     }
 }
