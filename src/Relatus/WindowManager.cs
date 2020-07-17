@@ -210,10 +210,12 @@ namespace Relatus
 
             boxing = new AABB[]
             {
-                new AABB(-buffer, buffer + PixelHeight, PixelWidth + buffer * 2, buffer) { Color = Color.Black },
-                new AABB(-buffer, 0, PixelWidth + buffer * 2, buffer) { Color = Color.Black },
-                new AABB(-buffer, buffer + PixelHeight, buffer, PixelHeight + buffer * 2) { Color = Color.Black },
-                new AABB(PixelWidth, buffer + PixelHeight, buffer, PixelHeight + buffer * 2) { Color = Color.Black }
+                // Letter boxing.
+                new AABB(-PixelWidth * 0.5f - buffer, PixelHeight * 0.5f + buffer, PixelWidth + buffer * 2, buffer) { Color = Color.Black },
+                new AABB(-PixelWidth * 0.5f - buffer, -PixelHeight * 0.5f, PixelWidth + buffer * 2, buffer) { Color = Color.Black },
+                // Pillar boxing.
+                new AABB(-PixelWidth * 0.5f - buffer, PixelHeight * 0.5f + buffer, buffer, PixelHeight + buffer * 2) { Color = Color.Black },
+                new AABB(PixelWidth * 0.5f, PixelHeight * 0.5f + buffer, buffer, PixelHeight + buffer * 2) { Color = Color.Black }
             };
 
             polygonCollection.SetCollection(boxing);

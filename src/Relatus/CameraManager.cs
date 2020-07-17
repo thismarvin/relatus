@@ -37,8 +37,6 @@ namespace Relatus
             Register
             (
                 Camera.CreateOrthographic($"Relatus_{CameraType.Static}", WindowManager.WindowWidth / WindowManager.Scale, WindowManager.WindowHeight / WindowManager.Scale, 1, 17)
-                      .SetPosition(WindowManager.PixelWidth / 2, WindowManager.PixelHeight / 2, 1)
-                      .SetTarget(WindowManager.PixelWidth / 2, WindowManager.PixelHeight / 2, 0)
             );
 
             Register(Camera.CreateOrthographic($"Relatus_{CameraType.TopLeftAligned}", WindowManager.PixelWidth, WindowManager.PixelHeight, 1, 17));
@@ -106,8 +104,8 @@ namespace Relatus
             }
 
             Get(CameraType.Static)
-                .SetPosition(WindowManager.PixelWidth / 2, WindowManager.PixelHeight / 2, 1)
-                .SetTarget(WindowManager.PixelWidth / 2, WindowManager.PixelHeight / 2, 0);
+                .SetPosition(0, 0, 1)
+                .SetTarget(0, 0, 0);
         }
 
         internal static void Update()
