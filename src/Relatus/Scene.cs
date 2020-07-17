@@ -1,7 +1,6 @@
 using Relatus.ECS;
 using Relatus.Graphics;
 using Relatus.Graphics.Transitions;
-using Relatus.Maths;
 using Relatus.Utilities;
 using System;
 using System.Collections.Generic;

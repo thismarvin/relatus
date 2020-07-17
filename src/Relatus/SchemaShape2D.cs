@@ -1,7 +1,7 @@
 using Microsoft.Xna.Framework;
 using System;
 
-namespace Relatus.Maths
+namespace Relatus
 {
     internal struct SchemaShape2D : IShape2D
     {

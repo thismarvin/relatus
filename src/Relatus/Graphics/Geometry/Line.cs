@@ -1,5 +1,4 @@
 using Microsoft.Xna.Framework;
-using Relatus.Maths;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -120,8 +119,8 @@ namespace Relatus.Graphics
             float yRemapped;
             for (int i = 0; i < TotalPoints; i++)
             {
-                xRemapped = (float)MoreMaths.RemapRange(points[i].X, xMin, xMax, 0, 1);
-                yRemapped = (float)MoreMaths.RemapRange(points[i].Y, yMin, yMax, 0, 1);
+                xRemapped = (float)MathExt.RemapRange(points[i].X, xMin, xMax, 0, 1);
+                yRemapped = (float)MathExt.RemapRange(points[i].Y, yMin, yMax, 0, 1);
 
                 remappedPoints[i] = new Vector2(xRemapped, yRemapped);
             }

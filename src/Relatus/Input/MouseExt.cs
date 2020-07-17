@@ -1,6 +1,5 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
-using Relatus.Maths;
 using System;
 using System.Collections.Generic;
 using System.Text;

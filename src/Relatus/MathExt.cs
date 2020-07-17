@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Relatus.Maths
+namespace Relatus
 {
-    public static class MoreMaths
+    public static class MathExt
     {
         /// <summary>
         /// Given a number within a given range, remap said number to proportionally reflect a new range.

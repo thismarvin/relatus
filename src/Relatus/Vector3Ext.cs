@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Relatus.Maths
+namespace Relatus
 {
     public static class Vector3Ext
     {
