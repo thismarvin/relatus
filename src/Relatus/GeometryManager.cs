@@ -357,37 +357,37 @@ namespace Relatus
 
         private static void RegisterStar()
         {
-            //int totalVertices = 10;
-            //float angleIncrement = MathHelper.TwoPi / totalVertices;
-            //int totalTriangles = totalVertices - 2;
-            //int totalIndices = totalTriangles * 3;
+            int totalVertices = 10;
+            float angleIncrement = MathHelper.TwoPi / totalVertices;
+            int totalTriangles = totalVertices - 2;
+            int totalIndices = totalTriangles * 3;
 
-            //Vector3[] vertices = new Vector3[totalVertices];
-            //short[] indices = new short[totalIndices];
+            Vector3[] vertices = new Vector3[totalVertices];
+            short[] indices = new short[totalIndices];
 
-            //int alternate = 0;
+            int alternate = 0;
 
-            //for (int i = 0; i < totalVertices; i++)
-            //{
-            //    if (alternate++ % 2 == 0)
-            //    {
-            //        vertices[i] = new Vector3(0.5f + (float)Math.Cos(i * angleIncrement) * 0.25f, 0.5f + (float)Math.Sin(i * angleIncrement) * 0.25f, 0);
-            //    }
-            //    else
-            //    {
-            //        vertices[i] = new Vector3(0.5f + (float)Math.Cos(i * angleIncrement) * 0.5f, 0.5f + (float)Math.Sin(i * angleIncrement) * 0.5f, 0);
-            //    }
-            //}
+            for (int i = 0; i < totalVertices; i++)
+            {
+                if (alternate++ % 2 == 0)
+                {
+                    vertices[i] = new Vector3(0.5f + (float)Math.Cos(i * angleIncrement) * 0.25f, -0.5f + (float)Math.Sin(i * angleIncrement) * 0.25f, 0);
+                }
+                else
+                {
+                    vertices[i] = new Vector3(0.5f + (float)Math.Cos(i * angleIncrement) * 0.5f, -0.5f + (float)Math.Sin(i * angleIncrement) * 0.5f, 0);
+                }
+            }
 
-            //int j = 0;
-            //for (int i = 0; i < totalTriangles; i++)
-            //{
-            //    indices[j++] = 0;
-            //    indices[j++] = ((short)(i + 1));
-            //    indices[j++] = ((short)(i + 2));
-            //}
+            int j = 0;
+            for (int i = 0; i < totalTriangles; i++)
+            {
+                indices[j++] = 0;
+                indices[j++] = ((short)(i + 1));
+                indices[j++] = ((short)(i + 2));
+            }
 
-            //RegisterShapeData("Relatus_Star", new GeometryData(new Mesh(vertices, indices), true));
+            RegisterShapeData("Relatus_Star", new GeometryData(new Mesh(vertices, indices), true));
         }
     }
 }
