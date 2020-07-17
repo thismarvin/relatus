@@ -105,7 +105,7 @@ namespace Relatus
             WVP = world * view * projection;
             SpriteTransform = CreateTransform();
 
-            WindowManager.WindowChanged += HandleWindowResize;
+            WindowManager.WindowResize += HandleWindowResize;
         }
 
         internal void HandleWindowResize(object sender, EventArgs e)

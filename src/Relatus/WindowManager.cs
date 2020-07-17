@@ -52,10 +52,10 @@ namespace Relatus
         private static int defaultWindowHeight;
         private static bool manipulatingScreen;
 
-        public static EventHandler<EventArgs> WindowChanged { get; set; }
+        public static EventHandler<EventArgs> WindowResize { get; set; }
         private static void RaiseWindowChangedEvent()
         {
-            WindowChanged?.Invoke(null, EventArgs.Empty);
+            WindowResize?.Invoke(null, EventArgs.Empty);
         }
 
         static WindowManager()

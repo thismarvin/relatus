@@ -44,7 +44,7 @@ namespace Relatus
             Register(Camera.CreateOrthographic($"Relatus_{CameraType.TopLeftAligned}", WindowManager.PixelWidth, WindowManager.PixelHeight, 1, 17));
             Register(Camera.CreateOrthographic($"Relatus_{CameraType.TopRightAligned}", WindowManager.PixelWidth, WindowManager.PixelHeight, 1, 17));
 
-            WindowManager.WindowChanged += HandleWindowResize;
+            WindowManager.WindowResize += HandleWindowResize;
         }
 
         #region Handle Cameras
