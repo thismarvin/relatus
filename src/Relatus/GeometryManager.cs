@@ -101,30 +101,27 @@ namespace Relatus
             if (totalVertices <= 2)
                 throw new RelatusException("A polygon must have at least 3 vertices.", new ArgumentException());
 
-            List<Vector3> vertices = new List<Vector3>();
-            List<short> indices = new List<short>();
+            float angleIncrement = MathHelper.TwoPi / totalVertices;
             int totalTriangles = totalVertices - 2;
             int totalIndices = totalTriangles * 3;
-            float angleIncrement = MathHelper.TwoPi / totalVertices;
 
-            for (float i = MathHelper.TwoPi; i >= 0; i -= angleIncrement)
+            Vector3[] vertices = new Vector3[totalVertices];
+            short[] indices = new short[totalIndices];
+
+            for (int i = 0; i < totalVertices; i++)
             {
-                vertices.Add(new Vector3(0.5f + (float)Math.Cos(i) * 0.5f, 0.5f + (float)Math.Sin(i) * 0.5f, 0));
-
-                if (vertices.Count >= totalVertices)
-                    break;
+                vertices[i] = new Vector3(0.5f + (float)Math.Cos(i * angleIncrement) * 0.5f, -0.5f + (float)Math.Sin(i * angleIncrement) * 0.5f, 0);
             }
 
-            int j = 1;
-            for (int i = 0; i < totalIndices; i += 3)
+            int j = 0;
+            for (int i = 0; i < totalTriangles; i++)
             {
-                indices.Add(0);
-                indices.Add((short)(j + 1));
-                indices.Add((short)j);
-                j++;
+                indices[j++] = 0;
+                indices[j++] = ((short)(i + 1));
+                indices[j++] = ((short)(i + 2));
             }
 
-            return new GeometryData(vertices.ToArray(), indices.ToArray());
+            return new GeometryData(new Mesh(vertices, indices));
         }
 
         /// <summary>
@@ -141,13 +138,13 @@ namespace Relatus
                 throw new RelatusException("A polygon must have at least 3 vertices.", new ArgumentException());
 
             int initialTotalVertices = totalVertices;
-            int _totalVertices = initialTotalVertices * 2;
+
+            float angleIncrement = MathHelper.TwoPi / initialTotalVertices;
+            int actualTotalVertices = initialTotalVertices * 2;
             int totalTriangles = initialTotalVertices * 2;
             int totalIndices = totalTriangles * 3;
 
-            Vector3[] vertices = new Vector3[_totalVertices];
-
-            float angleIncrement = MathHelper.TwoPi / totalVertices;
+            Vector3[] vertices = new Vector3[actualTotalVertices];
 
             float theta;
             if (initialTotalVertices == 3)
@@ -163,27 +160,20 @@ namespace Relatus
 
             float scaledLineWidthX = (lineWidth / width) / (float)Math.Sin(theta);
             float scaledLineWidthY = (lineWidth / height) / (float)Math.Sin(theta);
-            int vertexIndex = 0;
 
-            for (float i = MathHelper.TwoPi; i >= 0; i -= angleIncrement)
+            for (int i = 0; i < initialTotalVertices; i++)
             {
-                vertices[vertexIndex++] = new Vector3(0.5f + (float)Math.Cos(i) * (0.5f - scaledLineWidthX), 0.5f + (float)Math.Sin(i) * (0.5f - scaledLineWidthY), 0);
-
-                if (vertexIndex >= vertices.Length / 2)
-                    break;
+                vertices[i] = new Vector3(0.5f + (float)Math.Cos(i * angleIncrement) * 0.5f, -0.5f + (float)Math.Sin(i * angleIncrement) * 0.5f, 0);
             }
 
-            for (float i = MathHelper.TwoPi; i >= 0; i -= angleIncrement)
+            for (int i = 0; i < initialTotalVertices; i++)
             {
-                vertices[vertexIndex++] = new Vector3(0.5f + (float)Math.Cos(i) * 0.5f, 0.5f + (float)Math.Sin(i) * 0.5f, 0);
-
-                if (vertexIndex >= vertices.Length)
-                    break;
+                vertices[initialTotalVertices + i] = new Vector3(0.5f + (float)Math.Cos(i * angleIncrement) * (0.5f - scaledLineWidthX), -0.5f + (float)Math.Sin(i * angleIncrement) * (0.5f - scaledLineWidthY), 0);
             }
 
-            short[] indices = CreateHollowIndices(_totalVertices, totalIndices);
+            short[] indices = CreateHollowIndices(actualTotalVertices, totalIndices);
 
-            return new GeometryData(vertices, indices);
+            return new GeometryData(new Mesh(vertices, indices));
         }
 
         /// <summary>
@@ -195,30 +185,38 @@ namespace Relatus
         /// <returns>Generated shape data of your hollow square.</returns>
         public static GeometryData CreateHollowSquare(float width, float height, float lineWidth)
         {
-            int initialTotalVertices = 4;
-            int totalVertices = initialTotalVertices * 2;
-            int totalTriangles = initialTotalVertices * 2;
-            int totalIndices = totalTriangles * 3;
-
             float scaledLineWidthX = lineWidth / width;
             float scaledLineWidthY = lineWidth / height;
 
-            Vector3[] vertices = new Vector3[]
-            {
-                new Vector3(scaledLineWidthX, scaledLineWidthY, 0),
-                new Vector3(scaledLineWidthX, 1 - scaledLineWidthY, 0),
-                new Vector3(1 - scaledLineWidthX, 1 - scaledLineWidthY, 0),
-                new Vector3(1 - scaledLineWidthX, scaledLineWidthY, 0),
+            return new GeometryData
+            (
+                new Mesh
+                (
+                    new Vector3[]
+                    {
+                        new Vector3(0, 0, 0),
+                        new Vector3(0, -1, 0),
+                        new Vector3(1, -1, 0),
+                        new Vector3(1, 0, 0),
 
-                new Vector3(0, 0, 0),
-                new Vector3(0, 1, 0),
-                new Vector3(1, 1, 0),
-                new Vector3(1, 0, 0),
-            };
-
-            short[] indices = CreateHollowIndices(totalVertices, totalIndices);
-
-            return new GeometryData(vertices, indices);
+                        new Vector3(scaledLineWidthX, -scaledLineWidthY, 0),
+                        new Vector3(scaledLineWidthX, -1 + scaledLineWidthY, 0),
+                        new Vector3(1 - scaledLineWidthX, -1 + scaledLineWidthY, 0),
+                        new Vector3(1 - scaledLineWidthX, -scaledLineWidthY, 0),
+                    },
+                    new short[]
+                    {
+                        0, 1, 4,
+                        1, 2, 5,
+                        2, 3, 6,
+                        3, 0, 7,
+                        4, 1, 5,
+                        5, 2, 6,
+                        6, 3, 7,
+                        7, 0, 4
+                    }
+                )
+            );
         }
 
         /// <summary>
@@ -242,44 +240,65 @@ namespace Relatus
 
         private static short[] CreateHollowIndices(int totalVertices, int totalIndices)
         {
+            if (totalVertices % 2 != 0)
+            {
+                throw new RelatusException("This algorithm will only work if the total amount of vertices is even.", new ArgumentException());
+            }
+
             short[] indices = new short[totalIndices];
+
+            int totalInitialVertices = totalVertices / 2;
             int i = 0;
             int j = 0;
-            for (; i < totalVertices / 2 - 1; i++)
+
+            for (; i < totalInitialVertices - 1; i++)
             {
-                indices[j] = (short)(i);
-                indices[j + 1] = (short)(i + (totalVertices / 2 + 1));
-                indices[j + 2] = (short)(i + (totalVertices / 2));
-                j += 3;
+                indices[j++] = (short)i;
+                indices[j++] = (short)(i + 1);
+                indices[j++] = (short)(totalInitialVertices + i);
             }
 
-            indices[j] = (short)(i);
-            indices[j + 1] = (short)(totalVertices / 2);
-            indices[j + 2] = (short)(i + (totalVertices / 2));
-            j += 3;
-            i++;
+            indices[j++] = (short)i++;
+            indices[j++] = 0;
+            indices[j++] = (short)(totalVertices - 1);
 
-            indices[j] = (short)(i);
-            indices[j + 1] = (short)(totalVertices / 2 - 1);
-            indices[j + 2] = (short)(i - (totalVertices / 2));
-            j += 3;
-            i++;
-
-            for (; i < totalVertices; i++)
+            i = 0;
+            for (; i < totalInitialVertices - 1; i++)
             {
-                indices[j] = (short)(i);
-                indices[j + 1] = (short)(i - (totalVertices / 2 + 1));
-                indices[j + 2] = (short)(i - (totalVertices / 2));
-                j += 3;
+                indices[j++] = (short)(totalInitialVertices + i);
+                indices[j++] = (short)(i + 1);
+                indices[j++] = (short)(totalInitialVertices + i + 1);
             }
+
+            indices[j++] = (short)(totalVertices - 1);
+            indices[j++] = 0;
+            indices[j++] = (short)(totalInitialVertices);
 
             return indices;
         }
 
         private static void RegisterTriangle()
         {
-            GeometryData shapeData = CreateRegularPolygon(3);
-            shapeData.Managed = true;
+            float cos30 = (float)Math.Sqrt(3) / 2;
+
+            GeometryData shapeData = new GeometryData
+            (
+                new Mesh
+                (
+                    new Vector3[]
+                    {
+                        new Vector3(1 - cos30, 0, 0),
+                        new Vector3(1 - cos30, -1, 0),
+                        new Vector3(1, -0.5f, 0),
+                    },
+                    new short[]
+                    {
+                        0, 1, 2
+                    }
+                ),
+                true
+            );
+
             RegisterShapeData("Relatus_Triangle", shapeData);
         }
 
@@ -287,16 +306,18 @@ namespace Relatus
         {
             GeometryData rightTriangleData = new GeometryData
             (
-                new Vector3[]
-                {
-                    new Vector3(0, 0, 0),
-                    new Vector3(1, 1, 0),
-                    new Vector3(0, 1, 0),
-                },
-                new short[]
-                {
-                    0, 1, 2,
-                },
+                new Mesh(
+                    new Vector3[]
+                    {
+                        new Vector3(0, 0, 0),
+                        new Vector3(0, -1, 0),
+                        new Vector3(1, -1, 0),
+                    },
+                    new short[]
+                    {
+                        0, 1, 2,
+                    }
+                ),
                 true
             );
 
@@ -307,18 +328,20 @@ namespace Relatus
         {
             GeometryData squareData = new GeometryData
             (
-                new Vector3[]
-                {
-                    new Vector3(0, 0, 0),
-                    new Vector3(0, -1, 0),
-                    new Vector3(1, -1, 0),
-                    new Vector3(1, 0, 0),
-                },
-                new short[]
-                {
-                    0, 1, 3,
-                    3, 1, 2
-                },
+                new Mesh(
+                    new Vector3[]
+                    {
+                        new Vector3(0, 0, 0),
+                        new Vector3(0, -1, 0),
+                        new Vector3(1, -1, 0),
+                        new Vector3(1, 0, 0),
+                    },
+                    new short[]
+                    {
+                        0, 1, 2,
+                        0, 2, 3
+                    }
+                ),
                 true
             );
 
@@ -334,39 +357,37 @@ namespace Relatus
 
         private static void RegisterStar()
         {
-            List<Vector3> vertices = new List<Vector3>();
-            List<short> indices = new List<short>();
-            int totalVertices = 10;
-            int totalTriangles = totalVertices - 2;
-            int totalIndices = totalTriangles * 3;
-            float angleIncrement = MathHelper.TwoPi / totalVertices;
-            int alternate = 0;
+            //int totalVertices = 10;
+            //float angleIncrement = MathHelper.TwoPi / totalVertices;
+            //int totalTriangles = totalVertices - 2;
+            //int totalIndices = totalTriangles * 3;
 
-            for (float i = MathHelper.TwoPi; i >= 0; i -= angleIncrement)
-            {
-                if (alternate++ % 2 == 0)
-                {
-                    vertices.Add(new Vector3(0.5f + (float)Math.Cos(i) * 0.25f, 0.5f + (float)Math.Sin(i) * 0.25f, 0));
-                }
-                else
-                {
-                    vertices.Add(new Vector3(0.5f + (float)Math.Cos(i) * 0.5f, 0.5f + (float)Math.Sin(i) * 0.5f, 0));
-                }
+            //Vector3[] vertices = new Vector3[totalVertices];
+            //short[] indices = new short[totalIndices];
 
-                if (vertices.Count >= totalVertices)
-                    break;
-            }
+            //int alternate = 0;
 
-            int j = 1;
-            for (int i = 0; i < totalIndices; i += 3)
-            {
-                indices.Add(0);
-                indices.Add((short)(j + 1));
-                indices.Add((short)j);
-                j++;
-            }
+            //for (int i = 0; i < totalVertices; i++)
+            //{
+            //    if (alternate++ % 2 == 0)
+            //    {
+            //        vertices[i] = new Vector3(0.5f + (float)Math.Cos(i * angleIncrement) * 0.25f, 0.5f + (float)Math.Sin(i * angleIncrement) * 0.25f, 0);
+            //    }
+            //    else
+            //    {
+            //        vertices[i] = new Vector3(0.5f + (float)Math.Cos(i * angleIncrement) * 0.5f, 0.5f + (float)Math.Sin(i * angleIncrement) * 0.5f, 0);
+            //    }
+            //}
 
-            RegisterShapeData("Relatus_Star", new GeometryData(vertices.ToArray(), indices.ToArray(), true));
+            //int j = 0;
+            //for (int i = 0; i < totalTriangles; i++)
+            //{
+            //    indices[j++] = 0;
+            //    indices[j++] = ((short)(i + 1));
+            //    indices[j++] = ((short)(i + 2));
+            //}
+
+            //RegisterShapeData("Relatus_Star", new GeometryData(new Mesh(vertices, indices), true));
         }
     }
 }
