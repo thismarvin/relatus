@@ -22,7 +22,6 @@ namespace Relatus
         public Matrix SpriteTransform { get; private set; }
 
         public RectangleF Bounds => new RectangleF(position.X, position.Y, width, height);
-        public Vector2 Center => new Vector2(position.X + width / 2, position.Y + height / 2);
 
         public Vector3 Position
         {
