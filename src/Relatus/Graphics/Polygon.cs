@@ -1,6 +1,5 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Relatus.ECS;
 using Relatus.Maths;
 using System;
 using System.Collections.Generic;
@@ -17,7 +16,8 @@ namespace Relatus.Graphics
             set
             {
                 x = value;
-                transformChanged = true;
+                modelChanged = true;
+                transformNeedsUpdating = true;
             }
         }
         public float Y
@@ -26,7 +26,8 @@ namespace Relatus.Graphics
             set
             {
                 y = value;
-                transformChanged = true;
+                modelChanged = true;
+                transformNeedsUpdating = true;
             }
         }
         public float Z
@@ -35,7 +36,8 @@ namespace Relatus.Graphics
             set
             {
                 z = value;
-                transformChanged = true;
+                modelChanged = true;
+                transformNeedsUpdating = true;
             }
         }
         public float Width
@@ -44,7 +46,8 @@ namespace Relatus.Graphics
             set
             {
                 width = value;
-                transformChanged = true;
+                modelChanged = true;
+                transformNeedsUpdating = true;
             }
         }
         public float Height
@@ -53,7 +56,8 @@ namespace Relatus.Graphics
             set
             {
                 height = value;
-                transformChanged = true;
+                modelChanged = true;
+                transformNeedsUpdating = true;
             }
         }
         public Color Color
@@ -62,7 +66,8 @@ namespace Relatus.Graphics
             set
             {
                 color = value;
-                transformChanged = true;
+                modelChanged = true;
+                transformNeedsUpdating = true;
             }
         }
         public virtual float Rotation
@@ -71,7 +76,8 @@ namespace Relatus.Graphics
             set
             {
                 rotation = value;
-                transformChanged = true;
+                modelChanged = true;
+                transformNeedsUpdating = true;
             }
         }
         public Vector2 RotationOffset
@@ -80,7 +86,8 @@ namespace Relatus.Graphics
             set
             {
                 rotationOffset = value;
-                transformChanged = true;
+                modelChanged = true;
+                transformNeedsUpdating = true;
             }
         }
         public Vector3 Translation
@@ -89,7 +96,8 @@ namespace Relatus.Graphics
             set
             {
                 translation = value;
-                transformChanged = true;
+                modelChanged = true;
+                transformNeedsUpdating = true;
             }
         }
         public Vector3 Scale
@@ -98,7 +106,8 @@ namespace Relatus.Graphics
             set
             {
                 scale = value;
-                transformChanged = true;
+                modelChanged = true;
+                transformNeedsUpdating = true;
             }
         }
 
@@ -107,18 +116,13 @@ namespace Relatus.Graphics
             get => geometry;
             set
             {
-                if (geometry != null && !geometry.Managed)
-                {
-                    geometry.Dispose();
-                }
-
-                geometry = value;
-                transformChanged = true;
+                AttachGeometry(value);
             }
         }
         #endregion
 
         public Vector3 Position { get => new Vector3(X, Y, Z); }
+        public Vector3 Center { get => new Vector3(X + Width / 2, Y + Height / 2, Z); }
         public RectangleF Bounds { get => new RectangleF(X, Y, Width, Height); }
 
         private float x;
@@ -135,40 +139,62 @@ namespace Relatus.Graphics
 
         private GeometryData geometry;
 
-        private bool transformChanged;
+        private bool geometryChanged;
+        private bool modelChanged;
         protected DynamicVertexBuffer modelBuffer;
         protected VertexBufferBinding[] vertexBufferBindings;
 
-        private static readonly SpriteBatch spriteBatch;
-
+        private bool transformNeedsUpdating;
         private Matrix transformCache;
 
+        private static readonly GraphicsDevice graphicsDevice;
         static Polygon()
         {
-            spriteBatch = GraphicsManager.SpriteBatch;
+            graphicsDevice = Engine.Graphics.GraphicsDevice;
         }
 
-        public Polygon(float x, float y, float z, float width, float height)
+        public Polygon()
         {
-            this.x = x;
-            this.y = y;
-            this.z = z;
-            this.width = width;
-            this.height = height;
-
             color = Color.White;
-            rotation = 0;
-            rotationOffset = Vector2.Zero;
-            translation = Vector3.Zero;
             scale = new Vector3(1);
 
+            transformNeedsUpdating = true;
             transformCache = Matrix.Identity;
+        }
+
+        public Polygon AttachGeometry(GeometryData geometry)
+        {
+            if (this.geometry != null && !this.geometry.Managed)
+            {
+                this.geometry.Dispose();
+            }
+
+            this.geometry = geometry;
+            geometryChanged = true;
+
+            return this;
         }
 
         public Polygon ApplyChanges()
         {
-            transformChanged = false;
-            UpdateModelBuffer();
+            if (!geometryChanged && !modelChanged)
+                return this;
+
+            if (modelChanged)
+            {
+                modelBuffer?.Dispose();
+                modelBuffer = new DynamicVertexBuffer(Engine.Graphics.GraphicsDevice, typeof(VertexTransformColor), 1, BufferUsage.WriteOnly);
+                modelBuffer.SetData(new VertexTransformColor[] { GetVertexTransformColor() });
+            }
+
+            vertexBufferBindings = new VertexBufferBinding[]
+            {
+                new VertexBufferBinding(Geometry.VertexBuffer),
+                new VertexBufferBinding(modelBuffer, 0, 1)
+            };
+
+            geometryChanged = false;
+            modelChanged = false;
 
             return this;
         }
@@ -179,7 +205,19 @@ namespace Relatus.Graphics
             this.y = y;
             this.z = z;
 
-            transformChanged = true;
+            modelChanged = true;
+            transformNeedsUpdating = true;
+
+            return this;
+        }
+
+        public virtual Polygon SetCenter(float x, float y)
+        {
+            this.x = x - Width / 2;
+            this.y = y + Height / 2;
+
+            modelChanged = true;
+            transformNeedsUpdating = true;
 
             return this;
         }
@@ -191,31 +229,23 @@ namespace Relatus.Graphics
             this.width = width;
             this.height = height;
 
-            transformChanged = true;
-
-            return this;
-        }
-
-        public Polygon AttachGeometry(GeometryData geometry)
-        {
-            this.geometry = geometry;
+            modelChanged = true;
+            transformNeedsUpdating = true;
 
             return this;
         }
 
         public Matrix CalculateTransform()
         {
-            if (transformCache == Matrix.Identity)
+            if (transformNeedsUpdating)
             {
+                transformNeedsUpdating = false;
+
                 transformCache =
                 Matrix.CreateScale(Width * Scale.X, Height * Scale.Y, 1 * Scale.Z) *
-
                 Matrix.CreateTranslation(-new Vector3(RotationOffset.X, RotationOffset.Y, 0)) *
                 Matrix.CreateRotationZ(Rotation) *
-
-                Matrix.CreateTranslation(X + Translation.X + RotationOffset.X, Y + Translation.Y + RotationOffset.Y, Translation.Z) *
-
-                Matrix.Identity;
+                Matrix.CreateTranslation(X + Translation.X + RotationOffset.X, Y + Translation.Y + RotationOffset.Y, Translation.Z);
             }
 
             return transformCache;
@@ -223,40 +253,29 @@ namespace Relatus.Graphics
 
         internal VertexTransformColor GetVertexTransformColor()
         {
-            return new VertexTransformColor(new CPosition(X, Y, Z), new CDimension(Width, Height), new CTransform(Scale, Rotation, RotationOffset, Translation), new CColor(Color));
-        }
+            Vector3 scale = new Vector3(Width * Scale.X, Height * Scale.Y, Scale.Z);
+            Vector3 translation = new Vector3(X + Translation.X, Y + Translation.Y, Z + Translation.Z);            
 
-        private void UpdateModelBuffer()
-        {
-            modelBuffer?.Dispose();
-
-            modelBuffer = new DynamicVertexBuffer(Engine.Graphics.GraphicsDevice, typeof(VertexTransformColor), 1, BufferUsage.WriteOnly);
-            modelBuffer.SetData(new VertexTransformColor[] { GetVertexTransformColor() });
-
-            vertexBufferBindings = new VertexBufferBinding[]
-            {
-                new VertexBufferBinding(Geometry.Geometry),
-                new VertexBufferBinding(modelBuffer, 0, 1)
-            };
+            return new VertexTransformColor(scale, RotationOffset, rotation, translation, Color);
         }
 
         public virtual void Draw(Camera camera)
         {
-            if (transformChanged)
+            if (geometryChanged || modelChanged)
             {
-                throw new RelatusException("The polygon's transform was modified, but ApplyChanges() was never called.", new MethodExpectedException());
+                throw new RelatusException("The polygon was modified, but ApplyChanges() was never called.", new MethodExpectedException());
             }
 
-            spriteBatch.GraphicsDevice.RasterizerState = GraphicsManager.RasterizerState;
-            spriteBatch.GraphicsDevice.SetVertexBuffers(vertexBufferBindings);
-            spriteBatch.GraphicsDevice.Indices = Geometry.Indices;
+            graphicsDevice.RasterizerState = GraphicsManager.RasterizerState;
+            graphicsDevice.SetVertexBuffers(vertexBufferBindings);
+            graphicsDevice.Indices = Geometry.IndexBuffer;
 
             GeometryManager.SetupPolygonShader(camera);
 
             foreach (EffectPass pass in GeometryManager.PolygonShader.Techniques[1].Passes)
             {
                 pass.Apply();
-                spriteBatch.GraphicsDevice.DrawInstancedPrimitives(PrimitiveType.TriangleList, 0, 0, Geometry.TotalTriangles, 1);
+                graphicsDevice.DrawInstancedPrimitives(PrimitiveType.TriangleList, 0, 0, Geometry.TotalTriangles, 1);
             }
         }
     }

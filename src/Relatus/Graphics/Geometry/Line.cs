@@ -55,18 +55,20 @@ namespace Relatus.Graphics
 
             ProcessPoints();
 
-            line = new Polygon(x, y, 0, width, height)
-            {
-                Geometry = CreateShapeData()
-            };
+            line = new Polygon()
+                .SetBounds(x, y, width, height)
+                .AttachGeometry(CreateShapeData());
         }
 
         public Line(Vector2[] points)
         {
-            lineWidth = 1;
-            line = new Polygon(x, y, 0, width, height);
+            this.points = points;
 
-            SetPoints(points);
+            ProcessPoints();
+
+            line = new Polygon()
+                .SetBounds(x, y, width, height)
+                .AttachGeometry(CreateShapeData());
         }
 
         public void SetPoints(Vector2[] points)
@@ -298,14 +300,16 @@ namespace Relatus.Graphics
 
         private GeometryData CreateShapeData()
         {
-            return new GeometryData(CreateVertices(), CreateIndices());
+            return new GeometryData(new Mesh(CreateVertices(), CreateIndices()));
         }
 
         private void UpdateShapeData()
         {
             ProcessPoints();
-            line.Geometry = CreateShapeData();
-            line.SetBounds(x, y, width, height);
+
+            line
+                .SetBounds(x, y, width, height)
+                .AttachGeometry(CreateShapeData());
         }
 
         public void Draw(Camera camera)
