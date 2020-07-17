@@ -2,7 +2,6 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Relatus.Graphics;
-using Relatus.Maths;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -211,10 +210,10 @@ namespace Relatus
 
             boxing = new AABB[]
             {
-                new AABB(-buffer, -buffer, PixelWidth + buffer * 2, buffer) { Color = Color.Black },
-                new AABB(-buffer, PixelHeight,PixelWidth + buffer * 2, buffer) { Color = Color.Black },
-                new AABB(-buffer, -buffer, buffer, PixelHeight + buffer * 2) { Color = Color.Black },
-                new AABB(PixelWidth, -buffer, buffer, PixelHeight + buffer * 2) { Color = Color.Black }
+                new AABB(-buffer, buffer + PixelHeight, PixelWidth + buffer * 2, buffer) { Color = Color.Black },
+                new AABB(-buffer, 0, PixelWidth + buffer * 2, buffer) { Color = Color.Black },
+                new AABB(-buffer, buffer + PixelHeight, buffer, PixelHeight + buffer * 2) { Color = Color.Black },
+                new AABB(PixelWidth, buffer + PixelHeight, buffer, PixelHeight + buffer * 2) { Color = Color.Black }
             };
 
             polygonCollection.SetCollection(boxing);

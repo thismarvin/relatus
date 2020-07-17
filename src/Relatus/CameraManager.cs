@@ -34,9 +34,17 @@ namespace Relatus
         {
             cameras = new ResourceHandler<Camera>();
 
-            Register(Camera.CreateOrthographic($"Relatus_{CameraType.Static}", WindowManager.PixelWidth, WindowManager.PixelHeight, 1, 17));
+            Register
+            (
+                Camera.CreateOrthographic($"Relatus_{CameraType.Static}", WindowManager.WindowWidth / WindowManager.Scale, WindowManager.WindowHeight / WindowManager.Scale, 1, 17)
+                      .SetPosition(WindowManager.PixelWidth / 2, WindowManager.PixelHeight / 2, 1)
+                      .SetTarget(WindowManager.PixelWidth / 2, WindowManager.PixelHeight / 2, 0)
+            );
+
             Register(Camera.CreateOrthographic($"Relatus_{CameraType.TopLeftAligned}", WindowManager.PixelWidth, WindowManager.PixelHeight, 1, 17));
             Register(Camera.CreateOrthographic($"Relatus_{CameraType.TopRightAligned}", WindowManager.PixelWidth, WindowManager.PixelHeight, 1, 17));
+
+            WindowManager.WindowChanged += HandleWindowResize;
         }
 
         #region Handle Cameras
@@ -79,6 +87,11 @@ namespace Relatus
         }
         #endregion
 
+        private static void HandleWindowResize(object sender, EventArgs e)
+        {
+            Get(CameraType.Static).SetBounds(WindowManager.WindowWidth / WindowManager.Scale, WindowManager.WindowHeight / WindowManager.Scale);
+        }
+
         private static void ManageManagedCameras()
         {
             if (WindowManager.WideScreenSupported)
@@ -92,7 +105,9 @@ namespace Relatus
                 Get(CameraType.TopRightAligned).SetPosition(0, 0, 1);
             }
 
-            Get(CameraType.Static).SetPosition(0, 0, 1);
+            Get(CameraType.Static)
+                .SetPosition(WindowManager.PixelWidth / 2, WindowManager.PixelHeight / 2, 1)
+                .SetTarget(WindowManager.PixelWidth / 2, WindowManager.PixelHeight / 2, 0);
         }
 
         internal static void Update()
