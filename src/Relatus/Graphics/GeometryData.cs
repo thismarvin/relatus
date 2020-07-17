@@ -9,24 +9,26 @@ namespace Relatus.Graphics
     public class GeometryData : IDisposable
     {
         internal bool Managed { get; set; }
-        public VertexBuffer Geometry { get; private set; }
-        public IndexBuffer Indices { get; private set; }        
-        public Vector3[] Vertices { get; private set; }
-        public int TotalTriangles { get => Indices.IndexCount / 3; }
-        public int TotalVertices { get => Geometry.VertexCount; }
-        
-        public GeometryData(Vector3[] vertices, short[] indices)
-        {
-            Geometry = new VertexBuffer(Engine.Graphics.GraphicsDevice, typeof(VertexPosition), vertices.Length, BufferUsage.WriteOnly);
-            Geometry.SetData(vertices);
 
-            Indices = new IndexBuffer(Engine.Graphics.GraphicsDevice, typeof(short), indices.Length, BufferUsage.WriteOnly);
-            Indices.SetData(indices);
-            
-            Vertices = vertices;
+        public Mesh Mesh { get; private set; }
+        public VertexBuffer VertexBuffer { get; private set; }
+        public IndexBuffer IndexBuffer { get; private set; }
+
+        public int TotalTriangles => IndexBuffer.IndexCount / 3;
+        public int TotalVertices => VertexBuffer.VertexCount;
+
+        public GeometryData(Mesh mesh)
+        {
+            Mesh = mesh;
+
+            VertexBuffer = new VertexBuffer(Engine.Graphics.GraphicsDevice, typeof(VertexPosition), mesh.TotalVertices, BufferUsage.WriteOnly);
+            VertexBuffer.SetData(mesh.Vertices);
+
+            IndexBuffer = new IndexBuffer(Engine.Graphics.GraphicsDevice, typeof(short), mesh.TotalIndices, BufferUsage.WriteOnly);
+            IndexBuffer.SetData(mesh.Indices);
         }
 
-        internal GeometryData(Vector3[] vertices, short[] indices, bool managed) : this(vertices, indices)
+        internal GeometryData(Mesh mesh, bool managed) : this(mesh)
         {
             Managed = managed;
         }
@@ -40,8 +42,8 @@ namespace Relatus.Graphics
             {
                 if (disposing)
                 {
-                    Geometry.Dispose();
-                    Indices.Dispose();
+                    VertexBuffer.Dispose();
+                    IndexBuffer.Dispose();
                 }
 
                 // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
