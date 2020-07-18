@@ -66,7 +66,10 @@ namespace Relatus.Graphics.Transitions
                     }
                     break;
             }
+        }
 
+        protected override void AfterUpdate()
+        {
             fadeColor = defaultColor * alpha;
             fade.Color = fadeColor;
             fade.ApplyChanges();
@@ -75,6 +78,11 @@ namespace Relatus.Graphics.Transitions
         protected override void DrawTransition()
         {
             fade.Draw(CameraManager.Get(CameraType.Static));
+        }
+
+        protected override void OnDispose()
+        {
+            fade.Dispose();
         }
     }
 }

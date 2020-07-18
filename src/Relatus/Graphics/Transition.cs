@@ -121,9 +121,25 @@ namespace Relatus.Graphics
         #region IDisposable Support
         protected bool disposedValue = false; // To detect redundant calls
 
-        protected virtual void Dispose(bool disposing)
+        protected virtual void OnDispose()
         {
 
+        }
+
+        private void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    OnDispose();
+                }
+
+                // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
+                // TODO: set large fields to null.
+
+                disposedValue = true;
+            }
         }
 
         // TODO: override a finalizer only if Dispose(bool disposing) above has code to free unmanaged resources.
