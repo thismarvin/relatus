@@ -21,11 +21,11 @@ namespace Relatus.Graphics
         {
             Mesh = mesh;
 
-            VertexBuffer = new VertexBuffer(Engine.Graphics.GraphicsDevice, typeof(VertexPosition), mesh.TotalVertices, BufferUsage.WriteOnly);
-            VertexBuffer.SetData(mesh.Vertices);
+            VertexBuffer = new VertexBuffer(Engine.Graphics.GraphicsDevice, typeof(VertexPosition), Mesh.Vertices.Length, BufferUsage.WriteOnly);
+            VertexBuffer.SetData(Mesh.Vertices);
 
-            IndexBuffer = new IndexBuffer(Engine.Graphics.GraphicsDevice, typeof(short), mesh.TotalIndices, BufferUsage.WriteOnly);
-            IndexBuffer.SetData(mesh.Indices);
+            IndexBuffer = new IndexBuffer(Engine.Graphics.GraphicsDevice, typeof(short), Mesh.Indices.Length, BufferUsage.WriteOnly);
+            IndexBuffer.SetData(Mesh.Indices);
         }
 
         internal GeometryData(Mesh mesh, bool managed) : this(mesh)

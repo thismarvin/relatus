@@ -10,9 +10,6 @@ namespace Relatus.Graphics
         public Vector3[] Vertices { get; private set; }
         public short[] Indices { get; private set; }
 
-        public int TotalVertices => Vertices.Length;
-        public int TotalIndices => Indices.Length; 
-
         public Mesh(Vector3[] vertices, short[] indices)
         {
             Vertices = vertices;
