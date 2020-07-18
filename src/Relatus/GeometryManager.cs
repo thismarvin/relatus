@@ -241,9 +241,7 @@ namespace Relatus
         private static short[] CreateHollowIndices(int totalVertices, int totalIndices)
         {
             if (totalVertices % 2 != 0)
-            {
                 throw new RelatusException("This algorithm will only work if the total amount of vertices is even.", new ArgumentException());
-            }
 
             short[] indices = new short[totalIndices];
 
