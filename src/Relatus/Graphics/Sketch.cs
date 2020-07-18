@@ -8,7 +8,9 @@ namespace Relatus.Graphics
 {
     public static class Sketch
     {
+        private static readonly GraphicsDevice graphicsDevice;
         private static readonly SpriteBatch spriteBatch;
+
         private static readonly Queue<Effect> shaders;
         private static RenderTarget2D accumulation;
         private static RenderTarget2D result;
@@ -18,7 +20,9 @@ namespace Relatus.Graphics
 
         static Sketch()
         {
+            graphicsDevice = Engine.Graphics.GraphicsDevice;
             spriteBatch = GraphicsManager.SpriteBatch;
+
             shaders = new Queue<Effect>();
         }
 
@@ -35,15 +39,15 @@ namespace Relatus.Graphics
                 throw new RelatusException("CreateBackgroundLayer(spriteBatch, color) must be independent of any other Sketch calls.", new MethodOrderException());
 
             // Initialize a RenderTarget2D to accumulate all spriteBatch draw calls.
-            accumulation = new RenderTarget2D(spriteBatch.GraphicsDevice, WindowManager.WindowWidth, WindowManager.WindowHeight);
+            accumulation = new RenderTarget2D(graphicsDevice, WindowManager.WindowWidth, WindowManager.WindowHeight);
 
             // Setup the GraphicsDevice with the new accumulation RenderTarget2D.
-            spriteBatch.GraphicsDevice.SetRenderTarget(accumulation);
-            spriteBatch.GraphicsDevice.Clear(color);
+            graphicsDevice.SetRenderTarget(accumulation);
+            graphicsDevice.Clear(color);
 
             // Reset the GraphicsDevice's RenderTarget.
-            spriteBatch.GraphicsDevice.SetRenderTarget(null);
-            spriteBatch.GraphicsDevice.Clear(Color.Transparent);
+            graphicsDevice.SetRenderTarget(null);
+            graphicsDevice.Clear(Color.Transparent);
 
             // Relay the final RenderTarget2D to be drawn by the LayerManager.
             SketchManager.AddSketch(accumulation);
@@ -122,11 +126,11 @@ namespace Relatus.Graphics
                 throw new RelatusException("Begin(spriteBatch) must be called before End(spriteBatch).", new MethodOrderException());
 
             // Initialize a RenderTarget2D to accumulate all spriteBatch draw calls.
-            accumulation = new RenderTarget2D(spriteBatch.GraphicsDevice, WindowManager.WindowWidth, WindowManager.WindowHeight);
+            accumulation = new RenderTarget2D(graphicsDevice, WindowManager.WindowWidth, WindowManager.WindowHeight);
 
             // Setup the GraphicsDevice with the new accumulation RenderTarget2D.
-            spriteBatch.GraphicsDevice.SetRenderTarget(accumulation);
-            spriteBatch.GraphicsDevice.Clear(clearColor);
+            graphicsDevice.SetRenderTarget(accumulation);
+            graphicsDevice.Clear(clearColor);
             clearColor = Color.Transparent;
         }
 
@@ -143,7 +147,7 @@ namespace Relatus.Graphics
                 throw new RelatusException("End(spriteBatch) must be called after Begin(spriteBatch).", new MethodOrderException());
 
             // Reset the GraphicsDevice's RenderTarget.
-            spriteBatch.GraphicsDevice.SetRenderTarget(null);
+            graphicsDevice.SetRenderTarget(null);
 
             if (shaders.Count > 0)
             {
@@ -151,7 +155,7 @@ namespace Relatus.Graphics
                 RenderTarget2D[] renderTargets = new RenderTarget2D[shaders.Count];
                 for (int i = 0; i < renderTargets.Length; i++)
                 {
-                    renderTargets[i] = new RenderTarget2D(spriteBatch.GraphicsDevice, WindowManager.WindowWidth, WindowManager.WindowHeight);
+                    renderTargets[i] = new RenderTarget2D(graphicsDevice, WindowManager.WindowWidth, WindowManager.WindowHeight);
                 }
 
                 int totalShaders = shaders.Count;
@@ -163,8 +167,8 @@ namespace Relatus.Graphics
                     shader = shaders.Dequeue();
 
                     // Setup the GraphicsDevice with the current RenderTarget2D.
-                    spriteBatch.GraphicsDevice.SetRenderTarget(renderTargets[i]);
-                    spriteBatch.GraphicsDevice.Clear(Color.Transparent);
+                    graphicsDevice.SetRenderTarget(renderTargets[i]);
+                    graphicsDevice.Clear(Color.Transparent);
 
                     // Apply the shader.
                     spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, shader, null);
@@ -178,11 +182,11 @@ namespace Relatus.Graphics
                 }
 
                 // Initialize a RenderTarget2D to capture the result of all the shaders.
-                result = new RenderTarget2D(spriteBatch.GraphicsDevice, WindowManager.WindowWidth, WindowManager.WindowHeight);
+                result = new RenderTarget2D(graphicsDevice, WindowManager.WindowWidth, WindowManager.WindowHeight);
 
                 // Setup the GraphicsDevice with the result RenderTarget2D.
-                spriteBatch.GraphicsDevice.SetRenderTarget(result);
-                spriteBatch.GraphicsDevice.Clear(Color.Transparent);
+                graphicsDevice.SetRenderTarget(result);
+                graphicsDevice.Clear(Color.Transparent);
 
                 spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null, null);
                 {
@@ -198,7 +202,7 @@ namespace Relatus.Graphics
                 accumulation.Dispose();
 
                 // Reset the GraphicsDevice's RenderTarget.
-                spriteBatch.GraphicsDevice.SetRenderTarget(null);
+                graphicsDevice.SetRenderTarget(null);
 
                 // Relay the final RenderTarget2D to be drawn by the LayerManager.
                 if (!disableRelay)
