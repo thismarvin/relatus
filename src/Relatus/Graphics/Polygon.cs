@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Relatus.Graphics
 {
-    public class Polygon
+    public class Polygon : IDisposable
     {
         #region Properties
         public float X
@@ -14,6 +14,9 @@ namespace Relatus.Graphics
             get => x;
             set
             {
+                if (x == value)
+                    return;
+
                 x = value;
                 modelChanged = true;
                 transformNeedsUpdating = true;
@@ -24,6 +27,9 @@ namespace Relatus.Graphics
             get => y;
             set
             {
+                if (y == value)
+                    return;
+
                 y = value;
                 modelChanged = true;
                 transformNeedsUpdating = true;
@@ -34,6 +40,9 @@ namespace Relatus.Graphics
             get => z;
             set
             {
+                if (z == value)
+                    return;
+
                 z = value;
                 modelChanged = true;
                 transformNeedsUpdating = true;
@@ -44,6 +53,9 @@ namespace Relatus.Graphics
             get => width;
             set
             {
+                if (width == value)
+                    return;
+
                 width = value;
                 modelChanged = true;
                 transformNeedsUpdating = true;
@@ -54,6 +66,9 @@ namespace Relatus.Graphics
             get => height;
             set
             {
+                if (height == value)
+                    return;
+
                 height = value;
                 modelChanged = true;
                 transformNeedsUpdating = true;
@@ -64,6 +79,9 @@ namespace Relatus.Graphics
             get => color;
             set
             {
+                if (color == value)
+                    return;
+
                 color = value;
                 modelChanged = true;
                 transformNeedsUpdating = true;
@@ -74,6 +92,9 @@ namespace Relatus.Graphics
             get => rotation;
             set
             {
+                if (rotation == value)
+                    return;
+
                 rotation = value;
                 modelChanged = true;
                 transformNeedsUpdating = true;
@@ -84,6 +105,9 @@ namespace Relatus.Graphics
             get => rotationOffset;
             set
             {
+                if (rotationOffset == value)
+                    return;
+
                 rotationOffset = value;
                 modelChanged = true;
                 transformNeedsUpdating = true;
@@ -94,6 +118,9 @@ namespace Relatus.Graphics
             get => translation;
             set
             {
+                if (translation == value)
+                    return;
+
                 translation = value;
                 modelChanged = true;
                 transformNeedsUpdating = true;
@@ -104,6 +131,9 @@ namespace Relatus.Graphics
             get => scale;
             set
             {
+                if (scale == value)
+                    return;
+
                 scale = value;
                 modelChanged = true;
                 transformNeedsUpdating = true;
@@ -120,9 +150,24 @@ namespace Relatus.Graphics
         }
         #endregion
 
-        public Vector3 Position { get => new Vector3(X, Y, Z); }
-        public Vector3 Center { get => new Vector3(X + Width / 2, Y + Height / 2, Z); }
-        public RectangleF Bounds { get => new RectangleF(X, Y, Width, Height); }
+        public Vector3 Position
+        {
+            get => new Vector3(x, y, z);
+            set => SetPosition(value.X, value.Y, value.Z);
+        }
+
+        // I just want to note that although this is a Vector3, it is really treated like a Vector2.
+        public Vector3 Center
+        {
+            get => new Vector3(x + width / 2, y + height / 2, z);
+            set => SetCenter(value.X, value.Y);
+        }
+
+        public RectangleF Bounds
+        {
+            get => new RectangleF(x, y, width, height);
+            set => SetBounds(value.X, value.Y, value.Width, value.Height);
+        }
 
         private float x;
         private float y;
@@ -130,21 +175,18 @@ namespace Relatus.Graphics
         private float width;
         private float height;
         private Color color;
-
         private float rotation;
         private Vector2 rotationOffset;
         private Vector3 translation;
         private Vector3 scale;
 
         private GeometryData geometry;
-
         private bool geometryChanged;
         private bool modelChanged;
-        protected DynamicVertexBuffer modelBuffer;
-        protected VertexBufferBinding[] vertexBufferBindings;
-
         private bool transformNeedsUpdating;
         private Matrix transformCache;
+        private DynamicVertexBuffer modelBuffer;
+        private VertexBufferBinding[] vertexBufferBindings;
 
         private static readonly GraphicsDevice graphicsDevice;
         static Polygon()
@@ -163,6 +205,9 @@ namespace Relatus.Graphics
 
         public Polygon AttachGeometry(GeometryData geometry)
         {
+            if (this.geometry == geometry)
+                return this;
+
             if (this.geometry != null && !this.geometry.Managed)
             {
                 this.geometry.Dispose();
@@ -188,7 +233,7 @@ namespace Relatus.Graphics
 
             vertexBufferBindings = new VertexBufferBinding[]
             {
-                new VertexBufferBinding(Geometry.VertexBuffer),
+                new VertexBufferBinding(geometry.VertexBuffer),
                 new VertexBufferBinding(modelBuffer, 0, 1)
             };
 
@@ -241,10 +286,10 @@ namespace Relatus.Graphics
                 transformNeedsUpdating = false;
 
                 transformCache =
-                Matrix.CreateScale(Width * Scale.X, Height * Scale.Y, 1 * Scale.Z) *
-                Matrix.CreateTranslation(-new Vector3(RotationOffset.X, RotationOffset.Y, 0)) *
-                Matrix.CreateRotationZ(Rotation) *
-                Matrix.CreateTranslation(X + Translation.X + RotationOffset.X, Y + Translation.Y + RotationOffset.Y, Translation.Z);
+                Matrix.CreateScale(width * scale.X, height * scale.Y, 1 * scale.Z) *
+                Matrix.CreateTranslation(-new Vector3(rotationOffset.X, rotationOffset.Y, 0)) *
+                Matrix.CreateRotationZ(rotation) *
+                Matrix.CreateTranslation(x + translation.X + rotationOffset.X, y + translation.Y + rotationOffset.Y, translation.Z);
             }
 
             return transformCache;
@@ -252,10 +297,10 @@ namespace Relatus.Graphics
 
         internal VertexTransformColor GetVertexTransformColor()
         {
-            Vector3 scale = new Vector3(Width * Scale.X, Height * Scale.Y, Scale.Z);
-            Vector3 translation = new Vector3(X + Translation.X, Y + Translation.Y, Z + Translation.Z);            
+            Vector3 scale = new Vector3(width * this.scale.X, height * this.scale.Y, this.scale.Z);
+            Vector3 translation = new Vector3(x + this.translation.X, y + this.translation.Y, z + this.translation.Z);
 
-            return new VertexTransformColor(scale, RotationOffset, rotation, translation, Color);
+            return new VertexTransformColor(scale, rotationOffset, rotation, translation, color);
         }
 
         public virtual void Draw(Camera camera)
@@ -267,15 +312,52 @@ namespace Relatus.Graphics
 
             graphicsDevice.RasterizerState = GraphicsManager.RasterizerState;
             graphicsDevice.SetVertexBuffers(vertexBufferBindings);
-            graphicsDevice.Indices = Geometry.IndexBuffer;
+            graphicsDevice.Indices = geometry.IndexBuffer;
 
             GeometryManager.SetupPolygonShader(camera);
 
             foreach (EffectPass pass in GeometryManager.PolygonShader.Techniques[1].Passes)
             {
                 pass.Apply();
-                graphicsDevice.DrawInstancedPrimitives(PrimitiveType.TriangleList, 0, 0, Geometry.TotalTriangles, 1);
+                graphicsDevice.DrawInstancedPrimitives(PrimitiveType.TriangleList, 0, 0, geometry.TotalTriangles, 1);
             }
         }
+
+        #region IDisposable Support
+        private bool disposedValue = false; // To detect redundant calls
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    Geometry.Dispose();
+                    modelBuffer.Dispose();
+                }
+
+                // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
+                // TODO: set large fields to null.
+
+                disposedValue = true;
+            }
+        }
+
+        // TODO: override a finalizer only if Dispose(bool disposing) above has code to free unmanaged resources.
+        // ~Polygon()
+        // {
+        //   // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+        //   Dispose(false);
+        // }
+
+        // This code added to correctly implement the disposable pattern.
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+            Dispose(true);
+            // TODO: uncomment the following line if the finalizer is overridden above.
+            // GC.SuppressFinalize(this);
+        }
+        #endregion
     }
 }
