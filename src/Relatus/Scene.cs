@@ -26,7 +26,7 @@ namespace Relatus
         public Transition EnterTransition { get; set; }
         public Transition ExitTransition { get; set; }
         public string Name { get; private set; }
-        public RectangleF SceneBounds { get; private set; }
+        public RectangleF SceneBounds { get; set; }
 
         public int SystemCapacity { get => systemManager.Capacity; }
         public int ComponentCapacity { get => componentManager.Capacity; }
@@ -183,14 +183,6 @@ namespace Relatus
             systemManager.Draw(camera);
         }
         #endregion
-
-        protected void SetSceneBounds(int width, int height)
-        {
-            if (SceneBounds.Width == width && SceneBounds.Height == height)
-                return;
-
-            SceneBounds = new RectangleF(0, 0, width, height);
-        }
 
         /// <summary>
         /// Performs logic related to entering a scene. (Automatically called right after the previous scene was unloaded).

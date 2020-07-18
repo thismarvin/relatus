@@ -1,5 +1,4 @@
 using Microsoft.Xna.Framework.Input;
-using Relatus.ECS;
 using Relatus.Graphics;
 using System;
 using System.Collections.Generic;
