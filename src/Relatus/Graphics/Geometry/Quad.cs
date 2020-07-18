@@ -11,8 +11,11 @@ namespace Relatus.Graphics
             get => lineWidth;
             set
             {
+                if (lineWidth == value)
+                    return;
+
                 lineWidth = value;
-                Geometry = GeometryManager.CreateHollowSquare(Width, Height, lineWidth);
+                AttachGeometry(GeometryManager.CreateHollowSquare(Width, Height, lineWidth));
             }
         }
 

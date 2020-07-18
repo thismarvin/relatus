@@ -11,9 +11,11 @@ namespace Relatus.Graphics
             get => radius;
             set
             {
-                radius = value;
-                Width = radius * 2;
-                Height = radius * 2;
+                if (radius == value)
+                    return;
+
+                radius = value;                
+                SetBounds(X, Y, radius * 2, radius * 2);
             }
         }
 
@@ -22,8 +24,11 @@ namespace Relatus.Graphics
             get => lineWidth;
             set
             {
+                if (lineWidth == value)
+                    return;
+
                 lineWidth = value;
-                Geometry = GeometryManager.CreateHollowCircle(radius, lineWidth);
+                AttachGeometry(GeometryManager.CreateHollowCircle(radius, lineWidth));
             }
         }
 
