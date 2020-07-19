@@ -29,10 +29,13 @@ namespace Relatus
         /// <summary>
         /// Register a <see cref="Scene"/> to be managed by Relatus.
         /// </summary>
-        /// <param name="scene">The scene you want to be registered.</param>
-        public static void Register(Scene scene)
+        /// <param name="scenes">The scene you want to be registered.</param>
+        public static void Register(params Scene[] scenes)
         {
-            scenes.Register(scene.Name, scene);
+            for (int i = 0; i < scenes.Length; i++)
+            {
+                SceneManager.scenes.Register(scenes[i].Name, scenes[i]);
+            }
         }
 
         /// <summary>
