@@ -5,17 +5,20 @@ using System.Text;
 
 namespace Relatus
 {
-    public struct RectangleF
+    public struct RectangleF : IEquatable<RectangleF>
     {
         public float X { get; private set; }
         public float Y { get; private set; }
         public float Width { get; private set; }
         public float Height { get; private set; }
 
-        public float Top { get => Y; }
-        public float Bottom { get => Y - Height; }
-        public float Left { get => X; }
-        public float Right { get => X + Width; }
+        public float Top => Y;
+        public float Bottom => Y - Height;
+        public float Left => X;
+        public float Right => X + Width;
+
+        public Vector2 Position => new Vector2(X, Y);
+        public Vector2 Center => new Vector2(X + Width / 2, Y - Height / 2);
 
         public RectangleF(float x, float y, float width, float height)
         {
@@ -25,63 +28,82 @@ namespace Relatus
             Height = height;
         }
 
-        public bool Intersects(RectangleF rectangle)
+        public RectangleF(Vector2 position, float width, float height)
         {
-            return (Left < rectangle.Right && Right > rectangle.Left && Top > rectangle.Bottom && Bottom < rectangle.Top);
+            X = position.X;
+            Y = position.Y;
+            Width = width;
+            Height = height;
         }
 
-        public bool CompletelyWithin(RectangleF rectangle)
+        public bool Intersects(RectangleF rectangle)
         {
-            return (Left >= rectangle.Left && Right <= rectangle.Right && Top <= rectangle.Top && Bottom >= rectangle.Bottom);
+            return (Left < rectangle.Right && Right > rectangle.Left && Bottom < rectangle.Top && Top > rectangle.Bottom);
+        }
+
+        public bool Contains(float x, float y)
+        {
+            return (Left <= x && Right >= x && Bottom <= y && Top >= y);
+        }
+
+        public bool Contains(Vector2 point)
+        {
+            return Contains(point.X, point.Y);
+        }
+
+        public bool Contains(RectangleF rectangle)
+        {
+            return (Left <= rectangle.Left && Right >= rectangle.Right && Bottom <= rectangle.Bottom && Top >= rectangle.Top);
         }
 
         public Vector2 GetResolution(RectangleF rectangle)
         {
-            Vector2[] aVertices = new Vector2[4]{
-                new Vector2(Left, Top),
-                new Vector2(Right, Top),
-                new Vector2(Right, Bottom),
-                new Vector2(Left, Bottom),
-            };
+            if (!Intersects(rectangle))
+                return Vector2.Zero;
 
-            LineSegment[] aEdges = new LineSegment[2]{
-                new LineSegment(
-                    aVertices[0].X,
-                    aVertices[0].Y,
-                    aVertices[1].X,
-                    aVertices[1].Y
-                ),
-                new LineSegment(
-                    aVertices[1].X,
-                    aVertices[1].Y,
-                    aVertices[2].X,
-                    aVertices[2].Y
-                )
-            };
+            float xMin = Width * 0.5f + rectangle.Width * 0.5f;
+            float yMin = Height * 0.5f + rectangle.Height * 0.5f;
 
-            Vector2[] bVertices = new Vector2[4]{
-                new Vector2(rectangle.Left, rectangle.Top),
-                new Vector2(rectangle.Right, rectangle.Top),
-                new Vector2(rectangle.Right, rectangle.Bottom),
-                new Vector2(rectangle.Left, rectangle.Bottom)
-            };
+            float xDelta = Math.Abs(Center.X - rectangle.Center.X);
+            float yDelta = Math.Abs(Center.Y - rectangle.Center.Y);
 
-            LineSegment[] bEdges = new LineSegment[2]{
-                new LineSegment(
-                    bVertices[0].X,
-                    bVertices[0].Y,
-                    bVertices[1].X,
-                    bVertices[1].Y
-                ),
-                new LineSegment(
-                    bVertices[1].X,
-                    bVertices[1].Y,
-                    bVertices[2].X,
-                    bVertices[2].Y
-                )
-            };
+            if (MathExt.RemapRange(xDelta, 0, xMin, 0, 1) > MathExt.RemapRange(yDelta, 0, yMin, 0, 1))
+            {
+                float xResolution = (xMin - xDelta) * (X < rectangle.X ? -1 : 1);
+                return new Vector2(xResolution, 0);
+            }
 
-            return CollisionHelper.GetResolution(new SchemaShape2D(aVertices, aEdges), new SchemaShape2D(bVertices, bEdges));
+            float yResolution = (yMin - yDelta) * (Y < rectangle.Y ? -1 : 1);
+            return new Vector2(0, yResolution);
+        }
+
+        public static bool operator ==(RectangleF a, RectangleF b)
+        {
+            return (a.X == b.X && a.Y == b.Y && a.Width == b.Width && a.Height == b.Height);
+        }
+
+        public static bool operator !=(RectangleF a, RectangleF b)
+        {
+            return !(a == b);
+        }
+
+        public bool Equals(RectangleF other)
+        {
+            return this == other;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj == null | !(obj is RectangleF))
+                return false;
+
+            return (RectangleF)obj == this;
+        }
+
+        public override int GetHashCode()
+        {
+            // For furture reference as to where I found this, and why it works, refer to this Stack Overflow post: https://stackoverflow.com/a/4630550.
+            return (X, Y, Width, Height).GetHashCode();
         }
 
         public override string ToString()
