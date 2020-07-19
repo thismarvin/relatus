@@ -14,9 +14,23 @@ namespace Relatus
         public float Height { get; set; }
         public int Depth { get; set; }
 
-        public Vector2 Position { get => new Vector2(X, Y); }
-        public Vector2 Center { get => new Vector2(X + Width / 2, X + Height / 2); }
-        public RectangleF Bounds { get => new RectangleF(X, Y, Width, Height); }
+        public Vector2 Position
+        {
+            get => new Vector2(X, Y);
+            set => SetPosition(value.X, value.Y);
+        }
+
+        public Vector2 Center
+        {
+            get => new Vector2(X + Width / 2, Y + Height / 2);
+            set => SetCenter(value.X, value.Y);
+        }
+
+        public RectangleF Bounds
+        {
+            get => new RectangleF(X, Y, Width, Height);
+            set => SetBounds(value.X, value.Y, value.Width, value.Height);
+        }
 
         public RelatusObject(float x, float y, int width, int height)
         {
@@ -35,7 +49,15 @@ namespace Relatus
             return this;
         }
 
-        public virtual RelatusObject SetBounds(float x, float y, int width, int height)
+        public virtual RelatusObject SetCenter(float x, float y)
+        {
+            X = x - Width / 2;
+            Y = y + Height / 2;
+
+            return this;
+        }
+
+        public virtual RelatusObject SetBounds(float x, float y, float width, float height)
         {
             X = x;
             Y = y;
