@@ -10,8 +10,7 @@ namespace Relatus.Graphics.Transitions
         const int PADDING = 64;
 
         private readonly Circle pinhole;
-        private int radius;
-
+        private float radius;
         private float lineWidth;
 
         public Pinhole(TransitionType type) : this(type, 0, 4)
@@ -27,19 +26,17 @@ namespace Relatus.Graphics.Transitions
 
         protected override void SetupTransition()
         {
-            lineWidth = Type == TransitionType.Enter ? radius : 1;
-            //pinhole.ShapeData = Geometry.CreateHollowCircle(pinhole.Radius, lineWidth);
+            lineWidth = Type == TransitionType.Enter ? radius : 1;            
             pinhole.LineWidth = lineWidth;
-            pinhole.ApplyChanges();
-            
+            pinhole.ApplyChanges();            
         }
 
         protected override void AccommodateToCamera()
         {
-            radius = (int)Camera.Bounds.Width > (int)Camera.Bounds.Height ? (int)Camera.Bounds.Width / 2 : (int)Camera.Bounds.Height / 2;
+            radius = Camera.Bounds.Width > Camera.Bounds.Height ? Camera.Bounds.Width / 2 : Camera.Bounds.Height / 2;
             radius += PADDING;
             pinhole.Radius = radius;
-            pinhole.SetCenter(Camera.Center.X, Camera.Center.Y);
+            pinhole.SetCenter(Camera.Position.X, Camera.Position.Y);
             pinhole.ApplyChanges();
         }
 
@@ -65,15 +62,22 @@ namespace Relatus.Graphics.Transitions
                     }
                     break;
             }
+        }
 
-            //pinhole.ShapeData = Geometry.CreateHollowCircle(pinhole.Radius, lineWidth);
+        protected override void AfterUpdate()
+        {
             pinhole.LineWidth = lineWidth;
             pinhole.ApplyChanges();
         }
 
         protected override void DrawTransition()
         {
-            pinhole.Draw(CameraManager.Get(CameraType.Static));
+            pinhole.Draw(Camera);
+        }
+
+        protected override void OnDispose()
+        {
+            pinhole.Dispose();
         }
     }
 }

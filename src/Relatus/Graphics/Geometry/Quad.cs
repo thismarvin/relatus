@@ -11,15 +11,19 @@ namespace Relatus.Graphics
             get => lineWidth;
             set
             {
+                if (lineWidth == value)
+                    return;
+
                 lineWidth = value;
-                Geometry = GeometryManager.CreateHollowSquare(Width, Height, lineWidth);
+                AttachGeometry(GeometryManager.CreateHollowSquare(Width, Height, lineWidth));
             }
         }
 
         private float lineWidth;
 
-        public Quad(float x, float y, float width, float height) : base(x, y, width, height)
-        {
+        public Quad(float x, float y, float width, float height)
+        {            
+            SetBounds(x, y, width, height);
             AttachGeometry(GeometryManager.GetShapeData(ShapeType.Square));
             ApplyChanges();
         }

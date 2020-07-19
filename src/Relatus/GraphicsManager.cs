@@ -18,12 +18,19 @@ namespace Relatus
         public static Texture2D SimpleTexture { get; private set; }
         public static BasicEffect BasicEffect { get; private set; }
 
-        public static RasterizerState RasterizerState { get => DebugManager.ShowWireFrame ? DebugRasterizerState : DefaultRasterizerState; }
+        public static RasterizerState RasterizerState => DebugManager.ShowWireFrame ? DebugRasterizerState : DefaultRasterizerState;
 
         static GraphicsManager()
         {
-            DefaultRasterizerState = new RasterizerState();
-            ScissorRasterizerState = new RasterizerState() { ScissorTestEnable = true };
+            DefaultRasterizerState = new RasterizerState()
+            {
+                CullMode = CullMode.CullClockwiseFace
+            };
+            ScissorRasterizerState = new RasterizerState()
+            {
+                ScissorTestEnable = true,
+                CullMode = CullMode.CullClockwiseFace
+            };
             DebugRasterizerState = new RasterizerState
             {
                 FillMode = FillMode.WireFrame,

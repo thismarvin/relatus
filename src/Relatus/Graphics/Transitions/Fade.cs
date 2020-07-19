@@ -7,7 +7,7 @@ namespace Relatus.Graphics.Transitions
 {
     public class Fade : Transition
     {
-        const int PADDING = 8;
+        const int PADDING = 32;
 
         private float alpha;
         private Color defaultColor;
@@ -22,7 +22,8 @@ namespace Relatus.Graphics.Transitions
         public Fade(TransitionType type, float velocity, float acceleration, Color color) : base(type, velocity, acceleration)
         {
             defaultColor = color;
-            fade = new Quad(-PADDING, -PADDING, 1, 1) { Color = Color.Black };
+            fade = new Quad(0, 0, 1, 1) { Color = Color.Black };
+            fade.ApplyChanges();
         }
 
         protected override void AccommodateToCamera()
@@ -30,23 +31,17 @@ namespace Relatus.Graphics.Transitions
             fade.Width = Camera.Bounds.Width + PADDING * 2;
             fade.Height = Camera.Bounds.Height + PADDING * 2;
 
-            if (WindowManager.WideScreenSupported)
-            {
-                fade.X = -WindowManager.PillarBox - PADDING;
-                fade.Y = -WindowManager.LetterBox - PADDING;
-            }
-            else
-            {
-                fade.X = -PADDING;
-                fade.Y = -PADDING;
-            }
+            fade.SetCenter(Camera.Position.X, Camera.Position.Y);
+            fade.ApplyChanges();
         }
 
         protected override void SetupTransition()
         {
             alpha = Type == TransitionType.Enter ? 1 : 0;
             fadeColor = defaultColor * alpha;
+
             fade.Color = fadeColor;
+            fade.ApplyChanges();
         }
 
         protected override void UpdateLogic()
@@ -71,14 +66,23 @@ namespace Relatus.Graphics.Transitions
                     }
                     break;
             }
+        }
 
+        protected override void AfterUpdate()
+        {
             fadeColor = defaultColor * alpha;
             fade.Color = fadeColor;
+            fade.ApplyChanges();
         }
 
         protected override void DrawTransition()
         {
             fade.Draw(CameraManager.Get(CameraType.Static));
+        }
+
+        protected override void OnDispose()
+        {
+            fade.Dispose();
         }
     }
 }

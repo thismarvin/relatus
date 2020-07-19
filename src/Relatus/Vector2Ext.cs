@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Relatus.Maths
+namespace Relatus
 {
     public static class Vector2Ext
     {
@@ -33,7 +33,7 @@ namespace Relatus.Maths
 
         public static Vector2 Random(float magnitude)
         {
-            float angle = (float)MoreRandom.NextDouble(0, MathHelper.TwoPi);
+            float angle = (float)RandomExt.NextDouble(0, MathHelper.TwoPi);
             Vector2 result = Vector2Ext.FromAngle(angle);
             result.SetMagnitude(magnitude);
 

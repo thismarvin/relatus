@@ -1,3 +1,4 @@
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Relatus.Graphics;
 using System;
@@ -36,6 +37,15 @@ namespace Relatus.ECS
             vertexBuffer = new VertexTransformColor[scene.EntityCapacity];
         }
 
+        private VertexTransformColor CreateVertexTransformColor(CPosition position, CDimension dimension, CTransform transform, CColor color)
+        {
+            Vector3 scale = new Vector3(dimension.Width * transform.Scale.X, dimension.Height * transform.Scale.Y, transform.Scale.Z);
+            Vector2 rotationOffset = new Vector2(transform.RotationOffset.X, transform.RotationOffset.Y);
+            Vector3 translation = new Vector3(position.X + transform.Translation.X, position.Y + transform.Translation.Y, position.Z + transform.Translation.Z);
+
+            return new VertexTransformColor(scale, rotationOffset, transform.Rotation, translation, color.Color);
+        }
+
         public override void UpdateEntity(int entity)
         {
             CPosition position = (CPosition)positions[entity];
@@ -43,7 +53,7 @@ namespace Relatus.ECS
             CTransform transform = (CTransform)transforms[entity];
             CColor color = (CColor)colors[entity];
 
-            vertexBuffer[entity] = new VertexTransformColor(position, dimension, transform, color);
+            vertexBuffer[entity] = CreateVertexTransformColor(position, dimension, transform, color);
         }
 
         public override void DrawEntity(int entity, Camera camera)
@@ -73,8 +83,8 @@ namespace Relatus.ECS
                 transformsBuffer.SetData(vertexBuffer);
 
                 Engine.Graphics.GraphicsDevice.RasterizerState = GraphicsManager.RasterizerState;
-                Engine.Graphics.GraphicsDevice.SetVertexBuffers(new VertexBufferBinding(geometry.Geometry), new VertexBufferBinding(transformsBuffer, 0, 1));
-                Engine.Graphics.GraphicsDevice.Indices = geometry.Indices;
+                Engine.Graphics.GraphicsDevice.SetVertexBuffers(new VertexBufferBinding(geometry.VertexBuffer), new VertexBufferBinding(transformsBuffer, 0, 1));
+                Engine.Graphics.GraphicsDevice.Indices = geometry.IndexBuffer;
 
                 GeometryManager.SetupPolygonShader(camera);
 

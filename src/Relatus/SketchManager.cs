@@ -17,6 +17,7 @@ namespace Relatus
 
     public static class SketchManager
     {
+        private static readonly GraphicsDevice graphicsDevice;
         private static readonly SpriteBatch spriteBatch;
         private static readonly List<RenderTarget2D> renderTargets;
         private static readonly List<StageType> completedStages;
@@ -24,6 +25,7 @@ namespace Relatus
 
         static SketchManager()
         {
+            graphicsDevice = Engine.Graphics.GraphicsDevice;
             spriteBatch = GraphicsManager.SpriteBatch;
             renderTargets = new List<RenderTarget2D>();
             completedStages = new List<StageType>();
@@ -78,11 +80,11 @@ namespace Relatus
             if (postProcessing != null)
             {
                 // Initialize a RenderTarget2D to accumulate all RenderTargets.
-                RenderTarget2D accumulation = new RenderTarget2D(spriteBatch.GraphicsDevice, WindowManager.WindowWidth, WindowManager.WindowHeight);
+                RenderTarget2D accumulation = new RenderTarget2D(graphicsDevice, WindowManager.WindowWidth, WindowManager.WindowHeight);
 
                 // Setup the GraphicsDevice with the new accumulation RenderTarget2D.
-                spriteBatch.GraphicsDevice.SetRenderTarget(accumulation);
-                spriteBatch.GraphicsDevice.Clear(Color.Transparent);
+                graphicsDevice.SetRenderTarget(accumulation);
+                graphicsDevice.Clear(Color.Transparent);
 
                 // Draw all the saved RenderTargets onto the accumulation RenderTarget2D.
                 spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null, null);
@@ -95,8 +97,8 @@ namespace Relatus
                 spriteBatch.End();
 
                 // Reset the GraphicsDevice's RenderTarget.
-                spriteBatch.GraphicsDevice.SetRenderTarget(null);
-                spriteBatch.GraphicsDevice.Clear(Color.Transparent);
+                graphicsDevice.SetRenderTarget(null);
+                graphicsDevice.Clear(Color.Transparent);
 
                 // Apply the shader.
                 spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, postProcessing, null);

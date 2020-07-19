@@ -1,7 +1,6 @@
 using Relatus.ECS;
 using Relatus.Graphics;
 using Relatus.Graphics.Transitions;
-using Relatus.Maths;
 using Relatus.Utilities;
 using System;
 using System.Collections.Generic;
@@ -24,11 +23,10 @@ namespace Relatus
             set => systemManager.DisableAsynchronousUpdates = !value;
         }
 
-        public Camera Camera { get; set; }
         public Transition EnterTransition { get; set; }
         public Transition ExitTransition { get; set; }
         public string Name { get; private set; }
-        public RectangleF SceneBounds { get; private set; }
+        public RectangleF SceneBounds { get; set; }
 
         public int SystemCapacity { get => systemManager.Capacity; }
         public int ComponentCapacity { get => componentManager.Capacity; }
@@ -53,10 +51,6 @@ namespace Relatus
         {
             Name = name;
             SceneBounds = new RectangleF(0, 0, WindowManager.PixelWidth, WindowManager.PixelHeight);
-
-            Camera = new Camera(Name);
-            Camera.SetMovementRestriction(0, 0, SceneBounds.Width, SceneBounds.Height);
-            CameraManager.Register(Camera);
 
             EnterTransition = new Pinhole(TransitionType.Enter);
             ExitTransition = new Fade(TransitionType.Exit);
@@ -184,21 +178,11 @@ namespace Relatus
         /// <summary>
         /// Runs all registered <see cref="IDrawableSystem"/> systems.
         /// </summary>
-        protected void RunDrawableSystems()
+        protected void RunDrawableSystems(Camera camera)
         {
-            systemManager.Draw(Camera);
+            systemManager.Draw(camera);
         }
         #endregion
-
-        protected void SetSceneBounds(int width, int height)
-        {
-            if (SceneBounds.Width == width && SceneBounds.Height == height)
-                return;
-
-            SceneBounds = new RectangleF(0, 0, width, height);
-
-            Camera.SetMovementRestriction(0, 0, SceneBounds.Width, SceneBounds.Height);
-        }
 
         /// <summary>
         /// Performs logic related to entering a scene. (Automatically called right after the previous scene was unloaded).

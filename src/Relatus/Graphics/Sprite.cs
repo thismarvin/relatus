@@ -128,7 +128,7 @@ namespace Relatus.Graphics
 
             if (customScissorRectangle)
             {
-                spriteBatch.Begin(SpriteSortMode.Deferred, BlendState, SamplerState, null, GraphicsManager.ScissorRasterizerState, Effect, camera.Transform);
+                spriteBatch.Begin(SpriteSortMode.Deferred, BlendState, SamplerState, null, GraphicsManager.ScissorRasterizerState, Effect, camera.SpriteTransform);
                 {
                     spriteBatch.GraphicsDevice.ScissorRectangle = scissorRectangle;
                     spriteBatch.Draw(SpriteSheet, Position, sourceRectangle, Tint, Rotation, RotationOffset, Scale, SpriteEffect, 0);
@@ -137,7 +137,7 @@ namespace Relatus.Graphics
             }
             else
             {
-                spriteBatch.Begin(SpriteSortMode.Deferred, BlendState, SamplerState, null, null, Effect, camera.Transform);
+                spriteBatch.Begin(SpriteSortMode.Deferred, BlendState, SamplerState, null, null, Effect, camera.SpriteTransform);
                 {
                     spriteBatch.Draw(SpriteSheet, Position, sourceRectangle, Tint, Rotation, RotationOffset, Scale, SpriteEffect, 0);
                 }

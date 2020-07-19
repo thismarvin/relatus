@@ -2,19 +2,19 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Relatus.Maths
+namespace Relatus
 {
     /// <summary>
     /// Manages an instance of a <see cref="Random"/> class object, and adds additional random number generation related functionality.
     /// </summary>
-    public static class MoreRandom
+    public static class RandomExt
     {
         /// <summary>
         /// The game's main pseudo-random number generator that is seeded upon startup.
         /// </summary>
         public static Random RNG { get; set; }
 
-        static MoreRandom()
+        static RandomExt()
         {
             RNG = new Random(DateTime.Now.Millisecond);
         }

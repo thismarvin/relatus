@@ -35,7 +35,7 @@ namespace Relatus.ECS
             positions = scene.GetData<CPosition>();
             transforms = scene.GetData<CTransform>();
 
-            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, camera.Transform);
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, camera.SpriteTransform);
             {
                 CSprite sprite;
                 CPosition position;

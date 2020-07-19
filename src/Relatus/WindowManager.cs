@@ -2,7 +2,6 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Relatus.Graphics;
-using Relatus.Maths;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -53,10 +52,10 @@ namespace Relatus
         private static int defaultWindowHeight;
         private static bool manipulatingScreen;
 
-        public static EventHandler<EventArgs> WindowChanged { get; set; }
+        public static EventHandler<EventArgs> WindowResize { get; set; }
         private static void RaiseWindowChangedEvent()
         {
-            WindowChanged?.Invoke(null, EventArgs.Empty);
+            WindowResize?.Invoke(null, EventArgs.Empty);
         }
 
         static WindowManager()
@@ -211,10 +210,12 @@ namespace Relatus
 
             boxing = new AABB[]
             {
-                new AABB(-buffer, -buffer, PixelWidth + buffer * 2, buffer) { Color = Color.Black },
-                new AABB(-buffer, PixelHeight,PixelWidth + buffer * 2, buffer) { Color = Color.Black },
-                new AABB(-buffer, -buffer, buffer, PixelHeight + buffer * 2) { Color = Color.Black },
-                new AABB(PixelWidth, -buffer, buffer, PixelHeight + buffer * 2) { Color = Color.Black }
+                // Letter boxing.
+                new AABB(-PixelWidth * 0.5f - buffer, PixelHeight * 0.5f + buffer, PixelWidth + buffer * 2, buffer) { Color = Color.Black },
+                new AABB(-PixelWidth * 0.5f - buffer, -PixelHeight * 0.5f, PixelWidth + buffer * 2, buffer) { Color = Color.Black },
+                // Pillar boxing.
+                new AABB(-PixelWidth * 0.5f - buffer, PixelHeight * 0.5f + buffer, buffer, PixelHeight + buffer * 2) { Color = Color.Black },
+                new AABB(PixelWidth * 0.5f, PixelHeight * 0.5f + buffer, buffer, PixelHeight + buffer * 2) { Color = Color.Black }
             };
 
             polygonCollection.SetCollection(boxing);
