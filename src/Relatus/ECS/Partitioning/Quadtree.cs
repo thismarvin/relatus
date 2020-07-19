@@ -129,8 +129,8 @@ namespace Relatus.ECS
 
             topLeft = new Quadtree<T>(new RectangleF(Boundary.X, Boundary.Y, width, height), capacity);
             topRight = new Quadtree<T>(new RectangleF(Boundary.X + width, Boundary.Y, width, height), capacity);
-            bottomRight = new Quadtree<T>(new RectangleF(Boundary.X + width, Boundary.Y + height, width, height), capacity);
-            bottomLeft = new Quadtree<T>(new RectangleF(Boundary.X, Boundary.Y + height, width, height), capacity);
+            bottomRight = new Quadtree<T>(new RectangleF(Boundary.X + width, Boundary.Y - height, width, height), capacity);
+            bottomLeft = new Quadtree<T>(new RectangleF(Boundary.X, Boundary.Y - height, width, height), capacity);
 
             divided = true;
         }

@@ -11,6 +11,7 @@ namespace Relatus.ECS
     /// <typeparam name="T">The element stored within the partitioner.</typeparam>
     public class Bin<T> : Partitioner<T> where T : IPartitionable
     {
+        private RectangleF validatedBoundary;
         private HashSet<T>[] buckets;
         private readonly int powerOfTwo;
         private readonly int bucketSize;
@@ -32,8 +33,30 @@ namespace Relatus.ECS
 
         protected override void Initialize()
         {
-            columns = (int)Math.Ceiling(Boundary.Width / Math.Pow(2, powerOfTwo));
-            rows = (int)Math.Ceiling(Boundary.Height / Math.Pow(2, powerOfTwo));
+            validatedBoundary = new RectangleF
+            (
+                (float)MathExt.RemapRange
+                (
+                    Boundary.X,
+                    Boundary.Left,
+                    Boundary.Right,
+                    0,
+                    Boundary.Width
+                ),
+                (float)MathExt.RemapRange
+                (
+                    Boundary.Y,
+                    Boundary.Bottom,
+                    Boundary.Top,
+                    0,
+                    Boundary.Height
+                ),
+                Boundary.Width,
+                Boundary.Height
+            );
+
+            columns = (int)Math.Ceiling(Boundary.Width / bucketSize);
+            rows = (int)Math.Ceiling(Boundary.Height / bucketSize);
 
             buckets = new HashSet<T>[rows * columns];
 
@@ -46,11 +69,31 @@ namespace Relatus.ECS
         public override List<int> Query(RectangleF bounds)
         {
             List<int> result = new List<int>();
+
+            if (!bounds.Intersects(Boundary))
+                return result;
+
+            if (Boundary.CompletelyWithin(bounds))
+            {
+                for (int i = 0; i < buckets.Length; i++)
+                {
+                    foreach (T entry in buckets[i])
+                    {
+                        result.Add(entry.Identifier);
+                    }
+                }
+
+                return result;
+            }
+
             HashSet<int> unique = new HashSet<int>();
             HashSet<int> ids = GetHashIDs(bounds);
 
             foreach (int id in ids)
             {
+                if (id < 0)
+                    continue;
+
                 foreach (T entry in buckets[id])
                 {
                     if (unique.Add(entry.Identifier))
@@ -70,9 +113,12 @@ namespace Relatus.ECS
 
             HashSet<int> ids = GetHashIDs(entry.Bounds);
 
-            foreach (int i in ids)
+            foreach (int id in ids)
             {
-                buckets[i].Add(entry);
+                if (id < 0)
+                    continue;
+
+                buckets[id].Add(entry);
             }
 
             return ids.Count > 0;
@@ -91,80 +137,65 @@ namespace Relatus.ECS
 
         private HashSet<int> GetHashIDs(RectangleF bounds)
         {
-            HashSet<int> result = new HashSet<int>();
+            RectangleF validatedBoundary = new RectangleF
+            (
+                (float)MathExt.RemapRange
+                (
+                    bounds.X,
+                    Boundary.Left,
+                    Boundary.Right,
+                    0,
+                    Boundary.Width
+                ),
+                (float)MathExt.RemapRange
+                (
+                    bounds.Y,
+                    Boundary.Bottom,
+                    Boundary.Top,
+                    0,
+                    Boundary.Height
+                ),
+                bounds.Width,
+                bounds.Height
+            );
 
-            // Make sure that the query's bounds are within the partitioner's bounds.
-            RectangleF validatedBounds = ValidateBounds(bounds);
+            RectangleF constrainedBounds = MathExt.ConstrainRectangle(validatedBoundary, this.validatedBoundary);
 
-            // Hash all corners of the validated query's bounds.
-            HashPosition(validatedBounds.Left, validatedBounds.Top);
-            HashPosition(validatedBounds.Right, validatedBounds.Top);
-            HashPosition(validatedBounds.Right, validatedBounds.Bottom);
-            HashPosition(validatedBounds.Left, validatedBounds.Bottom);
-
-            /// Ideally the dimensions of the validated query's bounds will be less than the partitioner's bucket size.
-            /// However, this is not always the case. In order to handle all dimensions, we have to carefully divide the query bounds into smaller
-            /// subsections. Each subsection needs to be the same size as the partitioner's bucket size for optimal guaranteed coverage.
-            if (validatedBounds.Width > bucketSize || validatedBounds.Height > bucketSize)
+            List<int> hashes = new List<int>()
             {
-                int totalRows = (int)Math.Ceiling(validatedBounds.Height / bucketSize);
-                int totalColumns = (int)Math.Ceiling(validatedBounds.Width / bucketSize);
+                GetHash(constrainedBounds.Left, constrainedBounds.Top),
+                GetHash(constrainedBounds.Right, constrainedBounds.Top),
+                GetHash(constrainedBounds.Right, constrainedBounds.Bottom),
+                GetHash(constrainedBounds.Left, constrainedBounds.Bottom)
+            };
+
+            if (constrainedBounds.Width > bucketSize || constrainedBounds.Height > bucketSize)
+            {
+                int totalRows = (int)Math.Ceiling(constrainedBounds.Height / bucketSize);
+                int totalColumns = (int)Math.Ceiling(constrainedBounds.Width / bucketSize);
 
                 for (int y = 0; y <= totalRows; y++)
                 {
                     for (int x = 0; x <= totalColumns; x++)
                     {
-                        HashPosition(bounds.X + x * bucketSize, bounds.Y + y * bucketSize);
+                        hashes.Add(GetHash(constrainedBounds.X + x * bucketSize, constrainedBounds.Y - y * bucketSize));
                     }
                 }
             }
 
-            return result;
+            return new HashSet<int>(hashes);
 
-            Point ValidatePosition(float _x, float _y)
+            int GetHash(float x, float y)
             {
-                int xValidated = (int)_x;
-                int yValidated = (int)_y;
+                Vector2 constrainedPosition = MathExt.ConstrainPoint(x, y, this.validatedBoundary);
 
-                xValidated = Math.Max(0, xValidated);
-                xValidated = Math.Min((int)Boundary.Right, xValidated);
+                int column = (int)constrainedPosition.X >> powerOfTwo;
+                int row = (int)constrainedPosition.Y >> powerOfTwo;
 
-                yValidated = Math.Max(0, yValidated);
-                yValidated = Math.Min((int)Boundary.Bottom, yValidated);
+                if (row < 0 || row >= rows || column < 0 || column >= columns)
+                    return -1;
 
-                return new Point(xValidated, yValidated);
-            }
-
-            RectangleF ValidateBounds(RectangleF _bounds)
-            {
-                Point validatedPosition = ValidatePosition((int)_bounds.X, (int)_bounds.Y);
-
-                int xValidated = validatedPosition.X;
-                int yValidated = validatedPosition.Y;
-
-                int widthValidated = (int)Math.Ceiling(_bounds.Width);
-                int heightValidated = (int)Math.Ceiling(_bounds.Height);
-
-                widthValidated = Math.Min((int)Math.Ceiling(Boundary.Right) - xValidated, widthValidated);
-                heightValidated = Math.Min((int)Math.Ceiling(Boundary.Bottom) - yValidated, heightValidated);
-
-                return new RectangleF(xValidated, yValidated, widthValidated, heightValidated);
-            }
-
-            void HashPosition(float _x, float _y)
-            {
-                Point validatedPosition = ValidatePosition(_x, _y);
-
-                int xValidated = validatedPosition.X;
-                int yValidated = validatedPosition.Y;
-
-                int row = xValidated >> powerOfTwo;
-                int column = yValidated >> powerOfTwo;
-
-                if (column < 0 || column >= columns || row < 0 || row >= rows)
-                    return;
-
-                result.Add(columns * column + row);
+                return columns * row + column;
             }
         }
     }
