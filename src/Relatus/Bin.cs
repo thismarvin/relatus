@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Relatus.ECS
+namespace Relatus
 {
     /// <summary>
     /// An implementation of a <see cref="Partitioner{T}"/> that uses a hashing algorithm to store and retrieve <see cref="IPartitionable"/> entries.

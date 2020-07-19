@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Relatus.ECS
+namespace Relatus
 {
     /// <summary>
     /// An abstraction of a class that implements spatial partitioning capabilities.

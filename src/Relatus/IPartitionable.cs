@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Relatus.ECS
+namespace Relatus
 {
     /// <summary>
     /// Provides functionality to be processed by any given <see cref="Partitioner{T}"/>.
