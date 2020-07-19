@@ -73,7 +73,7 @@ namespace Relatus.ECS
             if (!bounds.Intersects(Boundary))
                 return result;
 
-            if (Boundary.CompletelyWithin(bounds))
+            if (bounds.Contains(Boundary))
             {
                 for (int i = 0; i < buckets.Length; i++)
                 {

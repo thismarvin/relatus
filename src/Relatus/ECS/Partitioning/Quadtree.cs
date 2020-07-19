@@ -40,7 +40,7 @@ namespace Relatus.ECS
         {
             List<int> result = new List<int>();
 
-            if (Boundary.CompletelyWithin(bounds))
+            if (bounds.Contains(Boundary))
             {
                 for (int i = 0; i < objects.Length; i++)
                 {
@@ -52,7 +52,7 @@ namespace Relatus.ECS
             }
             else
             {
-                for (int i = 0; i < objects.Length; i++)
+                for (int i = 0; i < insertionIndex; i++)
                 {
                     if (objects[i] == null)
                         continue;
