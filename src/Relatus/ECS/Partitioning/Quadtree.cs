@@ -75,7 +75,7 @@ namespace Relatus.ECS
             return result;
         }
 
-        public override bool Insert(T entry)
+        public override bool Add(T entry)
         {
             if (!entry.Bounds.Intersects(Boundary))
                 return false;
@@ -91,7 +91,7 @@ namespace Relatus.ECS
                     Subdivide();
 
                 /// Note that short-circuiting is intended here! We basically keep trying to add an entry to a tree and if we succeed then we should abort. Doing so prevents adding duplicate entries!
-                if (topLeft.Insert(entry) || topRight.Insert(entry) || bottomRight.Insert(entry) || bottomLeft.Insert(entry))
+                if (topLeft.Add(entry) || topRight.Add(entry) || bottomRight.Add(entry) || bottomLeft.Add(entry))
                     return true;
             }
 

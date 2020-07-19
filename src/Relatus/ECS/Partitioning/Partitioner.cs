@@ -49,11 +49,19 @@ namespace Relatus.ECS
         /// </summary>
         /// <param name="entry">The <see cref="IPartitionable"/> item to add to the partitioner.</param>
         /// <returns>Whether or not the given item was successfully added to the partitioner.</returns>
-        public abstract bool Insert(T entry);
+        public abstract bool Add(T entry);
 
         /// <summary>
         /// Removes all items that were inside the partitioner.
         /// </summary>
         public abstract void Clear();
+
+        public void AddRange(IEnumerable<T> entries)
+        {
+            foreach (T entry in entries)
+            {
+                Add(entry);
+            }
+        }
     }
 }

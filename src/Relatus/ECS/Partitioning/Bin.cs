@@ -106,7 +106,7 @@ namespace Relatus.ECS
             return result;
         }
 
-        public override bool Insert(T entry)
+        public override bool Add(T entry)
         {
             if (!entry.Bounds.Intersects(Boundary))
                 return false;
