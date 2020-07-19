@@ -159,7 +159,7 @@ namespace Relatus.Graphics
         // I just want to note that although this is a Vector3, it is really treated like a Vector2.
         public Vector3 Center
         {
-            get => new Vector3(x + width / 2, y + height / 2, z);
+            get => new Vector3(x + width / 2, y - height / 2, z);
             set => SetCenter(value.X, value.Y);
         }
 
