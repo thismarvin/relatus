@@ -29,6 +29,11 @@ namespace Relatus
             return lowerBound + RNG.NextDouble() * (upperBound - lowerBound);
         }
 
+        public static double NextFloat(float lowerBound, float upperBound)
+        {
+            return lowerBound + (float)RNG.NextDouble() * (upperBound - lowerBound);
+        }
+
         /// <summary>
         /// Returns a boolean value that is consistent with a given probability.
         /// </summary>
