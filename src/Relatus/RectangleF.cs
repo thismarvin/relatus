@@ -13,7 +13,7 @@ namespace Relatus
         public float Height { get; private set; }
 
         public float Top { get => Y; }
-        public float Bottom { get => Y + Height; }
+        public float Bottom { get => Y - Height; }
         public float Left { get => X; }
         public float Right { get => X + Width; }
 
@@ -27,12 +27,12 @@ namespace Relatus
 
         public bool Intersects(RectangleF rectangle)
         {
-            return (Left < rectangle.Right && Right > rectangle.Left && Top < rectangle.Bottom && Bottom > rectangle.Top);
+            return (Left < rectangle.Right && Right > rectangle.Left && Top > rectangle.Bottom && Bottom < rectangle.Top);
         }
 
         public bool CompletelyWithin(RectangleF rectangle)
         {
-            return (Left >= rectangle.Left && Right <= rectangle.Right && Top >= rectangle.Top && Bottom <= rectangle.Bottom);
+            return (Left >= rectangle.Left && Right <= rectangle.Right && Top <= rectangle.Top && Bottom >= rectangle.Bottom);
         }
 
         public Vector2 GetResolution(RectangleF rectangle)

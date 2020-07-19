@@ -54,7 +54,7 @@ namespace Relatus
             double yFactor = Math.Round(axisLength * Math.Sin(angle));
 
             int xResolutionDirection = aAABB.Left > bAABB.Left ? 1 : -1;
-            int yResolutionDirection = aAABB.Bottom > bAABB.Bottom ? -1 : 1;
+            int yResolutionDirection = aAABB.Bottom > bAABB.Bottom ? 1 : -1;
 
             double xResolution = xFactor == 0 ? 0 : (minPass.Overlap / xFactor) * xResolutionDirection;
             double yResolution = yFactor == 0 ? 0 : (minPass.Overlap / yFactor) * yResolutionDirection;
