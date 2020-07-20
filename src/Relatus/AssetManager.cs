@@ -1,6 +1,5 @@
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
-using Relatus.Graphics;
 using Relatus.Utilities;
 using System;
 using System.Collections.Generic;
@@ -17,6 +16,7 @@ namespace Relatus
         private static readonly ResourceHandler<Effect> effects;
         private static readonly ResourceHandler<SoundEffect> soundEffects;
         private static readonly ResourceHandler<BMFont> fonts;
+        private static readonly ResourceHandler<SpriteAtlas> atlases;
 
         static AssetManager()
         {
@@ -24,6 +24,7 @@ namespace Relatus
             effects = new ResourceHandler<Effect>();
             soundEffects = new ResourceHandler<SoundEffect>();
             fonts = new ResourceHandler<BMFont>();
+            atlases = new ResourceHandler<SpriteAtlas>();
         }
 
         #region Handle Images
@@ -147,6 +148,37 @@ namespace Relatus
         public static void UnloadFont(string name)
         {
             fonts.Remove(name);
+        }
+        #endregion
+
+        #region Handle SpriteAtlases
+        /// <summary>
+        /// Load a <see cref="SpriteAtlas"/> into memory.
+        /// </summary>
+        /// <param name="name">The name that the sprite atlas being loaded will be referenced as.</param>
+        /// <param name="path">The relative path to the sprite atlas contained in the Content folder.</param>
+        public static void LoadSpriteAtlas(string name, string path)
+        {
+            atlases.Register(name, Engine.Instance.Content.Load<SpriteAtlas>(path));
+        }
+
+        /// <summary>
+        /// Get a <see cref="SpriteAtlas"/> that was already loaded into memory.
+        /// </summary>
+        /// <param name="name">The name assigned to a previously loaded sprite atlas.</param>
+        /// <returns>The loaded <see cref="SpriteAtlas"/> associated with the given name.</returns>
+        public static SpriteAtlas GetSpriteAtlas(string name)
+        {
+            return atlases.Get(name);
+        }
+
+        /// <summary>
+        /// Unload an already loaded <see cref="SpriteAtlas"/> from memory.
+        /// </summary>
+        /// <param name="name">The name assigned to a previously loaded sprite atlas.</param>
+        public static void UnloadSpriteAtlas(string name)
+        {
+            atlases.Remove(name);
         }
         #endregion
 
