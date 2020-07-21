@@ -38,7 +38,7 @@ namespace Relatus.Graphics
             this.texture = texture;
             Width = texture.Width;
             Height = texture.Height;
-            ApplyChanges();
+            ApplyChanges();                        
         }
 
         public BetterSprite ApplyChanges()
@@ -52,8 +52,8 @@ namespace Relatus.Graphics
             });
 
             modelBuffer?.Dispose();
-            modelBuffer = new DynamicVertexBuffer(graphicsDevice, typeof(VertexTextureTransform), 1, BufferUsage.WriteOnly);
-            modelBuffer.SetData(new VertexTextureTransform[] { GetVertexTransformColor() });
+            modelBuffer = new DynamicVertexBuffer(graphicsDevice, typeof(VertexTransform), 1, BufferUsage.WriteOnly);
+            modelBuffer.SetData(new VertexTransform[] { GetVertexTransformColor() });
 
             vertexBufferBindings = new VertexBufferBinding[]
             {
@@ -64,12 +64,12 @@ namespace Relatus.Graphics
             return this;
         }
 
-        internal VertexTextureTransform GetVertexTransformColor()
+        internal VertexTransform GetVertexTransformColor()
         {
             Vector3 scale = new Vector3(Width, Height, 1);
             Vector3 translation = new Vector3(X, Y, 0);
 
-            return new VertexTextureTransform(Color.White, scale, Vector2.Zero, 0, translation);
+            return new VertexTransform(scale, Vector2.Zero, 0, translation);
         }
 
         public void Draw(Camera camera)
@@ -77,7 +77,8 @@ namespace Relatus.Graphics
             graphicsDevice.RasterizerState = GraphicsManager.RasterizerState;
             graphicsDevice.SetVertexBuffers(vertexBufferBindings);
             graphicsDevice.Indices = geometry.IndexBuffer;
-            //graphicsDevice.Textures[0] = texture;
+            graphicsDevice.SamplerStates[0] = SamplerState.PointClamp;
+            graphicsDevice.Textures[0] = texture;
 
             spriteShader.Parameters["SpriteTexture"].SetValue(texture);
             spriteShader.Parameters["WorldViewProjection"].SetValue(camera.WVP);
