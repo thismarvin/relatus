@@ -17,9 +17,9 @@ namespace Relatus.ECS
         /// <summary>
         /// Create a <see cref="MorroSystem"/> that combines the functionality of an <see cref="UpdateSystem"/> and a <see cref="DrawSystem"/>.
         /// </summary>
-        /// <param name="scene">The scene this system will exist in.</param>
+        /// <param name="factory">The factory this system will exist in.</param>
         /// <param name="tasks">The total amount of tasks to divide the update cycle into. Assigning more than one task allows entities to be updated asynchronously.</param>
-        internal HybridSystem(Scene scene, uint tasks) : base(scene)
+        internal HybridSystem(MorroFactory factory, uint tasks) : base(factory)
         {
             updateSystemHandler = new UpdateSystemHandler(this, UpdateEntity)
             {
@@ -32,10 +32,10 @@ namespace Relatus.ECS
         /// <summary>
         /// Create a <see cref="MorroSystem"/> that combines the functionality of an <see cref="UpdateSystem"/> and a <see cref="DrawSystem"/>.
         /// </summary>
-        /// <param name="scene">The scene this system will exist in.</param>
+        /// <param name="factory">The factory this system will exist in.</param>
         /// <param name="tasks">The total amount of tasks to divide the update cycle into. Assigning more than one task allows entities to be updated asynchronously.</param>
         /// <param name="targetFPS">The target framerate the system will update in.</param>
-        internal HybridSystem(Scene scene, uint tasks, int targetFPS) : base(scene)
+        internal HybridSystem(MorroFactory factory, uint tasks, int targetFPS) : base(factory)
         {
             updateSystemHandler = new UpdateSystemHandler(this, UpdateEntity)
             {

@@ -40,22 +40,22 @@ namespace Relatus.ECS
             }
         }
 
-        protected Scene scene;
+        protected MorroFactory factory;
 
         private readonly int[] entitiesAsArray;
         private bool entityDataChanged;
 
-        public MorroSystem(Scene scene)
+        public MorroSystem(MorroFactory factory)
         {
             RequiredComponents = new HashSet<Type>();
             BlacklistedComponents = new HashSet<Type>();
             Dependencies = new HashSet<Type>();
             Subscriptions = new HashSet<Type>();
             Entities = new HashSet<int>();
-            entitiesAsArray = new int[scene.EntityCapacity];
+            entitiesAsArray = new int[factory.EntityCapacity];
 
             Enabled = true;
-            this.scene = scene;
+            this.factory = factory;
         }
 
         /// <summary>

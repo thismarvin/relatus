@@ -16,8 +16,8 @@ namespace Relatus.ECS
         /// <summary>
         /// Create a <see cref="MorroSystem"/> that will process <see cref="IComponent"/> data and preform draw logic every frame.
         /// </summary>
-        /// <param name="scene">The scene this system will exist in.</param>
-        internal DrawSystem(Scene scene) : base(scene)
+        /// <param name="factory">The factory this system will exist in.</param>
+        internal DrawSystem(MorroFactory factory) : base(factory)
         {
             drawSystemHandler = new DrawSystemHandler(this, DrawEntity);
         }

@@ -15,9 +15,9 @@ namespace Relatus.ECS
         /// <summary>
         /// Create a <see cref="MorroSystem"/> that will process or manipulate <see cref="IComponent"/> data on every frame or a fixed basis.
         /// </summary>
-        /// <param name="scene">The scene this system will exist in.</param>
+        /// <param name="factory">The factory this system will exist in.</param>
         /// <param name="tasks">The total amount of tasks to divide the update cycle into. Assigning more than one task allows entities to be updated asynchronously.</param>
-        public UpdateSystem(Scene scene, uint tasks) : base(scene)
+        public UpdateSystem(MorroFactory factory, uint tasks) : base(factory)
         {
             updateSystemHandler = new UpdateSystemHandler(this, UpdateEntity)
             {
@@ -28,10 +28,10 @@ namespace Relatus.ECS
         /// <summary>
         /// Create a <see cref="MorroSystem"/> that will process or manipulate <see cref="IComponent"/> data on every frame or a fixed basis.
         /// </summary>
-        /// <param name="scene">The scene this system will exist in.</param>
+        /// <param name="factory">The factory this system will exist in.</param>
         /// <param name="tasks">The total amount of tasks to divide the update cycle into. Assigning more than one task allows entities to be updated asynchronously.</param>
         /// <param name="targetFPS">The target framerate the system will update in.</param>
-        public UpdateSystem(Scene scene, uint tasks, int targetFPS) : base(scene)
+        public UpdateSystem(MorroFactory factory, uint tasks, int targetFPS) : base(factory)
         {
             updateSystemHandler = new UpdateSystemHandler(this, UpdateEntity)
             {

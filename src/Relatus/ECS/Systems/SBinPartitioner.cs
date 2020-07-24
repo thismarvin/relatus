@@ -12,12 +12,13 @@ namespace Relatus.ECS
         /// <summary>
         /// Creates an implementation of a <see cref="PartitioningSystem"/> that implements a <see cref="Bin{T}"/>.
         /// </summary>
-        /// <param name="scene">The scene this system will exist in.</param>
+        /// <param name="factory">The scene this system will exist in.</param>
+        /// <param name="boundary">The area the partitioner will cover.</param>
         /// <param name="maximumDimension">The maximum expected size of any entity inserted into the bin.</param>
         /// <param name="targetFPS">The target framerate the system will update in.</param>
-        public SBinPartitioner(Scene scene, int maximumDimension, int targetFPS) : base(scene, targetFPS)
-        {            
-            partitioner = new Bin<PartitionerEntry>(scene.SceneBounds, maximumDimension);
+        public SBinPartitioner(MorroFactory factory, RectangleF boundary, int maximumDimension, int targetFPS) : base(factory, targetFPS)
+        {
+            partitioner = new Bin<PartitionerEntry>(boundary, maximumDimension);
         }
     }
 }

@@ -30,7 +30,7 @@ namespace Relatus.ECS
             geometry = GeometryManager.GetShapeData(ShapeType.Square);
         }
 
-        public SSprite(Scene scene) : base(scene)
+        public SSprite(MorroFactory factory) : base(factory)
         {
             Require(typeof(CSprite), typeof(CPosition), typeof(CTransform));
         }
@@ -42,9 +42,9 @@ namespace Relatus.ECS
 
         public override void Draw(Camera camera)
         {
-            sprites = scene.GetData<CSprite>();
-            positions = scene.GetData<CPosition>();
-            transforms = scene.GetData<CTransform>();
+            sprites = factory.GetData<CSprite>();
+            positions = factory.GetData<CPosition>();
+            transforms = factory.GetData<CTransform>();
 
             graphicsDevice.RasterizerState = GraphicsManager.RasterizerState;
             graphicsDevice.SamplerStates[0] = SamplerState.PointClamp;

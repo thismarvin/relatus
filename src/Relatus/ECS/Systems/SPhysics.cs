@@ -21,7 +21,7 @@ namespace Relatus.ECS
         private IComponent[] positions;
         private IComponent[] kinetics;
 
-        public SPhysics(Scene scene, Integrator integrator, uint tasks, int targetFPS) : base(scene, tasks)
+        public SPhysics(MorroFactory factory, Integrator integrator, uint tasks, int targetFPS) : base(factory, tasks)
         {
             Require(typeof(CPosition), typeof(CKinetic));
 
@@ -36,8 +36,8 @@ namespace Relatus.ECS
 
         public override void Update()
         {
-            positions = scene.GetData<CPosition>();
-            kinetics = scene.GetData<CKinetic>();
+            positions = factory.GetData<CPosition>();
+            kinetics = factory.GetData<CKinetic>();
 
             base.Update();
         }

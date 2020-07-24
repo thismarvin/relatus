@@ -11,7 +11,7 @@ namespace Relatus.ECS
 
         protected Partitioner<PartitionerEntry> partitioner;
 
-        internal PartitioningSystem(Scene scene, int targetFPS) : base(scene, 0, targetFPS)
+        internal PartitioningSystem(MorroFactory factory, int targetFPS) : base(factory, 0, targetFPS)
         {
             Require(typeof(CPosition), typeof(CDimension), typeof(CPartitionable));
         }
@@ -33,8 +33,8 @@ namespace Relatus.ECS
         {
             partitioner.Clear();
 
-            positions = scene.GetData<CPosition>();
-            dimensions = scene.GetData<CDimension>();
+            positions = factory.GetData<CPosition>();
+            dimensions = factory.GetData<CDimension>();
 
             base.Update();
         }
