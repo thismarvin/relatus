@@ -1,4 +1,3 @@
-using Relatus.Maths;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -27,7 +26,7 @@ namespace Relatus.ECS
             CPosition position = (CPosition)positions[entity];
             CDimension dimension = (CDimension)dimensions[entity];
 
-            partitioner.Insert(new PartitionerEntry(entity, position, dimension));
+            partitioner.Add(new PartitionerEntry(entity, position, dimension));
         }
 
         public override void Update()

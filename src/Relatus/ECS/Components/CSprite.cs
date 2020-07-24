@@ -1,5 +1,4 @@
 using Microsoft.Xna.Framework.Graphics;
-using Relatus.Core;
 using Relatus.Graphics;
 using System;
 using System.Collections.Generic;
@@ -9,15 +8,13 @@ namespace Relatus.ECS
 {
     public class CSprite : IComponent
     {
-        public Texture2D SpriteSheet { get; set; }
-        public Microsoft.Xna.Framework.Rectangle Source { get; set; }
-        public SpriteEffects SpriteEffect { get; set; }
+        public Texture2D Texture { get; set; }
+        public RectangleF SampleRegion { get; set; }
 
-        public CSprite(string name)
+        public CSprite(Texture2D texture, RectangleF sampleRegion)
         {
-            SpriteData spriteData = SpriteManager.GetSpriteData(name);
-            SpriteSheet = AssetManager.GetImage(spriteData.SpriteSheet);
-            Source = new Microsoft.Xna.Framework.Rectangle(spriteData.X, spriteData.Y, spriteData.Width, spriteData.Height);
+            Texture = texture;
+            SampleRegion = new RectangleF((int)sampleRegion.X, (int)sampleRegion.Y, (int)sampleRegion.Width, (int)sampleRegion.Height);
         }
     }
 }

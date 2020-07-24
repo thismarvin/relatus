@@ -1,5 +1,4 @@
 using Microsoft.Xna.Framework;
-using Relatus.Core;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -37,6 +36,15 @@ namespace Relatus.Input
         public void LoadProfile(string profile)
         {
             inputProfile = InputManager.GetProfile(profile);
+        }
+
+        /// <summary>
+        /// Load a given <see cref="InputProfile"/>.
+        /// </summary>
+        /// <param name="profile">The input profile to load.</param>
+        public void LoadProfile(InputProfile profile)
+        {
+            inputProfile = profile;
         }
 
         /// <summary>

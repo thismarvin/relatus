@@ -1,4 +1,3 @@
-using Relatus.Core;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -12,9 +11,11 @@ namespace Relatus.Graphics
             get => radius;
             set
             {
-                radius = value;
-                Width = radius * 2;
-                Height = radius * 2;
+                if (radius == value)
+                    return;
+
+                radius = value;                
+                SetBounds(X, Y, radius * 2, radius * 2);
             }
         }
 
@@ -23,17 +24,22 @@ namespace Relatus.Graphics
             get => lineWidth;
             set
             {
+                if (lineWidth == value)
+                    return;
+
                 lineWidth = value;
-                Geometry = GeometryManager.CreateHollowCircle(radius, lineWidth);
+                AttachGeometry(GeometryManager.CreateHollowCircle(radius, lineWidth));
             }
         }
 
         private float radius;
         private float lineWidth;
 
-        public Circle(float x, float y, float radius) : base(x, y, radius * 2, radius * 2)
+        public Circle(float x, float y, float radius)
         {
             this.radius = radius;
+
+            SetBounds(x, y, this.radius * 2, this.radius * 2);
             AttachGeometry(GeometryManager.GetShapeData(ShapeType.Circle));
             ApplyChanges();
         }

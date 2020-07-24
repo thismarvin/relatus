@@ -17,7 +17,7 @@ namespace Relatus.ECS
         /// </summary>
         /// <param name="scene">The scene this system will exist in.</param>
         /// <param name="tasks">The total amount of tasks to divide the update cycle into. Assigning more than one task allows entities to be updated asynchronously.</param>
-        internal UpdateSystem(Scene scene, uint tasks) : base(scene)
+        public UpdateSystem(Scene scene, uint tasks) : base(scene)
         {
             updateSystemHandler = new UpdateSystemHandler(this, UpdateEntity)
             {
@@ -31,7 +31,7 @@ namespace Relatus.ECS
         /// <param name="scene">The scene this system will exist in.</param>
         /// <param name="tasks">The total amount of tasks to divide the update cycle into. Assigning more than one task allows entities to be updated asynchronously.</param>
         /// <param name="targetFPS">The target framerate the system will update in.</param>
-        internal UpdateSystem(Scene scene, uint tasks, int targetFPS) : base(scene)
+        public UpdateSystem(Scene scene, uint tasks, int targetFPS) : base(scene)
         {
             updateSystemHandler = new UpdateSystemHandler(this, UpdateEntity)
             {

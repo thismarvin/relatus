@@ -1,5 +1,4 @@
 using Microsoft.Xna.Framework;
-using Relatus.Core;
 using Relatus.Graphics;
 using System;
 using System.Collections.Generic;
@@ -48,7 +47,7 @@ namespace Relatus.Debug
             Information = new string[] { "" };
 
             Vector2 position = DebugManager.NextDebugEntryPosition();
-            entryText = new Text(position.X, position.Y, "", FontType.Probity);
+            entryText = new Text(position.X, position.Y, "", AssetManager.GetFont("Relatus_Probity"));
         }
 
         /// <summary>

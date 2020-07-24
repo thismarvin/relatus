@@ -1,5 +1,5 @@
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Relatus.Core;
 using Relatus.Graphics;
 using System;
 using System.Collections.Generic;
@@ -19,6 +19,14 @@ namespace Relatus.ECS
 
         protected GeometryData geometry;
         protected VertexTransformColor[] vertexBuffer;
+        protected DynamicVertexBuffer transformsBuffer;
+        protected VertexBufferBinding[] vertexBufferBindings;
+
+        protected static readonly GraphicsDevice graphicsDevice;
+        static SimpleShapeSystem()
+        {
+            graphicsDevice = Engine.Graphics.GraphicsDevice;
+        }
 
         /// <summary>
         /// Create a <see cref="HybridSystem"/> that helps process, manipulate, and draw <see cref="GeometryData"/>.
@@ -29,7 +37,7 @@ namespace Relatus.ECS
         /// <param name="geometry">The shape data that this system will focus on and draw.</param>
         /// <param name="shapeTag">The type of the custom <see cref="IComponent"/> that acts as a tag specifically for this system.</param>
         /// <param name="tasks">The total amount of tasks to divide the update cycle into. Assigning more than one task allows entities to be updated asynchronously.</param>
-        internal SimpleShapeSystem(Scene scene, GeometryData geometry, Type shapeTag, uint tasks) : base(scene, tasks)
+        public SimpleShapeSystem(Scene scene, GeometryData geometry, Type shapeTag, uint tasks) : base(scene, tasks)
         {
             Require(typeof(CPosition), typeof(CDimension), typeof(CTransform), typeof(CColor), shapeTag);
 
@@ -44,12 +52,37 @@ namespace Relatus.ECS
             CTransform transform = (CTransform)transforms[entity];
             CColor color = (CColor)colors[entity];
 
-            vertexBuffer[entity] = new VertexTransformColor(position, dimension, transform, color);
+            vertexBuffer[entity] = CreateVertexTransformColor(position, dimension, transform, color);
         }
 
         public override void DrawEntity(int entity, Camera camera)
         {
             throw new NotImplementedException();
+        }
+
+        private VertexTransformColor CreateVertexTransformColor(CPosition position, CDimension dimension, CTransform transform, CColor color)
+        {
+            Vector3 scale = new Vector3(dimension.Width * transform.Scale.X, dimension.Height * transform.Scale.Y, transform.Scale.Z);
+            Vector2 rotationOffset = new Vector2(transform.RotationOffset.X, transform.RotationOffset.Y);
+            Vector3 translation = new Vector3(position.X + transform.Translation.X, position.Y + transform.Translation.Y, position.Z + transform.Translation.Z);
+
+            return new VertexTransformColor(scale, rotationOffset, transform.Rotation, translation, color.Color);
+        }
+
+        private void CreateVertexBufferBindings()
+        {
+            if (Entities.Count <= 0)
+                return;
+
+            transformsBuffer?.Dispose();
+            transformsBuffer = new DynamicVertexBuffer(graphicsDevice, typeof(VertexTransformColor), vertexBuffer.Length, BufferUsage.WriteOnly);
+            transformsBuffer.SetData(vertexBuffer);
+
+            vertexBufferBindings = new VertexBufferBinding[]
+            {
+                new VertexBufferBinding(geometry.VertexBuffer),
+                new VertexBufferBinding(transformsBuffer, 0, 1)
+            };
         }
 
         public override void Update()
@@ -69,21 +102,18 @@ namespace Relatus.ECS
             if (Entities.Count <= 0)
                 return;
 
-            using (DynamicVertexBuffer transformsBuffer = new DynamicVertexBuffer(Engine.Graphics.GraphicsDevice, typeof(VertexTransformColor), vertexBuffer.Length, BufferUsage.WriteOnly))
+            CreateVertexBufferBindings();
+
+            graphicsDevice.RasterizerState = GraphicsManager.RasterizerState;
+            graphicsDevice.SetVertexBuffers(vertexBufferBindings);
+            graphicsDevice.Indices = geometry.IndexBuffer;
+
+            GeometryManager.SetupPolygonShader(camera);
+
+            foreach (EffectPass pass in GeometryManager.PolygonShader.Techniques[1].Passes)
             {
-                transformsBuffer.SetData(vertexBuffer);
-
-                Engine.Graphics.GraphicsDevice.RasterizerState = GraphicsManager.RasterizerState;
-                Engine.Graphics.GraphicsDevice.SetVertexBuffers(new VertexBufferBinding(geometry.Geometry), new VertexBufferBinding(transformsBuffer, 0, 1));
-                Engine.Graphics.GraphicsDevice.Indices = geometry.Indices;
-
-                GeometryManager.SetupPolygonShader(camera);
-
-                foreach (EffectPass pass in GeometryManager.PolygonShader.Techniques[1].Passes)
-                {
-                    pass.Apply();
-                    Engine.Graphics.GraphicsDevice.DrawInstancedPrimitives(PrimitiveType.TriangleList, 0, 0, geometry.TotalTriangles, vertexBuffer.Length);
-                }
+                pass.Apply();
+                graphicsDevice.DrawInstancedPrimitives(PrimitiveType.TriangleList, 0, 0, geometry.TotalTriangles, vertexBuffer.Length);
             }
         }
     }

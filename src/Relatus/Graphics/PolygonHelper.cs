@@ -1,5 +1,4 @@
 using Microsoft.Xna.Framework;
-using Relatus.Maths;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -24,7 +23,7 @@ namespace Relatus.Graphics
 
             for (int i = 0; i < polygon.Geometry.TotalVertices; i++)
             {
-                result[i] = Vector2.Transform(new Vector2(polygon.Geometry.Vertices[i].X, polygon.Geometry.Vertices[i].Y), polygonTransform);
+                result[i] = Vector2.Transform(new Vector2(polygon.Geometry.Mesh.Vertices[i].X, polygon.Geometry.Mesh.Vertices[i].Y), polygonTransform);
             }
 
             return result;

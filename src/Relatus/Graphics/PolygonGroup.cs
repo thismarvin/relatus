@@ -1,5 +1,4 @@
 using Microsoft.Xna.Framework.Graphics;
-using Relatus.Core;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -51,7 +50,7 @@ namespace Relatus.Graphics
 
             vertexBufferBindings = new VertexBufferBinding[]
             {
-                new VertexBufferBinding(sharedShapeData.Geometry),
+                new VertexBufferBinding(sharedShapeData.VertexBuffer),
                 new VertexBufferBinding(transformBuffer, 0, 1)
             };
         }
@@ -66,7 +65,7 @@ namespace Relatus.Graphics
 
             Engine.Graphics.GraphicsDevice.RasterizerState = GraphicsManager.RasterizerState;
             Engine.Graphics.GraphicsDevice.SetVertexBuffers(vertexBufferBindings);
-            Engine.Graphics.GraphicsDevice.Indices = sharedShapeData.Indices;
+            Engine.Graphics.GraphicsDevice.Indices = sharedShapeData.IndexBuffer;
 
             GeometryManager.SetupPolygonShader(camera);
 

@@ -1,4 +1,3 @@
-using Relatus.Core;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -22,7 +21,7 @@ namespace Relatus.Utilities
             characters = new Dictionary<int, BMFontCharacter>();
         }
 
-        public void ParseInfo(string info)
+        internal void ParseInfo(string info)
         {
             string[] data = info.Split(',');
 
@@ -32,7 +31,7 @@ namespace Relatus.Utilities
             Italic = data[3] == "1" ? true : false;
         }
 
-        public void AddPage(string page)
+        internal void AddPage(string page)
         {
             string[] data = page.Split(',');
 
@@ -51,7 +50,7 @@ namespace Relatus.Utilities
             }
         }
 
-        public void AddCharacter(string character)
+        internal void AddCharacter(string character)
         {
             string[] data = character.Split(',');
 
@@ -85,7 +84,6 @@ namespace Relatus.Utilities
         {
             if (!characters.ContainsKey(character))
             {
-                //throw new MorroException("That character code was not included in the BMFont file.", new KeyNotFoundException());
                 return new BMFontCharacter(0, 0, 0, Size);
             }
 
