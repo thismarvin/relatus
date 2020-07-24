@@ -24,7 +24,7 @@ namespace Relatus.Graphics
                 new VertexElement(0, VertexElementFormat.Vector3, VertexElementUsage.Position, 1),
                 new VertexElement(12, VertexElementFormat.Vector3, VertexElementUsage.Position, 2),
                 new VertexElement(24, VertexElementFormat.Vector3, VertexElementUsage.Position, 3),
-                new VertexElement(36, VertexElementFormat.Single, VertexElementUsage.Position, 4)
+                new VertexElement(36, VertexElementFormat.Single, VertexElementUsage.TextureCoordinate, 1)
             );
         }
 

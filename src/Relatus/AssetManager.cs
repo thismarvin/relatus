@@ -184,8 +184,9 @@ namespace Relatus
 
         internal static void LoadContent()
         {
+            LoadEffect("Relatus_PolygonShader", "Assets/Effects/PolygonShader");
+            LoadEffect("Relatus_SpriteShader", "Assets/Effects/SpriteShader");
             LoadEffect("Relatus_BMFontShader", "Assets/Effects/BMFontShader");
-            LoadEffect("Relatus_PolygonShader", "Assets/Effects/Polygon");
 
             LoadFont("Relatus_Probity", "Assets/Fonts/probity");
         }
