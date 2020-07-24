@@ -12,16 +12,6 @@ namespace Relatus.ECS
         public int EntityCapacity => entityManager.Capacity;
         public int EntityCount => entityManager.EntityCount;
 
-        /// <summary>
-        /// By default all registered <see cref="MorroSystem"/>'s are ran asyncronously.
-        /// If this functionality is disabled, systems will run in the order they were registered.
-        /// </summary>
-        public bool AsynchronousSystemsEnabled
-        {
-            get => !systemManager.DisableAsynchronousUpdates;
-            set => systemManager.DisableAsynchronousUpdates = !value;
-        }
-
         private readonly SystemManager systemManager;
         private readonly ComponentManager componentManager;
         private readonly EntityManager entityManager;
@@ -45,16 +35,30 @@ namespace Relatus.ECS
             entityRemovalQueue = new SparseSet(entityCapacity);
         }
 
-        /// <summary>
-        /// Registers a given collection of <see cref="MorroSystem"/>'s to be managed by the scene.
-        /// </summary>
-        /// <param name="morroSystem">A collection of <see cref="MorroSystem"/>'s to be registered and managed by the scene.</param>
-        public void RegisterSystems(params MorroSystem[] morroSystem)
+        public SystemGroup CreateGroup(params MorroSystem[] systems)
         {
-            systemManager.RegisterSystem(morroSystem);
-            eventManager.LinkSystems();
+            return new SystemGroup(systems.Length).Add(systems);
         }
 
+        public MorroFactory Jumpstart(params SystemGroup[] systemGroups)
+        {
+            Register(systemGroups);
+            eventManager.LinkSystems();
+
+            return this;
+        }
+
+        public MorroFactory Register(params SystemGroup[] groups)
+        {
+            for (int i = 0; i < groups.Length; i++)
+            {
+                systemManager.RegisterSystem(groups[i].Systems);
+            }
+
+            return this;
+        }
+
+        #region Entity Helper Methods
         /// <summary>
         /// Creates an entity from a given collection of <see cref="IComponent"/> data.
         /// </summary>
@@ -107,6 +111,7 @@ namespace Relatus.ECS
         {
             entityManager.RemoveComponent(entity, componentTypes);
         }
+        #endregion
 
         /// <summary>
         /// Returns an array of all of the data of a given <see cref="IComponent"/> type.
@@ -140,12 +145,10 @@ namespace Relatus.ECS
         }
 
         /// <summary>
-        /// Runs all registered <see cref="IUpdateableSystem"/> systems.
+        /// Maintains the integrity of the factory.
         /// </summary>
-        public void RunUpdateableSystems()
+        public void Upkeep()
         {
-            systemManager.Update();
-
             if (entityRemovalQueue.Count != 0)
             {
                 foreach (uint entity in entityRemovalQueue)
@@ -157,11 +160,25 @@ namespace Relatus.ECS
         }
 
         /// <summary>
-        /// Runs all registered <see cref="IDrawableSystem"/> systems.
+        /// Runs all registered <see cref="IUpdateableSystem"/> systems in a given group.
         /// </summary>
-        public void RunDrawableSystems(Camera camera)
+        public void RunUpdateableSystems(params SystemGroup[] groups)
         {
-            systemManager.Draw(camera);
+            for (int i = 0; i < groups.Length; i++)
+            {
+                groups[i].RunUpdateableSystems();
+            }
+        }
+
+        /// <summary>
+        /// Runs all <see cref="IDrawableSystem"/> systems in a given group.
+        /// </summary>
+        public void RunDrawableSystems(Camera camera, params SystemGroup[] groups)
+        {
+            for (int i = 0; i < groups.Length; i++)
+            {
+                groups[i].RunDrawableSystems(camera);
+            }
         }
     }
 }

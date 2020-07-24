@@ -12,10 +12,11 @@ namespace Relatus.ECS
         public bool Enabled { get; set; }
         public HashSet<Type> RequiredComponents { get; private set; }
         public HashSet<Type> BlacklistedComponents { get; private set; }
-        public HashSet<Type> Dependencies { get; private set; }
         public HashSet<Type> Subscriptions { get; private set; }
-        protected internal HashSet<int> Entities { get; private set; }
 
+        // The following properties need to be internal for the UpdateHandlers to work.
+        // This probably isn't the best design, but it works for now!
+        protected internal HashSet<int> Entities { get; private set; }
         protected internal int[] EntitiesAsArray
         {
             get
@@ -47,15 +48,15 @@ namespace Relatus.ECS
 
         public MorroSystem(MorroFactory factory)
         {
+            this.factory = factory;
+
             RequiredComponents = new HashSet<Type>();
             BlacklistedComponents = new HashSet<Type>();
-            Dependencies = new HashSet<Type>();
             Subscriptions = new HashSet<Type>();
             Entities = new HashSet<int>();
             entitiesAsArray = new int[factory.EntityCapacity];
 
             Enabled = true;
-            this.factory = factory;
         }
 
         /// <summary>
@@ -83,20 +84,6 @@ namespace Relatus.ECS
             for (int i = 0; i < components.Length; i++)
             {
                 BlacklistedComponents.Add(components[i]);
-            }
-        }
-
-        /// <summary>
-        /// Initialize a set of <see cref="MorroSystem"/> types this system depends on running first before this system can run.
-        /// </summary>
-        /// <param name="systems">The types of <see cref="MorroSystem"/> this system depends on running first.</param>
-        public void Depend(params Type[] systems)
-        {
-            Dependencies.Clear();
-
-            for (int i = 0; i < systems.Length; i++)
-            {
-                Dependencies.Add(systems[i]);
             }
         }
 

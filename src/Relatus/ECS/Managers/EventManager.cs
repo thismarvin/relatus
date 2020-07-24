@@ -22,7 +22,6 @@ namespace Relatus.ECS
         /// </summary>
         public void LinkSystems()
         {
-            Type systemType;
             for (int i = 0; i < systemManager.TotalSystemsRegistered; i++)
             {
                 if (systemManager.Systems[i] is IEventAnnouncer)
@@ -31,7 +30,7 @@ namespace Relatus.ECS
                     {
                         if (i != j && systemManager.Systems[j] is IEventListener)
                         {
-                            systemType = systemManager.Systems[i].GetType();
+                            Type systemType = systemManager.Systems[i].GetType();
 
                             if (systemManager.Systems[j].Subscriptions.Contains(systemType))
                             {
