@@ -17,33 +17,13 @@ namespace Relatus.ECS
         // The following properties need to be internal for the UpdateHandlers to work.
         // This probably isn't the best design, but it works for now!
         protected internal HashSet<int> Entities { get; private set; }
-        protected internal int[] EntitiesAsArray
-        {
-            get
-            {
-                if (!entityDataChanged)
-                {
-                    return entitiesAsArray;
-                }
-                else
-                {
-                    entityDataChanged = false;
-
-                    int entityIndex = 0;
-
-                    foreach (int entity in Entities)
-                    {
-                        entitiesAsArray[entityIndex++] = entity;
-                    }
-
-                    return entitiesAsArray;
-                }
-            }
-        }
+        protected internal int[] EntitiesAsArray { get; private set; }
 
         protected MorroFactory factory;
 
         private readonly int[] entitiesAsArray;
+        private readonly Stack<int> entityRemoval;
+        private readonly Stack<int> entityAddition;
         private bool entityDataChanged;
 
         public MorroSystem(MorroFactory factory)
@@ -55,6 +35,8 @@ namespace Relatus.ECS
             Subscriptions = new HashSet<Type>();
             Entities = new HashSet<int>();
             entitiesAsArray = new int[factory.EntityCapacity];
+            entityRemoval = new Stack<int>(factory.EntityCapacity);
+            entityAddition = new Stack<int>(factory.EntityCapacity);
 
             Enabled = true;
         }
@@ -103,20 +85,43 @@ namespace Relatus.ECS
 
         internal void AddEntity(int entity)
         {
-            if (Entities.Contains(entity))
-                return;
-
-            Entities.Add(entity);
+            entityAddition.Push(entity);
             entityDataChanged = true;
         }
 
         internal void RemoveEntity(int entity)
         {
-            if (!Entities.Contains(entity))
+            entityRemoval.Push(entity);
+            entityDataChanged = true;
+        }
+
+        internal void ApplyChanges()
+        {
+            if (!entityDataChanged)
                 return;
 
-            Entities.Remove(entity);
-            entityDataChanged = true;
+            while (entityRemoval.Count > 0)
+            {
+                int entity = entityRemoval.Pop();
+
+                if (!Entities.Contains(entity))
+                    continue;
+
+                Entities.Remove(entity);
+            }
+
+            while (entityAddition.Count > 0)
+            {
+                Entities.Add(entityAddition.Pop());
+            }
+
+            int entityIndex = 0;
+            foreach (int entity in Entities)
+            {
+                entitiesAsArray[entityIndex++] = entity;
+            }
+
+            entityDataChanged = false;
         }
     }
 }

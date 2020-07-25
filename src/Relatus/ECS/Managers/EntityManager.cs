@@ -110,10 +110,9 @@ namespace Relatus.ECS
         /// <param name="componentTypes">The collection of <see cref="IComponent"/> types that will be removed.</param>
         public void RemoveComponent(int entity, params Type[] componentTypes)
         {
-            int componentID;
             for (int i = 0; i < componentTypes.Length; i++)
             {
-                componentID = componentManager.GetComponentID(componentTypes[i]);
+                int componentID = componentManager.GetComponentID(componentTypes[i]);
 
                 if (componentID == -1)
                     continue;
@@ -142,10 +141,9 @@ namespace Relatus.ECS
             if (components.Count == 0)
                 return false;
 
-            int componentID;
             foreach (Type component in components)
             {
-                componentID = componentManager.GetComponentID(component);
+                int componentID = componentManager.GetComponentID(component);
 
                 if (componentID == -1 || !attachedComponents[entity].Contains((uint)componentID))
                     return false;
@@ -165,10 +163,9 @@ namespace Relatus.ECS
             if (components.Length == 0)
                 return false;
 
-            int componentID;
             for (int i = 0; i < components.Length; i++)
             {
-                componentID = componentManager.GetComponentID(components[i]);
+                int componentID = componentManager.GetComponentID(components[i]);
 
                 if (componentID == -1 || !attachedComponents[entity].Contains((uint)componentID))
                     return false;
@@ -179,10 +176,9 @@ namespace Relatus.ECS
 
         private void AssignComponents(int entity, params IComponent[] components)
         {
-            int componentID;
             for (int i = 0; i < components.Length; i++)
             {
-                componentID = componentManager.GetComponentID(components[i]);
+                int componentID = componentManager.GetComponentID(components[i]);
 
                 if (componentID == -1)
                     continue;

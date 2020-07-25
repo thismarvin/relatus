@@ -75,10 +75,12 @@ namespace Relatus.ECS
         /// <summary>
         /// Queues the deletion of a given entity.
         /// </summary>
-        /// <param name="entity">The entity to be removed from the scene.</param>
-        public void RemoveEntity(int entity)
+        /// <param name="entity">The entity to be removed from the factory.</param>
+        public MorroFactory RemoveEntity(int entity)
         {
             entityRemovalQueue.Add((uint)entity);
+
+            return this;
         }
 
         /// <summary>
@@ -97,9 +99,11 @@ namespace Relatus.ECS
         /// </summary>
         /// <param name="entity">The entity that will be modified.</param>
         /// <param name="components">The collection of <see cref="IComponent"/> data that will be added.</param>
-        public void AddComponents(int entity, params IComponent[] components)
+        public MorroFactory AddComponents(int entity, params IComponent[] components)
         {
             entityManager.AddComponent(entity, components);
+
+            return this;
         }
 
         /// <summary>
@@ -107,9 +111,11 @@ namespace Relatus.ECS
         /// </summary>
         /// <param name="entity">The entity that will be modified.</param>
         /// <param name="componentTypes">The collection of <see cref="IComponent"/> types that will be removed.</param>
-        public void RemoveComponents(int entity, params Type[] componentTypes)
+        public MorroFactory RemoveComponents(int entity, params Type[] componentTypes)
         {
             entityManager.RemoveComponent(entity, componentTypes);
+
+            return this;
         }
         #endregion
 
@@ -145,9 +151,19 @@ namespace Relatus.ECS
         }
 
         /// <summary>
-        /// Maintains the integrity of the factory.
+        /// Applies any recent changes to entity data to all linked systems.
         /// </summary>
-        public void Upkeep()
+        public MorroFactory ApplyChanges()
+        {
+            systemManager.ApplyChanges();
+
+            return this;
+        }
+
+        /// <summary>
+        /// Removes any entities that were queued for deletion.
+        /// </summary>
+        public MorroFactory Clean()
         {
             if (entityRemovalQueue.Count != 0)
             {
@@ -157,28 +173,34 @@ namespace Relatus.ECS
                 }
                 entityRemovalQueue.Clear();
             }
+
+            return this;
         }
 
         /// <summary>
         /// Runs all registered <see cref="IUpdateableSystem"/> systems in a given group.
         /// </summary>
-        public void RunUpdateableSystems(params SystemGroup[] groups)
+        public MorroFactory RunUpdateableSystems(params SystemGroup[] groups)
         {
             for (int i = 0; i < groups.Length; i++)
             {
                 groups[i].RunUpdateableSystems();
             }
+
+            return this;
         }
 
         /// <summary>
         /// Runs all <see cref="IDrawableSystem"/> systems in a given group.
         /// </summary>
-        public void RunDrawableSystems(Camera camera, params SystemGroup[] groups)
+        public MorroFactory RunDrawableSystems(Camera camera, params SystemGroup[] groups)
         {
             for (int i = 0; i < groups.Length; i++)
             {
                 groups[i].RunDrawableSystems(camera);
             }
+
+            return this;
         }
     }
 }

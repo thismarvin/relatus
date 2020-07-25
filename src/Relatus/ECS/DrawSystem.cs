@@ -25,6 +25,7 @@ namespace Relatus.ECS
         public virtual void Draw(Camera camera)
         {
             drawSystemHandler.Draw(camera);
+            ApplyChanges();
         }
 
         public abstract void DrawEntity(int entity, Camera camera);

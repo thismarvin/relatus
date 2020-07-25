@@ -35,6 +35,7 @@ namespace Relatus.ECS
             {
                 Type systemType = systems[i].GetType();
 
+                // This should really throw an error.
                 if (registeredSystems.Contains(systemType))
                     continue;
 
@@ -42,6 +43,14 @@ namespace Relatus.ECS
                 systemLookup.Add(systemType, TotalSystemsRegistered);
                 Systems[TotalSystemsRegistered] = systems[i];
                 TotalSystemsRegistered++;
+            }
+        }
+
+        public void ApplyChanges()
+        {
+            for (int i = 0; i < TotalSystemsRegistered; i++)
+            {
+                Systems[i].ApplyChanges();
             }
         }
 
