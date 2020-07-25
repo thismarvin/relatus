@@ -8,7 +8,7 @@ namespace Relatus.ECS
     /// <summary>
     /// Handles all functionality related to creating and modifying entities.
     /// </summary>
-    public class EntityManager
+    internal class EntityManager
     {
         public int Capacity { get; private set; }
 

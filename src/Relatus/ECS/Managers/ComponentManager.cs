@@ -7,7 +7,7 @@ namespace Relatus.ECS
     /// <summary>
     /// Handles all functionality related to managing <see cref="IComponent"/> data.
     /// </summary>
-    public class ComponentManager
+    internal class ComponentManager
     {
         public int Capacity { get; private set; }
         public int TotalComponentsRegistered { get; private set; }

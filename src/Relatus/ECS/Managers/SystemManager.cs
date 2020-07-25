@@ -8,7 +8,7 @@ namespace Relatus.ECS
     /// <summary>
     /// Handles all functionality related to maintaining and managing <see cref="MorroSystem"/>'s.
     /// </summary>
-    public class SystemManager
+    internal class SystemManager
     {
         public int Capacity { get; private set; }
         public int TotalSystemsRegistered { get; private set; }

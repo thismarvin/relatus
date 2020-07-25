@@ -7,7 +7,7 @@ namespace Relatus.ECS
     /// <summary>
     /// Handles all functionality related to sending events between <see cref="IEventAnnouncer"/> and <see cref="IEventListener"/> capable <see cref="MorroSystem"/>'s.
     /// </summary>
-    public class EventManager
+    internal class EventManager
     {
         private readonly SystemManager systemManager;
 
