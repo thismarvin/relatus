@@ -43,7 +43,6 @@ namespace Relatus.ECS
         public virtual void Update()
         {
             updateSystemHandler.Update();
-            ApplyChanges();
         }
 
         public abstract void UpdateEntity(int entity);

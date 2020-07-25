@@ -17,6 +17,8 @@ namespace Relatus.ECS
         private readonly EntityManager entityManager;
         private readonly EventManager eventManager;
 
+        private readonly Stack<Tuple<int, IComponent[]>> componentAddition;
+        private readonly Stack<Tuple<int, Type[]>> componentSubtraction;
         private readonly SparseSet entityRemovalQueue;
 
         /// <summary>
@@ -32,6 +34,8 @@ namespace Relatus.ECS
             entityManager = new EntityManager(entityCapacity, systemManager, componentManager);
             eventManager = new EventManager(systemManager);
 
+            componentAddition = new Stack<Tuple<int, IComponent[]>>();
+            componentSubtraction = new Stack<Tuple<int, Type[]>>();
             entityRemovalQueue = new SparseSet(entityCapacity);
         }
 
@@ -101,7 +105,7 @@ namespace Relatus.ECS
         /// <param name="components">The collection of <see cref="IComponent"/> data that will be added.</param>
         public MorroFactory AddComponents(int entity, params IComponent[] components)
         {
-            entityManager.AddComponent(entity, components);
+            componentAddition.Push(new Tuple<int, IComponent[]>(entity, components));
 
             return this;
         }
@@ -113,7 +117,7 @@ namespace Relatus.ECS
         /// <param name="componentTypes">The collection of <see cref="IComponent"/> types that will be removed.</param>
         public MorroFactory RemoveComponents(int entity, params Type[] componentTypes)
         {
-            entityManager.RemoveComponent(entity, componentTypes);
+            componentSubtraction.Push(new Tuple<int, Type[]>(entity, componentTypes));
 
             return this;
         }
@@ -151,20 +155,25 @@ namespace Relatus.ECS
         }
 
         /// <summary>
-        /// Applies any recent changes to entity data to all linked systems.
+        /// Applies any recent changes to entity data, and maintains the integrity of all of the factory's systems.
         /// </summary>
         public MorroFactory ApplyChanges()
         {
-            systemManager.ApplyChanges();
+            // Handles removing components from entities.
+            while (componentSubtraction.Count > 0)
+            {
+                Tuple<int, Type[]> modification = componentSubtraction.Pop();
+                entityManager.RemoveComponent(modification.Item1, modification.Item2);
+            }
 
-            return this;
-        }
+            // Handles adding components to entities.
+            while (componentAddition.Count > 0)
+            {
+                Tuple<int, IComponent[]> modification = componentAddition.Pop();
+                entityManager.AddComponent(modification.Item1, modification.Item2);
+            }
 
-        /// <summary>
-        /// Removes any entities that were queued for deletion.
-        /// </summary>
-        public MorroFactory Clean()
-        {
+            // Handles removing entities.
             if (entityRemovalQueue.Count != 0)
             {
                 foreach (uint entity in entityRemovalQueue)
@@ -173,6 +182,9 @@ namespace Relatus.ECS
                 }
                 entityRemovalQueue.Clear();
             }
+
+            // Update all systems with the new entity data.
+            systemManager.ApplyChanges();
 
             return this;
         }
