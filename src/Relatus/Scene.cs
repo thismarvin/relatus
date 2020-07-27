@@ -25,7 +25,6 @@ namespace Relatus
         public Scene(string name)
         {
             Name = name;
-            SceneBounds = new RectangleF(0, 0, WindowManager.PixelWidth, WindowManager.PixelHeight);
 
             EnterTransition = new Pinhole(TransitionType.Enter);
             ExitTransition = new Fade(TransitionType.Exit);
