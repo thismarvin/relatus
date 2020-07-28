@@ -21,7 +21,6 @@ namespace Relatus.ECS
 
         protected MorroFactory factory;
 
-        private readonly int[] entitiesAsArray;
         private readonly Stack<int> entityRemoval;
         private readonly Stack<int> entityAddition;
         private bool entityDataChanged;
@@ -34,7 +33,7 @@ namespace Relatus.ECS
             BlacklistedComponents = new HashSet<Type>();
             Subscriptions = new HashSet<Type>();
             Entities = new HashSet<int>();
-            entitiesAsArray = new int[factory.EntityCapacity];
+            EntitiesAsArray = new int[factory.EntityCapacity];
             entityRemoval = new Stack<int>(factory.EntityCapacity);
             entityAddition = new Stack<int>(factory.EntityCapacity);
 
@@ -118,7 +117,7 @@ namespace Relatus.ECS
             int entityIndex = 0;
             foreach (int entity in Entities)
             {
-                entitiesAsArray[entityIndex++] = entity;
+                EntitiesAsArray[entityIndex++] = entity;
             }
 
             entityDataChanged = false;
