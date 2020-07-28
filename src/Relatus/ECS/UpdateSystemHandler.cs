@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Relatus.ECS
 {
-    public class UpdateSystemHandler
+    internal class UpdateSystemHandler
     {
         public uint TotalTasks { get; set; }
         public bool FixedUpdateEnabled { get; set; }
