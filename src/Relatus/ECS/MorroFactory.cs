@@ -23,7 +23,7 @@ namespace Relatus.ECS
 
         /// <summary>
         /// Creates a factory that provides ECS funcitonality.
-        /// </summary> 
+        /// </summary>
         /// <param name="entityCapacity">The total of amount of entities supported by this factory.</param>
         /// <param name="componentCapacity">The total of amount of unique <see cref="IComponent"/> types supported by this factory.</param>
         /// <param name="systemCapacity">The total of amount of unique <see cref="MorroSystem"/> types supported by this factory.</param>
@@ -128,7 +128,7 @@ namespace Relatus.ECS
         /// </summary>
         /// <typeparam name="T">The type of <see cref="IComponent"/> data to be retrieved.</typeparam>
         /// <returns>An array of all of the data of a given <see cref="IComponent"/> type.</returns>
-        public IComponent[] GetData<T>() where T : IComponent
+        public T[] GetData<T>() where T : IComponent
         {
             return componentManager.GetData<T>();
         }
