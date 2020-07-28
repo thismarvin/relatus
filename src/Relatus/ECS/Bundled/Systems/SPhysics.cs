@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Relatus.ECS
+namespace Relatus.ECS.Bundled
 {
     /// <summary>
     /// The types of integrators available to the built in physics system.

@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Relatus.ECS
+namespace Relatus.ECS.Bundled
 {
     /// <summary>
     /// A type of <see cref="HybridSystem"/> that helps process, manipulate, and draw <see cref="GeometryData"/>.
