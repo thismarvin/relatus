@@ -12,10 +12,10 @@ namespace Relatus.ECS
     /// </summary>
     public abstract class SimpleShapeSystem : HybridSystem
     {
-        protected IComponent[] positions;
-        protected IComponent[] dimensions;
-        protected IComponent[] transforms;
-        protected IComponent[] colors;
+        protected CPosition[] positions;
+        protected CDimension[] dimensions;
+        protected CTransform[] transforms;
+        protected CColor[] colors;
 
         protected GeometryData geometry;
         protected VertexTransformColor[] vertexBuffer;
@@ -47,10 +47,10 @@ namespace Relatus.ECS
 
         public override void UpdateEntity(int entity)
         {
-            CPosition position = (CPosition)positions[entity];
-            CDimension dimension = (CDimension)dimensions[entity];
-            CTransform transform = (CTransform)transforms[entity];
-            CColor color = (CColor)colors[entity];
+            CPosition position = positions[entity];
+            CDimension dimension = dimensions[entity];
+            CTransform transform = transforms[entity];
+            CColor color = colors[entity];
 
             vertexBuffer[entity] = CreateVertexTransformColor(position, dimension, transform, color);
         }
@@ -87,10 +87,10 @@ namespace Relatus.ECS
 
         public override void Update()
         {
-            positions = factory.GetData<CPosition>();
-            dimensions = factory.GetData<CDimension>();
-            transforms = factory.GetData<CTransform>();
-            colors = factory.GetData<CColor>();
+            positions = positions ?? factory.GetData<CPosition>();
+            dimensions = dimensions ?? factory.GetData<CDimension>();
+            transforms = transforms ?? factory.GetData<CTransform>();
+            colors = colors ?? factory.GetData<CColor>();
 
             Array.Clear(vertexBuffer, 0, vertexBuffer.Length);
 

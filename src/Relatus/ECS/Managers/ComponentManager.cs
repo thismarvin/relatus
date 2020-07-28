@@ -64,13 +64,13 @@ namespace Relatus.ECS
         /// </summary>
         /// <typeparam name="T">The type of <see cref="IComponent"/> data to be retrieved.</typeparam>
         /// <returns>An array of all of the data of a given <see cref="IComponent"/> type.</returns>
-        public IComponent[] GetData<T>() where T : IComponent
+        public T[] GetData<T>() where T : IComponent
         {
             Type componentType = typeof(T);
             if (!registeredComponents.Contains(componentType))
-                return new IComponent[0];
+                return new T[0];
 
-            return Data[componentLookup[componentType]];
+            return Array.ConvertAll(Data[componentLookup[componentType]], i => (T)i);
         }
 
         /// <summary>

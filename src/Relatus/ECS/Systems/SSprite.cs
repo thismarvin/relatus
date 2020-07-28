@@ -9,9 +9,9 @@ namespace Relatus.ECS
 {
     public class SSprite : DrawSystem
     {
-        private IComponent[] sprites;
-        private IComponent[] positions;
-        private IComponent[] transforms;
+        private CSprite[] sprites;
+        private CPosition[] positions;
+        private CTransform[] transforms;
 
         private VertexColorTexture[] vertexData;
         private VertexBufferBinding[] vertexBufferBindings;
@@ -42,9 +42,9 @@ namespace Relatus.ECS
 
         public override void Draw(Camera camera)
         {
-            sprites = factory.GetData<CSprite>();
-            positions = factory.GetData<CPosition>();
-            transforms = factory.GetData<CTransform>();
+            sprites = sprites ?? factory.GetData<CSprite>();
+            positions = positions ?? factory.GetData<CPosition>();
+            transforms = transforms ?? factory.GetData<CTransform>();
 
             graphicsDevice.RasterizerState = GraphicsManager.RasterizerState;
             graphicsDevice.SamplerStates[0] = SamplerState.PointClamp;
@@ -54,7 +54,7 @@ namespace Relatus.ECS
 
             foreach (int entity in Entities)
             {
-                CSprite sprite = (CSprite)sprites[entity];
+                CSprite sprite = sprites[entity];
                 graphicsDevice.SetVertexBuffers(vertexBufferBindings);
                 graphicsDevice.Textures[0] = sprite.Texture;
                 spriteShader.Parameters["SpriteTexture"].SetValue(sprite.Texture);
@@ -65,7 +65,6 @@ namespace Relatus.ECS
                     graphicsDevice.DrawInstancedPrimitives(PrimitiveType.TriangleList, 0, 0, geometry.TotalTriangles, 1);
                 }
             }
-
 
             //spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, camera.SpriteTransform);
             //{
