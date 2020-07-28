@@ -44,20 +44,19 @@ namespace Relatus.ECS
             return new SystemGroup(systems.Length).Add(systems);
         }
 
+        /// <summary>
+        /// Exposes all systems in a given collection of <see cref="SystemGroup"/>'s to this factory, and initializes the factory.
+        /// </summary>
+        /// <param name="systemGroups">The system groups to be exposed to this factory.</param>
+        /// <returns></returns>
         public MorroFactory Jumpstart(params SystemGroup[] systemGroups)
         {
-            Register(systemGroups);
-            eventManager.LinkSystems();
-
-            return this;
-        }
-
-        public MorroFactory Register(params SystemGroup[] groups)
-        {
-            for (int i = 0; i < groups.Length; i++)
+            for (int i = 0; i < systemGroups.Length; i++)
             {
-                systemManager.RegisterSystem(groups[i].Systems);
+                systemManager.RegisterSystem(systemGroups[i].Systems);
             }
+
+            eventManager.LinkSystems();
 
             return this;
         }
