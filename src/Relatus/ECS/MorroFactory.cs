@@ -64,14 +64,14 @@ namespace Relatus.ECS
 
         #region Entity Helper Methods
         /// <summary>
-        /// Creates an entity from a given collection of <see cref="IComponent"/> data.
+        /// Queues the creation of an entity. The entity will consist of the given collection of <see cref="IComponent"/> data.
         /// </summary>
         /// <param name="components">A collection of <see cref="IComponent"/> data that represents an entity.</param>
         /// <returns>The unique identifier of the entity that was just created.</returns>
         public int CreateEntity(params IComponent[] components)
         {
             int entity = entityManager.AllocateEntity();
-            entityManager.AddComponent(entity, components);
+            componentAddition.Push(new Tuple<int, IComponent[]>(entity, components));
 
             return entity;
         }
@@ -99,7 +99,7 @@ namespace Relatus.ECS
         }
 
         /// <summary>
-        /// Adds a given collection of <see cref="IComponent"/> data to a given entity.
+        /// Queues the addition of a given collection of <see cref="IComponent"/> data to a given entity.
         /// </summary>
         /// <param name="entity">The entity that will be modified.</param>
         /// <param name="components">The collection of <see cref="IComponent"/> data that will be added.</param>
@@ -111,7 +111,7 @@ namespace Relatus.ECS
         }
 
         /// <summary>
-        /// Removes a given collection of <see cref="IComponent"/> types from a given entity.
+        /// Queues the removal of a given collection of <see cref="IComponent"/> types from a given entity.
         /// </summary>
         /// <param name="entity">The entity that will be modified.</param>
         /// <param name="componentTypes">The collection of <see cref="IComponent"/> types that will be removed.</param>
