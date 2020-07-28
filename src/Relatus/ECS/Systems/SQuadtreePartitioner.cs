@@ -15,10 +15,14 @@ namespace Relatus.ECS
         /// <param name="factory">The scene this system will exist in.</param>
         /// <param name="boundary">The area the partitioner the will cover.</param>
         /// <param name="nodeCapacity">The total amount of entities that exist in a node before overflowing into a new tree.</param>
-        /// <param name="targetFPS">The target framerate the system will update in.</param>
-        public SQuadtreePartitioner(MorroFactory factory, RectangleF boundary, int nodeCapacity, int targetFPS) : base(factory, targetFPS)
+        public SQuadtreePartitioner(MorroFactory factory, RectangleF boundary, uint nodeCapacity) : base(factory)
         {
             partitioner = new Quadtree<PartitionerEntry>(boundary, nodeCapacity);
+        }
+
+        public override void EnableDivideAndConquer(uint sections)
+        {
+            throw new RelatusException("SQuadtreePartitioner was not designed to be compatible with the divide and conquer implementation.", new NotSupportedException());
         }
     }
 }

@@ -35,6 +35,11 @@ namespace Relatus.ECS
             Require(typeof(CSprite), typeof(CPosition), typeof(CTransform));
         }
 
+        //public override void EnableFixedUpdate(uint updatesPerSecond)
+        //{
+        //    throw new RelatusException("SSprite was not designed to run using a fixed update.", new NotSupportedException());
+        //}
+
         public override void DrawEntity(int entity, Camera camera)
         {
             throw new NotImplementedException();

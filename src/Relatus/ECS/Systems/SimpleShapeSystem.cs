@@ -35,14 +35,18 @@ namespace Relatus.ECS
         /// </summary>
         /// <param name="factory">The scene this system will exist in.</param>
         /// <param name="geometry">The shape data that this system will focus on and draw.</param>
-        /// <param name="shapeTag">The type of the custom <see cref="IComponent"/> that acts as a tag specifically for this system.</param>
-        /// <param name="tasks">The total amount of tasks to divide the update cycle into. Assigning more than one task allows entities to be updated asynchronously.</param>
-        public SimpleShapeSystem(MorroFactory factory, GeometryData geometry, Type shapeTag, uint tasks) : base(factory, tasks)
+        /// <param name="shapeTag">The type of a custom <see cref="IComponent"/> that acts as a tag specifically for this system.</param>
+        public SimpleShapeSystem(MorroFactory factory, GeometryData geometry, Type shapeTag) : base(factory)
         {
             Require(typeof(CPosition), typeof(CDimension), typeof(CTransform), typeof(CColor), shapeTag);
 
             this.geometry = geometry;
             vertexBuffer = new VertexTransformColor[factory.EntityCapacity];
+        }
+
+        public override void EnableFixedUpdate(uint updatesPerSecond)
+        {
+            throw new RelatusException("SimpleShapeSystem was not designed to run using a fixed update.", new NotSupportedException());
         }
 
         public override void UpdateEntity(int entity)

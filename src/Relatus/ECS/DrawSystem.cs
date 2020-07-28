@@ -9,8 +9,6 @@ namespace Relatus.ECS
     /// </summary>
     public abstract class DrawSystem : MorroSystem, IDrawableSystem
     {
-        public int Priority { get; set; }
-
         private readonly DrawSystemHandler drawSystemHandler;
 
         /// <summary>
@@ -28,10 +26,5 @@ namespace Relatus.ECS
         }
 
         public abstract void DrawEntity(int entity, Camera camera);
-
-        public int CompareTo(IDrawableSystem other)
-        {
-            return Priority.CompareTo(other.Priority);
-        }
     }
 }

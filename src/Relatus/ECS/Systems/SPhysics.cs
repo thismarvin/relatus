@@ -21,12 +21,18 @@ namespace Relatus.ECS
         private CPosition[] positions;
         private CKinetic[] kinetics;
 
-        public SPhysics(MorroFactory factory, Integrator integrator, uint tasks, int targetFPS) : base(factory, tasks)
+        public SPhysics(MorroFactory factory, uint targetFramerate, Integrator integrator) : base(factory)
         {
             Require(typeof(CPosition), typeof(CKinetic));
+            EnableFixedUpdate(targetFramerate);
 
-            target = 1f / targetFPS;
+            target = 1f / targetFramerate;
             this.integrator = integrator;
+        }
+
+        public override void EnableFixedUpdate(uint updatesPerSecond)
+        {
+            throw new RelatusException("SPhysics is not compatible with the default fixed update functionality (it implements its own).", new NotSupportedException());
         }
 
         public override void UpdateEntity(int entity)

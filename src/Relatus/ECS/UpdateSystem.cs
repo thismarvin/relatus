@@ -16,28 +16,41 @@ namespace Relatus.ECS
         /// Create a <see cref="MorroSystem"/> that will process or manipulate <see cref="IComponent"/> data on every frame or a fixed basis.
         /// </summary>
         /// <param name="factory">The factory this system will exist in.</param>
-        /// <param name="tasks">The total amount of tasks to divide the update cycle into. Assigning more than one task allows entities to be updated asynchronously.</param>
-        public UpdateSystem(MorroFactory factory, uint tasks) : base(factory)
+        public UpdateSystem(MorroFactory factory) : base(factory)
         {
-            updateSystemHandler = new UpdateSystemHandler(this, UpdateEntity)
-            {
-                TotalTasks = tasks
-            };
+            updateSystemHandler = new UpdateSystemHandler(this, UpdateEntity);
         }
 
         /// <summary>
-        /// Create a <see cref="MorroSystem"/> that will process or manipulate <see cref="IComponent"/> data on every frame or a fixed basis.
+        /// Enables this system to update entities asynchronously by dividing entities into sections.
         /// </summary>
-        /// <param name="factory">The factory this system will exist in.</param>
-        /// <param name="tasks">The total amount of tasks to divide the update cycle into. Assigning more than one task allows entities to be updated asynchronously.</param>
-        /// <param name="targetFPS">The target framerate the system will update in.</param>
-        public UpdateSystem(MorroFactory factory, uint tasks, int targetFPS) : base(factory)
+        /// <param name="sections">The total amount of sections to divide the entities into.</param>
+        public virtual void EnableDivideAndConquer(uint sections)
         {
-            updateSystemHandler = new UpdateSystemHandler(this, UpdateEntity)
-            {
-                TotalTasks = tasks,
-                TargetFPS = targetFPS
-            };
+            updateSystemHandler.AsynchronousUpdateEnabled = true;
+            updateSystemHandler.TotalTasks = sections;
+        }
+
+        public virtual void DisableDivideAndConquer()
+        {
+            updateSystemHandler.AsynchronousUpdateEnabled = false;
+            updateSystemHandler.TotalTasks = 1;
+        }
+
+        /// <summary>
+        /// Enables this systems to run at a fixed frame rate.
+        /// </summary>
+        /// <param name="updatesPerSecond">How often the system will update every second.</param>
+        public virtual void EnableFixedUpdate(uint updatesPerSecond)
+        {
+            updateSystemHandler.FixedUpdateEnabled = true;
+            updateSystemHandler.UpdatesPerSecond = updatesPerSecond;
+        }
+
+        public virtual void DisableFixedUpdate()
+        {
+            updateSystemHandler.FixedUpdateEnabled = false;
+            updateSystemHandler.UpdatesPerSecond = 60;
         }
 
         public virtual void Update()

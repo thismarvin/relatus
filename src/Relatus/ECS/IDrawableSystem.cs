@@ -7,10 +7,8 @@ namespace Relatus.ECS
     /// <summary>
     /// Provides functionality for a <see cref="MorroSystem"/> to draw entities.
     /// </summary>
-    public interface IDrawableSystem : IMorroSystem, IComparable<IDrawableSystem>
+    public interface IDrawableSystem : IMorroSystem
     {
-        int Priority { get; set; }
-
         void Draw(Camera camera);
     }
 }

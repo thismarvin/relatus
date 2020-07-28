@@ -11,7 +11,7 @@ namespace Relatus.ECS
 
         protected Partitioner<PartitionerEntry> partitioner;
 
-        internal PartitioningSystem(MorroFactory factory, int targetFPS) : base(factory, 0, targetFPS)
+        public PartitioningSystem(MorroFactory factory) : base(factory)
         {
             Require(typeof(CPosition), typeof(CDimension), typeof(CPartitionable));
         }
