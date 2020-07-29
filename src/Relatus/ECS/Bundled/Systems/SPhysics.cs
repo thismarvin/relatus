@@ -24,7 +24,6 @@ namespace Relatus.ECS.Bundled
         public SPhysics(MorroFactory factory, uint targetFramerate, Integrator integrator) : base(factory)
         {
             Require(typeof(CPosition), typeof(CKinetic));
-            EnableFixedUpdate(targetFramerate);
 
             target = 1f / targetFramerate;
             this.integrator = integrator;
