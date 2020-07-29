@@ -5,17 +5,11 @@ using System.Text;
 
 namespace Relatus.ECS
 {
-    public class MorroFactory
+    public partial class MorroFactory
     {
-        public int SystemCapacity => systemManager.Capacity;
-        public int ComponentCapacity => componentManager.Capacity;
-        public int EntityCapacity => entityManager.Capacity;
-        public int EntityCount => entityManager.EntityCount;
-
-        private readonly SystemManager systemManager;
-        private readonly ComponentManager componentManager;
-        private readonly EntityManager entityManager;
-        private readonly EventManager eventManager;
+        public int SystemCapacity { get; private set; }
+        public int ComponentCapacity { get; private set; }
+        public int EntityCapacity { get; private set; }
 
         private readonly Stack<Tuple<int, IComponent[]>> componentAddition;
         private readonly Stack<Tuple<int, Type[]>> componentSubtraction;
@@ -29,14 +23,39 @@ namespace Relatus.ECS
         /// <param name="systemCapacity">The total of amount of unique <see cref="MorroSystem"/> types supported by this factory.</param>
         public MorroFactory(int entityCapacity, int componentCapacity, int systemCapacity)
         {
-            systemManager = new SystemManager(systemCapacity);
-            componentManager = new ComponentManager(componentCapacity, entityCapacity);
-            entityManager = new EntityManager(entityCapacity, systemManager, componentManager);
-            eventManager = new EventManager(systemManager);
+            EntityCapacity = entityCapacity;
+            ComponentCapacity = componentCapacity;
+            SystemCapacity = systemCapacity;
 
             componentAddition = new Stack<Tuple<int, IComponent[]>>();
             componentSubtraction = new Stack<Tuple<int, Type[]>>();
-            entityRemovalQueue = new SparseSet(entityCapacity);
+            entityRemovalQueue = new SparseSet(EntityCapacity);
+
+            // System Setup
+            systems = new MorroSystem[SystemCapacity];
+            registeredSystems = new HashSet<Type>();
+            systemLookup = new Dictionary<Type, int>();
+
+            // Component Setup
+            registeredComponents = new HashSet<Type>();
+            componentLookup = new Dictionary<Type, int>();
+            componentData = new IComponent[ComponentCapacity][];
+
+            for (int i = 0; i < ComponentCapacity; i++)
+            {
+                componentData[i] = new IComponent[EntityCapacity];
+            }
+
+            // Entity Setup
+            attachedComponents = new SparseSet[EntityCapacity];
+            attachedSystems = new SparseSet[EntityCapacity];
+            entityBuffer = new Stack<int>(EntityCapacity);
+
+            for (int i = 0; i < EntityCapacity; i++)
+            {
+                attachedComponents[i] = new SparseSet(ComponentCapacity);
+                attachedSystems[i] = new SparseSet(SystemCapacity);
+            }
         }
 
         public SystemGroup CreateGroup(params MorroSystem[] systems)
@@ -53,10 +72,10 @@ namespace Relatus.ECS
         {
             for (int i = 0; i < systemGroups.Length; i++)
             {
-                systemManager.RegisterSystem(systemGroups[i].Systems);
+                RegisterSystem(systemGroups[i].Systems);
             }
 
-            eventManager.LinkSystems();
+            LinkSystems();
 
             return this;
         }
@@ -69,7 +88,7 @@ namespace Relatus.ECS
         /// <returns>The unique identifier of the entity that was just created.</returns>
         public int CreateEntity(params IComponent[] components)
         {
-            int entity = entityManager.AllocateEntity();
+            int entity = AllocateEntity();
             componentAddition.Push(new Tuple<int, IComponent[]>(entity, components));
 
             return entity;
@@ -84,17 +103,6 @@ namespace Relatus.ECS
             entityRemovalQueue.Add((uint)entity);
 
             return this;
-        }
-
-        /// <summary>
-        /// Returns whether or not a given entity contains a given collection of <see cref="IComponent"/> types.
-        /// </summary>
-        /// <param name="entity">The entity that will be checked.</param>
-        /// <param name="components">The collection of <see cref="IComponent"/> types that will be checked for.</param>
-        /// <returns>Whether or not a given entity contains a given collection of <see cref="IComponent"/> types.</returns>
-        public bool EntityContains(int entity, params Type[] components)
-        {
-            return entityManager.EntityContains(entity, components);
         }
 
         /// <summary>
@@ -123,37 +131,6 @@ namespace Relatus.ECS
         #endregion
 
         /// <summary>
-        /// Returns an array of all of the data of a given <see cref="IComponent"/> type.
-        /// </summary>
-        /// <typeparam name="T">The type of <see cref="IComponent"/> data to be retrieved.</typeparam>
-        /// <returns>An array of all of the data of a given <see cref="IComponent"/> type.</returns>
-        public T[] GetData<T>() where T : IComponent
-        {
-            return componentManager.GetData<T>();
-        }
-
-        /// <summary>
-        /// Returns the <see cref="IComponent"/> data of a given entity.
-        /// </summary>
-        /// <typeparam name="T">The type of <see cref="IComponent"/> data to be retrieved.</typeparam>
-        /// <param name="entity">The target entity to retrieve data from.</param>
-        /// <returns>The <see cref="IComponent"/> data of a given entity.</returns>
-        public T GetData<T>(int entity) where T : IComponent
-        {
-            return componentManager.GetData<T>(entity);
-        }
-
-        /// <summary>
-        /// Returns a <see cref="MorroSystem"/> of a given type.
-        /// </summary>
-        /// <typeparam name="T">The type of <see cref="MorroSystem"/> to retrieve.</typeparam>
-        /// <returns>A <see cref="MorroSystem"/> of a given type.</returns>
-        public T GetSystem<T>() where T : MorroSystem
-        {
-            return systemManager.GetSystem<T>();
-        }
-
-        /// <summary>
         /// Applies any recent changes to entity data, and maintains the integrity of all of the factory's systems.
         /// </summary>
         public MorroFactory ApplyChanges()
@@ -162,14 +139,14 @@ namespace Relatus.ECS
             while (componentSubtraction.Count > 0)
             {
                 Tuple<int, Type[]> modification = componentSubtraction.Pop();
-                entityManager.RemoveComponent(modification.Item1, modification.Item2);
+                RemoveComponent(modification.Item1, modification.Item2);
             }
 
             // Handles adding components to entities.
             while (componentAddition.Count > 0)
             {
                 Tuple<int, IComponent[]> modification = componentAddition.Pop();
-                entityManager.AddComponent(modification.Item1, modification.Item2);
+                AddComponent(modification.Item1, modification.Item2);
             }
 
             // Handles removing entities.
@@ -177,13 +154,13 @@ namespace Relatus.ECS
             {
                 foreach (uint entity in entityRemovalQueue)
                 {
-                    entityManager.ClearEntity((int)entity);
+                    ClearEntity((int)entity);
                 }
                 entityRemovalQueue.Clear();
             }
 
             // Update all systems with the new entity data.
-            systemManager.ApplyChanges();
+            UpdateSystems();
 
             return this;
         }

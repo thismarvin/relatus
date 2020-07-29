@@ -6,8 +6,8 @@ namespace Relatus.ECS.Bundled
 {
     public abstract class PartitioningSystem : UpdateSystem
     {
-        private CPosition[] positions;
-        private CDimension[] dimensions;
+        private IComponent[] positions;
+        private IComponent[] dimensions;
 
         protected Partitioner<PartitionerEntry> partitioner;
 
@@ -28,8 +28,8 @@ namespace Relatus.ECS.Bundled
 
         public override void UpdateEntity(int entity)
         {
-            CPosition position = positions[entity];
-            CDimension dimension = dimensions[entity];
+            CPosition position = (CPosition)positions[entity];
+            CDimension dimension = (CDimension)dimensions[entity];
 
             partitioner.Add(new PartitionerEntry(entity, position, dimension));
         }

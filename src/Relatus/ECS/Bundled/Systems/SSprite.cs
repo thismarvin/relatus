@@ -9,9 +9,9 @@ namespace Relatus.ECS.Bundled
 {
     public class SSprite : DrawSystem
     {
-        private CSprite[] sprites;
-        private CPosition[] positions;
-        private CTransform[] transforms;
+        private IComponent[] sprites;
+        private IComponent[] positions;
+        private IComponent[] transforms;
 
         private VertexColorTexture[] vertexData;
         private VertexBufferBinding[] vertexBufferBindings;
@@ -59,7 +59,7 @@ namespace Relatus.ECS.Bundled
 
             foreach (int entity in Entities)
             {
-                CSprite sprite = sprites[entity];
+                CSprite sprite = (CSprite)sprites[entity];
                 graphicsDevice.SetVertexBuffers(vertexBufferBindings);
                 graphicsDevice.Textures[0] = sprite.Texture;
                 spriteShader.Parameters["SpriteTexture"].SetValue(sprite.Texture);

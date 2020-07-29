@@ -12,10 +12,10 @@ namespace Relatus.ECS.Bundled
     /// </summary>
     public abstract class SimpleShapeSystem : HybridSystem
     {
-        protected CPosition[] positions;
-        protected CDimension[] dimensions;
-        protected CTransform[] transforms;
-        protected CColor[] colors;
+        protected IComponent[] positions;
+        protected IComponent[] dimensions;
+        protected IComponent[] transforms;
+        protected IComponent[] colors;
 
         protected GeometryData geometry;
         protected VertexTransformColor[] vertexBuffer;
@@ -51,10 +51,10 @@ namespace Relatus.ECS.Bundled
 
         public override void UpdateEntity(int entity)
         {
-            CPosition position = positions[entity];
-            CDimension dimension = dimensions[entity];
-            CTransform transform = transforms[entity];
-            CColor color = colors[entity];
+            CPosition position = (CPosition)positions[entity];
+            CDimension dimension = (CDimension)dimensions[entity];
+            CTransform transform = (CTransform)transforms[entity];
+            CColor color = (CColor)colors[entity];
 
             vertexBuffer[entity] = CreateVertexTransformColor(position, dimension, transform, color);
         }

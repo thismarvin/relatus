@@ -18,8 +18,8 @@ namespace Relatus.ECS.Bundled
         private readonly float target;
         private readonly Integrator integrator;
 
-        private CPosition[] positions;
-        private CKinetic[] kinetics;
+        private IComponent[] positions;
+        private IComponent[] kinetics;
 
         public SPhysics(MorroFactory factory, uint targetFramerate, Integrator integrator) : base(factory)
         {
@@ -50,8 +50,8 @@ namespace Relatus.ECS.Bundled
 
         private void Simultate(int entity)
         {
-            CPosition position = positions[entity];
-            CKinetic kinetic = kinetics[entity];
+            CPosition position = (CPosition)positions[entity];
+            CKinetic kinetic = (CKinetic)kinetics[entity];
 
             kinetic.Accumulator += (float)(Engine.TotalGameTime - kinetic.LastUpdate).TotalSeconds;
             kinetic.LastUpdate = new TimeSpan(Engine.TotalGameTime.Ticks);
