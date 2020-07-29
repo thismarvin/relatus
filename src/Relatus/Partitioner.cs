@@ -56,6 +56,11 @@ namespace Relatus
         /// </summary>
         public abstract void Clear();
 
+        public List<int> Query(RectangleF bounds, int buffer)
+        {
+            return Query(new RectangleF(bounds.X - buffer, bounds.Y + buffer, bounds.Width + buffer * 2, bounds.Height + buffer * 2));
+        }
+
         public void AddRange(IEnumerable<T> entries)
         {
             foreach (T entry in entries)

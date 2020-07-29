@@ -20,7 +20,6 @@ namespace Relatus
 
         private static readonly DebugEntry fps;
         private static readonly DebugEntry scene;
-        private static readonly DebugEntry entity;
 
         static DebugManager()
         {
@@ -31,9 +30,6 @@ namespace Relatus
 
             scene = new DebugEntry("Relatus_Scene", "SCENE: {0}");
             RegisterDebugEntry(scene);
-
-            entity = new DebugEntry("Relatus_Entities", "E: {0}");
-            RegisterDebugEntry(entity);
         }
 
         #region Handle DebugEntries
@@ -96,7 +92,6 @@ namespace Relatus
         {
             fps.SetInformation(Math.Round(WindowManager.FPS));
             scene.SetInformation(SceneManager.CurrentScene.Name);
-            entity.SetInformation(SceneManager.CurrentScene.EntityCount);
         }
 
         private static void DrawDebugEntries()

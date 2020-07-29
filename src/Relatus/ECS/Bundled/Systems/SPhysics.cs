@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Relatus.ECS
+namespace Relatus.ECS.Bundled
 {
     /// <summary>
     /// The types of integrators available to the built in physics system.
@@ -21,12 +21,17 @@ namespace Relatus.ECS
         private IComponent[] positions;
         private IComponent[] kinetics;
 
-        public SPhysics(Scene scene, Integrator integrator, uint tasks, int targetFPS) : base(scene, tasks)
+        public SPhysics(MorroFactory factory, uint targetFramerate, Integrator integrator) : base(factory)
         {
             Require(typeof(CPosition), typeof(CKinetic));
 
-            target = 1f / targetFPS;
+            target = 1f / targetFramerate;
             this.integrator = integrator;
+        }
+
+        public override void EnableFixedUpdate(uint updatesPerSecond)
+        {
+            throw new RelatusException("SPhysics is not compatible with the default fixed update functionality (it implements its own).", new NotSupportedException());
         }
 
         public override void UpdateEntity(int entity)
@@ -36,8 +41,8 @@ namespace Relatus.ECS
 
         public override void Update()
         {
-            positions = scene.GetData<CPosition>();
-            kinetics = scene.GetData<CKinetic>();
+            positions = positions ?? factory.GetData<CPosition>();
+            kinetics = kinetics ?? factory.GetData<CKinetic>();
 
             base.Update();
         }

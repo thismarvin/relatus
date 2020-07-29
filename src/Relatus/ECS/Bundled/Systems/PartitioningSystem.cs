@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Relatus.ECS
+namespace Relatus.ECS.Bundled
 {
     public abstract class PartitioningSystem : UpdateSystem
     {
@@ -11,7 +11,7 @@ namespace Relatus.ECS
 
         protected Partitioner<PartitionerEntry> partitioner;
 
-        internal PartitioningSystem(Scene scene, int targetFPS) : base(scene, 0, targetFPS)
+        public PartitioningSystem(MorroFactory factory) : base(factory)
         {
             Require(typeof(CPosition), typeof(CDimension), typeof(CPartitionable));
         }
@@ -19,6 +19,11 @@ namespace Relatus.ECS
         public List<int> Query(RectangleF bounds)
         {
             return partitioner.Query(bounds);
+        }
+
+        public List<int> Query(RectangleF bounds, int buffer)
+        {
+            return partitioner.Query(new RectangleF(bounds.X - buffer, bounds.Y + buffer, bounds.Width + buffer * 2, bounds.Height + buffer * 2));
         }
 
         public override void UpdateEntity(int entity)
@@ -33,8 +38,8 @@ namespace Relatus.ECS
         {
             partitioner.Clear();
 
-            positions = scene.GetData<CPosition>();
-            dimensions = scene.GetData<CDimension>();
+            positions = positions ?? factory.GetData<CPosition>();
+            dimensions = dimensions ?? factory.GetData<CDimension>();
 
             base.Update();
         }

@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Relatus.ECS
+namespace Relatus.ECS.Bundled
 {
     public class SSprite : DrawSystem
     {
@@ -30,10 +30,15 @@ namespace Relatus.ECS
             geometry = GeometryManager.GetShapeData(ShapeType.Square);
         }
 
-        public SSprite(Scene scene) : base(scene)
+        public SSprite(MorroFactory factory) : base(factory)
         {
             Require(typeof(CSprite), typeof(CPosition), typeof(CTransform));
         }
+
+        //public override void EnableFixedUpdate(uint updatesPerSecond)
+        //{
+        //    throw new RelatusException("SSprite was not designed to run using a fixed update.", new NotSupportedException());
+        //}
 
         public override void DrawEntity(int entity, Camera camera)
         {
@@ -42,9 +47,9 @@ namespace Relatus.ECS
 
         public override void Draw(Camera camera)
         {
-            sprites = scene.GetData<CSprite>();
-            positions = scene.GetData<CPosition>();
-            transforms = scene.GetData<CTransform>();
+            sprites = sprites ?? factory.GetData<CSprite>();
+            positions = positions ?? factory.GetData<CPosition>();
+            transforms = transforms ?? factory.GetData<CTransform>();
 
             graphicsDevice.RasterizerState = GraphicsManager.RasterizerState;
             graphicsDevice.SamplerStates[0] = SamplerState.PointClamp;
@@ -65,7 +70,6 @@ namespace Relatus.ECS
                     graphicsDevice.DrawInstancedPrimitives(PrimitiveType.TriangleList, 0, 0, geometry.TotalTriangles, 1);
                 }
             }
-
 
             //spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, camera.SpriteTransform);
             //{

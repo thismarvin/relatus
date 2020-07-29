@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Relatus.ECS
 {
-    public class DrawSystemHandler
+    internal class DrawSystemHandler
     {
         private readonly MorroSystem parent;
         private readonly Action<int, Camera> onDraw;

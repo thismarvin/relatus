@@ -12,50 +12,32 @@ namespace Relatus.ECS
         public bool Enabled { get; set; }
         public HashSet<Type> RequiredComponents { get; private set; }
         public HashSet<Type> BlacklistedComponents { get; private set; }
-        public HashSet<Type> Dependencies { get; private set; }
         public HashSet<Type> Subscriptions { get; private set; }
+
+        // The following properties need to be internal for the UpdateHandlers to work.
+        // This probably isn't the best design, but it works for now!
         protected internal HashSet<int> Entities { get; private set; }
+        protected internal int[] EntitiesAsArray { get; private set; }
 
-        protected internal int[] EntitiesAsArray
-        {
-            get
-            {
-                if (!entityDataChanged)
-                {
-                    return entitiesAsArray;
-                }
-                else
-                {
-                    entityDataChanged = false;
+        protected MorroFactory factory;
 
-                    int entityIndex = 0;
-
-                    foreach (int entity in Entities)
-                    {
-                        entitiesAsArray[entityIndex++] = entity;
-                    }
-
-                    return entitiesAsArray;
-                }
-            }
-        }
-
-        protected Scene scene;
-
-        private readonly int[] entitiesAsArray;
+        private readonly Stack<int> entityRemoval;
+        private readonly Stack<int> entityAddition;
         private bool entityDataChanged;
 
-        public MorroSystem(Scene scene)
+        public MorroSystem(MorroFactory factory)
         {
+            this.factory = factory;
+
             RequiredComponents = new HashSet<Type>();
             BlacklistedComponents = new HashSet<Type>();
-            Dependencies = new HashSet<Type>();
             Subscriptions = new HashSet<Type>();
             Entities = new HashSet<int>();
-            entitiesAsArray = new int[scene.EntityCapacity];
+            EntitiesAsArray = new int[factory.EntityCapacity];
+            entityRemoval = new Stack<int>(factory.EntityCapacity);
+            entityAddition = new Stack<int>(factory.EntityCapacity);
 
             Enabled = true;
-            this.scene = scene;
         }
 
         /// <summary>
@@ -87,20 +69,6 @@ namespace Relatus.ECS
         }
 
         /// <summary>
-        /// Initialize a set of <see cref="MorroSystem"/> types this system depends on running first before this system can run.
-        /// </summary>
-        /// <param name="systems">The types of <see cref="MorroSystem"/> this system depends on running first.</param>
-        public void Depend(params Type[] systems)
-        {
-            Dependencies.Clear();
-
-            for (int i = 0; i < systems.Length; i++)
-            {
-                Dependencies.Add(systems[i]);
-            }
-        }
-
-        /// <summary>
         /// Initialize a set of <see cref="IEventAnnouncer"/> types this system will subscribe to for future events.
         /// </summary>
         /// <param name="systems">The types of <see cref="IEventAnnouncer"/> this system will subscribe to.</param>
@@ -116,20 +84,43 @@ namespace Relatus.ECS
 
         internal void AddEntity(int entity)
         {
-            if (Entities.Contains(entity))
-                return;
-
-            Entities.Add(entity);
+            entityAddition.Push(entity);
             entityDataChanged = true;
         }
 
         internal void RemoveEntity(int entity)
         {
-            if (!Entities.Contains(entity))
+            entityRemoval.Push(entity);
+            entityDataChanged = true;
+        }
+
+        internal void ApplyChanges()
+        {
+            if (!entityDataChanged)
                 return;
 
-            Entities.Remove(entity);
-            entityDataChanged = true;
+            while (entityRemoval.Count > 0)
+            {
+                int entity = entityRemoval.Pop();
+
+                if (!Entities.Contains(entity))
+                    continue;
+
+                Entities.Remove(entity);
+            }
+
+            while (entityAddition.Count > 0)
+            {
+                Entities.Add(entityAddition.Pop());
+            }
+
+            int entityIndex = 0;
+            foreach (int entity in Entities)
+            {
+                EntitiesAsArray[entityIndex++] = entity;
+            }
+
+            entityDataChanged = false;
         }
     }
 }
