@@ -8,43 +8,26 @@ namespace Relatus.Input
 {
     /// <summary>
     /// Provides all the functionality necessary to interface with an <see cref="InputProfile"/>.
-    /// (Supports <see cref="KeyboardExt"/> and <see cref="SmartGamepad"/> input types simultaneously).
+    /// (Supports <see cref="KeyboardExt"/>, <see cref="MouseExt"/>, and <see cref="SmartGamepad"/> input types simultaneously).
     /// </summary>
     public class InputHandler
     {
         public PlayerIndex PlayerIndex { get; private set; }
+        public InputProfile Profile { get; set; }
 
         private bool isBeingUpdated;
-        private InputProfile inputProfile;
         private readonly SmartGamepad gamePad;
 
         /// <summary>
         /// Creates an instance of a <see cref="InputHandler"/> that is attached to a given <see cref="Microsoft.Xna.Framework.PlayerIndex"/>.
         /// </summary>
         /// <param name="playerIndex">The player index this input handler will attach to.</param>
-        public InputHandler(PlayerIndex playerIndex)
+        /// <param name="profile">The input profile this input handler will use.</param>
+        public InputHandler(PlayerIndex playerIndex, InputProfile profile)
         {
             PlayerIndex = playerIndex;
-            inputProfile = InputManager.GetProfile("Basic");
+            Profile = profile;
             gamePad = new SmartGamepad(PlayerIndex);
-        }
-
-        /// <summary>
-        /// Load an <see cref="InputProfile"/> that has been registered with the <see cref="InputManager"/>.
-        /// </summary>
-        /// <param name="profile">The name of the input profile that was previously saved to the <see cref="InputManager"/>.</param>
-        public void LoadProfile(string profile)
-        {
-            inputProfile = InputManager.GetProfile(profile);
-        }
-
-        /// <summary>
-        /// Load a given <see cref="InputProfile"/>.
-        /// </summary>
-        /// <param name="profile">The input profile to load.</param>
-        public void LoadProfile(InputProfile profile)
-        {
-            inputProfile = profile;
         }
 
         /// <summary>
@@ -56,7 +39,10 @@ namespace Relatus.Input
         {
             VerifyUpdateIsCalled();
 
-            InputMapping inputMapping = inputProfile.GetMapping(name);
+            if (Profile == null)
+                throw new RelatusException("The input profile has not been set.");
+
+            InputMapping inputMapping = Profile.GetMapping(name);
 
             if (PlayerIndex == PlayerIndex.One)
             {
@@ -86,7 +72,10 @@ namespace Relatus.Input
         {
             VerifyUpdateIsCalled();
 
-            InputMapping inputMapping = inputProfile.GetMapping(name);
+            if (Profile == null)
+                throw new RelatusException("The input profile has not been set.");
+
+            InputMapping inputMapping = Profile.GetMapping(name);
 
             if (PlayerIndex == PlayerIndex.One)
             {
@@ -113,17 +102,21 @@ namespace Relatus.Input
         /// <param name="leftMotorIntensity">The speed of the left motor, between 0.0 and 1.0.</param>
         /// <param name="rightMotorIntensity">The speed of the right motor, between 0.0 and 1.0.</param>
         /// <param name="duration">The duration of the vibration in milliseconds.</param>
-        public void SetVibration(float leftMotorIntensity, float rightMotorIntensity, float duration)
+        public InputHandler SetVibration(float leftMotorIntensity, float rightMotorIntensity, float duration)
         {
             gamePad.Vibrate(leftMotorIntensity, rightMotorIntensity, duration);
+
+            return this;
         }
 
         /// <summary>
         /// Resets the vibration of the gamepad to zero.
         /// </summary>
-        public void ResetVibration()
+        public InputHandler ResetVibration()
         {
             gamePad.ResetVibration();
+
+            return this;
         }
 
         public void Update()
