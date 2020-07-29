@@ -67,14 +67,38 @@ namespace Relatus
             float xDelta = Math.Abs(Center.X - rectangle.Center.X);
             float yDelta = Math.Abs(Center.Y - rectangle.Center.Y);
 
+            Vector2 resolution = Vector2.Zero;
+
             if (MathExt.RemapRange(xDelta, 0, xMin, 0, 1) > MathExt.RemapRange(yDelta, 0, yMin, 0, 1))
             {
                 float xResolution = (xMin - xDelta) * (X < rectangle.X ? -1 : 1);
-                return new Vector2(xResolution, 0);
+                resolution = new Vector2(xResolution, 0);
+            }
+            else
+            {
+                float yResolution = (yMin - yDelta) * (Y < rectangle.Y ? -1 : 1);
+                resolution = new Vector2(0, yResolution);
             }
 
-            float yResolution = (yMin - yDelta) * (Y < rectangle.Y ? -1 : 1);
-            return new Vector2(0, yResolution);
+            if (resolution.X < 0)
+            {
+                return new Vector2(rectangle.Right - Left, 0);
+            }
+            else if (resolution.X > 0)
+            {
+                return new Vector2(Right - rectangle.Left, 0);
+            }
+
+            if (resolution.Y < 0)
+            {
+                return new Vector2(0, rectangle.Top - Bottom);
+            }
+            else if (resolution.Y > 0)
+            {
+                return new Vector2(0, Top - rectangle.Bottom);
+            }
+
+            return Vector2.Zero;
         }
 
         public static bool operator ==(RectangleF a, RectangleF b)
