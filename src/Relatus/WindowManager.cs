@@ -23,27 +23,35 @@ namespace Relatus
         public static float Scale { get; private set; }
         public static bool WideScreenSupported { get; private set; }
 
-        public static float AspectRatio { get => GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.AspectRatio; }
+        public static float AspectRatio => GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.AspectRatio; 
         /// <summary>
         /// The width of the entire display/screen.
         /// </summary>
-        public static int DisplayWidth { get => GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width; }
+        public static int DisplayWidth => GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width; 
         /// <summary>
         /// The height of the entire display/screen.
         /// </summary>
-        public static int DisplayHeight { get => GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height; }
-        public static bool IsWideScreen { get => GraphicsAdapter.DefaultAdapter.IsWideScreen; }
-        public static DisplayOrientation Orientation { get => Engine.Instance.Window.CurrentOrientation; }
-        public static string Title { get => Engine.Instance.Window.Title; }
-        public static GameWindow Window { get => Engine.Instance.Window; }
+        public static int DisplayHeight => GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height; 
+        public static bool IsWideScreen => GraphicsAdapter.DefaultAdapter.IsWideScreen; 
+        public static DisplayOrientation Orientation => Engine.Instance.Window.CurrentOrientation; 
+        /// <summary>
+        /// The current window height divided by the scale.
+        /// </summary>
+        public static int ScaledHeight => (int)Math.Ceiling(WindowHeight / Scale);
+        /// <summary>
+        /// The current window width divided by the scale.
+        /// </summary>
+        public static int ScaledWidth => (int)Math.Ceiling(WindowWidth / Scale);
+        public static string Title => Engine.Instance.Window.Title; 
+        public static GameWindow Window => Engine.Instance.Window; 
         /// <summary>
         /// The current height of the window.
         /// </summary>
-        public static int WindowHeight { get => Engine.Graphics.PreferredBackBufferHeight; }
+        public static int WindowHeight => Engine.Graphics.PreferredBackBufferHeight; 
         /// <summary>
         /// The current width of the window.
         /// </summary>
-        public static int WindowWidth { get => Engine.Graphics.PreferredBackBufferWidth; }
+        public static int WindowWidth => Engine.Graphics.PreferredBackBufferWidth; 
 
         private static readonly PolygonCollection polygonCollection;
         private static readonly Queue<float> sampleFPS;
