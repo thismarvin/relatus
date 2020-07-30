@@ -1,5 +1,6 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Relatus.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -185,6 +186,11 @@ namespace Relatus.Graphics
             modelChanged = true;
 
             return this;
+        }
+
+        public BetterSprite SetSampleRegion(ImageRegion region)
+        {
+            return SetSampleRegion(region.X, region.Y, region.Width, region.Height);
         }
 
         public BetterSprite ApplyChanges()
