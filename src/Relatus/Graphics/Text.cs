@@ -15,7 +15,7 @@ namespace Relatus.Graphics
 
         private readonly BMFont font;
         private readonly BMFontShader shader;
-        private Sprite[] sprites;
+        //private Sprite[] sprites;
         private int spriteIndex;
         private Matrix transform;
 
@@ -23,7 +23,7 @@ namespace Relatus.Graphics
         private readonly Quad exactBounds;
         private readonly AABB broadBounds;
 
-        private readonly SpriteCollection spriteCollection;
+        //private readonly SpriteCollection spriteCollection;
 
         public Text(float x, float y, string content, BMFont font) : base(x, y, 1, 1)
         {
@@ -38,7 +38,7 @@ namespace Relatus.Graphics
             exactBounds = new Quad(X, Y, Width, Height) { Color = PICO8.BloodRed };
             broadBounds = new AABB(X, Y, Width, Height) { Color = PICO8.FleshPink };
 
-            spriteCollection = new SpriteCollection();
+            //spriteCollection = new SpriteCollection();
 
             CreateText();
         }
@@ -104,7 +104,7 @@ namespace Relatus.Graphics
             if (Content.Length <= 0)
                 return;
 
-            sprites = new Sprite[Content.Length];
+            //sprites = new Sprite[Content.Length];
             spriteIndex = 0;
 
             float xFinal = X;
@@ -116,17 +116,17 @@ namespace Relatus.Graphics
                 character = Content.Substring(i, 1).ToCharArray()[0];
                 characterData = font.GetCharacterData(character);
 
-                sprites[spriteIndex++] = new Sprite(xFinal + characterData.XOffset * Scale.X, Y + characterData.YOffset * Scale.Y, font.FontFace + " " + (int)character)
-                {
-                    Effect = shader.Effect,
-                    Scale = Scale,
-                    Rotation = Rotation
-                };
+                //sprites[spriteIndex++] = new Sprite(xFinal + characterData.XOffset * Scale.X, Y + characterData.YOffset * Scale.Y, font.FontFace + " " + (int)character)
+                //{
+                //    Effect = shader.Effect,
+                //    Scale = Scale,
+                //    Rotation = Rotation
+                //};
 
                 xFinal += characterData.XAdvance * Scale.X;
             }
 
-            spriteCollection.SetCollection(sprites);
+            //spriteCollection.SetCollection(sprites);
             SetBounds(X, Y, (int)Math.Ceiling(xFinal - X), (int)Math.Ceiling(font.Size * Scale.Y));
 
             exactBounds.SetBounds(X, Y, Width, Height);
@@ -148,20 +148,20 @@ namespace Relatus.Graphics
                 character = Content.Substring(i, 1).ToCharArray()[0];
                 characterData = font.GetCharacterData(character);
 
-                sprites[i].SetPosition(xFinal + characterData.XOffset * Scale.X, Y + characterData.YOffset * Scale.Y);
-                sprites[i].Scale = Scale;
-                sprites[i].Rotation = Rotation;
+                //sprites[i].SetPosition(xFinal + characterData.XOffset * Scale.X, Y + characterData.YOffset * Scale.Y);
+                //sprites[i].Scale = Scale;
+                //sprites[i].Rotation = Rotation;
 
-                if (Rotation != 0)
-                {
-                    result = Vector2.Transform(sprites[i].Position, transform);
-                    sprites[i].SetPosition(result.X, result.Y);
-                }
+                //if (Rotation != 0)
+                //{
+                //    result = Vector2.Transform(sprites[i].Position, transform);
+                //    sprites[i].SetPosition(result.X, result.Y);
+                //}
 
                 xFinal += characterData.XAdvance * Scale.X;
             }
 
-            spriteCollection.SetCollection(sprites);
+            //spriteCollection.SetCollection(sprites);
             SetBounds(X, Y, (int)Math.Ceiling(xFinal - X), (int)Math.Ceiling(font.Size * Scale.Y));
 
             exactBounds.SetBounds(X, Y, Width, Height);
@@ -243,7 +243,7 @@ namespace Relatus.Graphics
 
         public void Draw(Camera camera)
         {
-            spriteCollection.Draw(camera);
+            //spriteCollection.Draw(camera);
         }
 
         #region IDisposable Support
