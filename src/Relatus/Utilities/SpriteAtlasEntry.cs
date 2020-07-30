@@ -10,13 +10,15 @@ namespace Relatus.Utilities
         public ImageRegion ImageRegion { get; private set; }
         public int OffsetX { get; private set; }
         public int OffsetY { get; private set; }
+        public string Page { get; private set; }
 
-        internal SpriteAtlasEntry(string name, int x, int y, int width, int height, int offsetX, int offsetY)
+        internal SpriteAtlasEntry(string name, int x, int y, int width, int height, int offsetX, int offsetY, string page)
         {
             Name = name;
             ImageRegion = new ImageRegion(x, y, width, height);
             OffsetX = offsetX;
             OffsetY = offsetY;
+            Page = page;
         }
     }
 }
