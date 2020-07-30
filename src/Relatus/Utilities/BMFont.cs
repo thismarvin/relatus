@@ -27,8 +27,8 @@ namespace Relatus.Utilities
 
             FontFace = data[0].ToString();
             Size = int.Parse(data[1]);
-            Bold = data[2] == "1" ? true : false;
-            Italic = data[3] == "1" ? true : false;
+            Bold = data[2] == "1";
+            Italic = data[3] == "1";
         }
 
         internal void AddPage(string page)
@@ -41,12 +41,6 @@ namespace Relatus.Utilities
             if (!pages.ContainsKey(id))
             {
                 pages.Add(id, file);
-
-                AssetManager.LoadImage
-                (
-                    file,
-                    string.Format(CultureInfo.InvariantCulture, "{0}{1}", "Assets/Fonts/", file)
-                );
             }
         }
 
@@ -66,25 +60,37 @@ namespace Relatus.Utilities
 
             if (!characters.ContainsKey(id))
             {
-                characters.Add(id, new BMFontCharacter(id, xOffset, yOffset, xAdvance));
-
-                SpriteManager.RegisterSpriteData
-                (
-                    string.Format(CultureInfo.InvariantCulture, "{0} {1}", FontFace, id),
-                    x,
-                    y,
-                    width,
-                    height,
-                    pages[page]
-                );
+                characters.Add(id, new BMFontCharacter(id, x, y, width, height, xOffset, yOffset, xAdvance, pages[page]));
             }
+        }
+
+        internal BMFont LoadPages(string path)
+        {
+            // The BMFont's texture should be in the same directory as the .fnt file.
+            // The path parameter is referencing said file, but in order to load the texture we need the path to the directory.
+            // This following code is probably excessive, but it should get the path that we are looking for.
+            string[] splitPath = path.Split('/');
+            StringBuilder pathBuilder = new StringBuilder();
+            for (int i = 0; i < splitPath.Length - 1; i++)
+            {
+                pathBuilder.Append($"{splitPath[i]}/");
+            }
+            string directory = pathBuilder.ToString();
+
+            foreach (KeyValuePair<int, string> entry in pages)
+            {
+                string concatedPath = $"{directory}{entry.Value}";
+                AssetManager.LoadImage(entry.Value, concatedPath);
+            }
+
+            return this;
         }
 
         public BMFontCharacter GetCharacterData(char character)
         {
             if (!characters.ContainsKey(character))
             {
-                return new BMFontCharacter(0, 0, 0, Size);
+                return new BMFontCharacter();
             }
 
             return characters[character];
