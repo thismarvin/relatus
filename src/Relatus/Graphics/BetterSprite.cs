@@ -59,6 +59,11 @@ namespace Relatus.Graphics
             get => sampleRegion;
             set => SetSampleRegion((int)value.X, (int)value.Y, (int)value.Width, (int)value.Height);
         }
+        public RenderOptions RenderProperties
+        {
+            get => renderOptions;
+            set => SetRenderOptions(value);
+        }
 
         public int Width => SampleRegion.Width;
         public int Height => SampleRegion.Height;
@@ -89,6 +94,7 @@ namespace Relatus.Graphics
         private float rotation;
         private Color tint;
         private ImageRegion sampleRegion;
+        private RenderOptions renderOptions;
 
         private bool modelChanged;
         private bool textureChanged;
@@ -99,18 +105,21 @@ namespace Relatus.Graphics
         private static readonly GraphicsDevice graphicsDevice;
         private static readonly GeometryData geometry;
         private static readonly Effect spriteShader;
+        private static readonly EffectPass spritePass;
 
         static BetterSprite()
         {
             graphicsDevice = Engine.Graphics.GraphicsDevice;
             geometry = GeometryManager.GetShapeData(ShapeType.Square);
             spriteShader = AssetManager.GetEffect("Relatus_SpriteShader");
+            spritePass = spriteShader.CurrentTechnique.Passes[0];
         }
 
         public BetterSprite()
         {
             Tint = Color.White;
             Scale = Vector3.One;
+            RenderProperties = new RenderOptions();
 
             modelChanged = true;
             textureChanged = true;
@@ -209,6 +218,13 @@ namespace Relatus.Graphics
             return this;
         }
 
+        public virtual BetterSprite SetRenderOptions(RenderOptions options)
+        {
+            renderOptions = options;
+
+            return this;
+        }
+
         public virtual BetterSprite SetSampleRegion(ImageRegion region)
         {
             return SetSampleRegion(region.X, region.Y, region.Width, region.Height);
@@ -275,18 +291,30 @@ namespace Relatus.Graphics
         public virtual void Draw(Camera camera)
         {
             graphicsDevice.RasterizerState = GraphicsManager.RasterizerState;
-            graphicsDevice.SamplerStates[0] = SamplerState.PointClamp;
+            graphicsDevice.SamplerStates[0] = RenderProperties.SamplerState;
+            graphicsDevice.BlendState = RenderProperties.BlendState;
+            graphicsDevice.DepthStencilState = RenderProperties.DepthStencilState;
             graphicsDevice.SetVertexBuffers(vertexBufferBindings);
             graphicsDevice.Indices = geometry.IndexBuffer;
-            graphicsDevice.Textures[0] = texture;
 
             spriteShader.Parameters["SpriteTexture"].SetValue(texture);
             spriteShader.Parameters["WorldViewProjection"].SetValue(camera.WVP);
 
-            foreach (EffectPass pass in spriteShader.CurrentTechnique.Passes)
+            spritePass.Apply();
+
+            if (RenderProperties.Effect == null)
             {
-                pass.Apply();
+                graphicsDevice.Textures[0] = texture;
                 graphicsDevice.DrawInstancedPrimitives(PrimitiveType.TriangleList, 0, 0, geometry.TotalTriangles, 1);
+            }
+            else
+            {
+                foreach (EffectPass pass in RenderProperties.Effect.CurrentTechnique.Passes)
+                {
+                    pass.Apply();
+                    graphicsDevice.Textures[0] = texture;
+                    graphicsDevice.DrawInstancedPrimitives(PrimitiveType.TriangleList, 0, 0, geometry.TotalTriangles, 1);
+                }
             }
         }
     }
