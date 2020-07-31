@@ -54,13 +54,14 @@ namespace Relatus.Graphics
             get => tint;
             set => SetTint(value);
         }
-        public RectangleF SampleRegion
+        public ImageRegion SampleRegion
         {
             get => sampleRegion;
             set => SetSampleRegion((int)value.X, (int)value.Y, (int)value.Width, (int)value.Height);
         }
-        public int Width { get; private set; }
-        public int Height { get; private set; }
+
+        public int Width => SampleRegion.Width;
+        public int Height => SampleRegion.Height;
 
         public Vector3 Position
         {
@@ -87,7 +88,7 @@ namespace Relatus.Graphics
         private Vector2 rotationOffset;
         private float rotation;
         private Color tint;
-        private RectangleF sampleRegion;
+        private ImageRegion sampleRegion;
 
         private bool modelChanged;
         private bool textureChanged;
@@ -118,6 +119,16 @@ namespace Relatus.Graphics
         public static BetterSprite Create()
         {
             return new BetterSprite();
+        }
+
+        public static BetterSprite CreateFromAtlas(SpriteAtlas spriteAtlas, string name)
+        {
+            SpriteAtlasEntry entry = spriteAtlas.GetEntry(name);
+
+            return BetterSprite.Create()
+                .SetTexture(spriteAtlas.GetPage(entry.Page))
+                .SetSampleRegion(entry.ImageRegion)
+                .ApplyChanges();
         }
 
         public virtual BetterSprite SetTexture(Texture2D texture)
@@ -190,10 +201,7 @@ namespace Relatus.Graphics
 
         public virtual BetterSprite SetSampleRegion(int x, int y, int width, int height)
         {
-            sampleRegion = new RectangleF(x, y, width, height);
-
-            Width = width;
-            Height = height;
+            sampleRegion = new ImageRegion(x, y, width, height);
 
             textureChanged = true;
             modelChanged = true;
