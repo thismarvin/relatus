@@ -1,3 +1,4 @@
+using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -14,11 +15,13 @@ namespace Relatus.Utilities
 
         private readonly Dictionary<int, string> pages;
         private readonly Dictionary<int, BMFontCharacter> characters;
+        private readonly ResourceHandler<Texture2D> images;
 
         internal BMFont()
         {
             pages = new Dictionary<int, string>();
             characters = new Dictionary<int, BMFontCharacter>();
+            images = new ResourceHandler<Texture2D>();
         }
 
         internal void ParseInfo(string info)
@@ -80,10 +83,15 @@ namespace Relatus.Utilities
             foreach (KeyValuePair<int, string> entry in pages)
             {
                 string concatedPath = $"{directory}{entry.Value}";
-                AssetManager.LoadImage(entry.Value, concatedPath);
+                images.Register(entry.Value, Engine.Instance.Content.Load<Texture2D>(concatedPath));
             }
 
             return this;
+        }
+
+        public Texture2D GetPage(string page)
+        {
+            return images.Get(page);
         }
 
         public BMFontCharacter GetCharacterData(char character)

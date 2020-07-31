@@ -1,3 +1,4 @@
+using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -8,12 +9,13 @@ namespace Relatus.Utilities
     {
         public string Name { get; private set; }
 
-
         private readonly ResourceHandler<SpriteAtlasEntry> entries;
+        private readonly ResourceHandler<Texture2D> images;
 
         public SpriteAtlas()
         {
             entries = new ResourceHandler<SpriteAtlasEntry>();
+            images = new ResourceHandler<Texture2D>();
         }
 
         internal void ParseMeta(string meta)
@@ -44,9 +46,14 @@ namespace Relatus.Utilities
             string directory = pathBuilder.ToString();
 
             string concatedPath = $"{directory}{Name}";
-            AssetManager.LoadImage(Name, concatedPath);
+            images.Register(Name, Engine.Instance.Content.Load<Texture2D>(concatedPath));
 
             return this;
+        }
+
+        public Texture2D GetPage(string page)
+        {
+            return images.Get(page);
         }
 
         public SpriteAtlasEntry GetEntry(string name)
