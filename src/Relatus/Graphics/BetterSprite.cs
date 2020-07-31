@@ -62,6 +62,19 @@ namespace Relatus.Graphics
         public int Width { get; private set; }
         public int Height { get; private set; }
 
+        public Vector3 Position
+        {
+            get => new Vector3(x, y, z);
+            set => SetPosition(value.X, value.Y, value.Z);
+        }
+
+        // I just want to note that although this is a Vector3, it is really treated like a Vector2.
+        public Vector3 Center
+        {
+            get => new Vector3(x + Width / 2, y - Height / 2, z);
+            set => SetCenter(value.X, value.Y);
+        }
+
         private Texture2D texture;
         private float texelWidth;
         private float texelHeight;
@@ -93,11 +106,6 @@ namespace Relatus.Graphics
             spriteShader = AssetManager.GetEffect("Relatus_SpriteShader");
         }
 
-        public static BetterSprite Create()
-        {
-            return new BetterSprite();
-        }
-
         public BetterSprite()
         {
             Tint = Color.White;
@@ -107,7 +115,12 @@ namespace Relatus.Graphics
             textureChanged = true;
         }
 
-        public BetterSprite SetTexture(Texture2D texture)
+        public static BetterSprite Create()
+        {
+            return new BetterSprite();
+        }
+
+        public virtual BetterSprite SetTexture(Texture2D texture)
         {
             this.texture = texture;
 
@@ -119,7 +132,7 @@ namespace Relatus.Graphics
             return this;
         }
 
-        public BetterSprite SetPosition(float x, float y, float z)
+        public virtual BetterSprite SetPosition(float x, float y, float z)
         {
             this.x = x;
             this.y = y;
@@ -130,7 +143,7 @@ namespace Relatus.Graphics
             return this;
         }
 
-        public BetterSprite SetTranslation(float x, float y, float z)
+        public virtual BetterSprite SetTranslation(float x, float y, float z)
         {
             translation = new Vector3(x, y, z);
 
@@ -139,7 +152,7 @@ namespace Relatus.Graphics
             return this;
         }
 
-        public BetterSprite SetScale(float x, float y, float z)
+        public virtual BetterSprite SetScale(float x, float y, float z)
         {
             scale = new Vector3(x, y, z);
 
@@ -148,7 +161,7 @@ namespace Relatus.Graphics
             return this;
         }
 
-        public BetterSprite SetRotationOffset(float x, float y)
+        public virtual BetterSprite SetRotationOffset(float x, float y)
         {
             rotationOffset = new Vector2(x, y);
 
@@ -157,7 +170,7 @@ namespace Relatus.Graphics
             return this;
         }
 
-        public BetterSprite SetRotation(float rotation)
+        public virtual BetterSprite SetRotation(float rotation)
         {
             this.rotation = rotation;
 
@@ -166,7 +179,7 @@ namespace Relatus.Graphics
             return this;
         }
 
-        public BetterSprite SetTint(Color tint)
+        public virtual BetterSprite SetTint(Color tint)
         {
             this.tint = tint;
 
@@ -175,7 +188,7 @@ namespace Relatus.Graphics
             return this;
         }
 
-        public BetterSprite SetSampleRegion(int x, int y, int width, int height)
+        public virtual BetterSprite SetSampleRegion(int x, int y, int width, int height)
         {
             sampleRegion = new RectangleF(x, y, width, height);
 
@@ -188,7 +201,7 @@ namespace Relatus.Graphics
             return this;
         }
 
-        public BetterSprite SetSampleRegion(ImageRegion region)
+        public virtual BetterSprite SetSampleRegion(ImageRegion region)
         {
             return SetSampleRegion(region.X, region.Y, region.Width, region.Height);
         }
@@ -233,6 +246,16 @@ namespace Relatus.Graphics
             return this;
         }
 
+        public BetterSprite SetCenter(float x, float y)
+        {
+            this.x = x - Width / 2;
+            this.y = y + Height / 2;
+
+            modelChanged = true;
+
+            return this;
+        }
+
         internal VertexTransform GetVertexTransformColor()
         {
             Vector3 scale = new Vector3(SampleRegion.Width * Scale.X, SampleRegion.Height * Scale.Y, Scale.Z);
@@ -241,7 +264,7 @@ namespace Relatus.Graphics
             return new VertexTransform(scale, RotationOffset, Rotation, translation);
         }
 
-        public void Draw(Camera camera)
+        public virtual void Draw(Camera camera)
         {
             graphicsDevice.RasterizerState = GraphicsManager.RasterizerState;
             graphicsDevice.SamplerStates[0] = SamplerState.PointClamp;
