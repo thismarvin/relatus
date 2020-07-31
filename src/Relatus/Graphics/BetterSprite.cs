@@ -59,7 +59,7 @@ namespace Relatus.Graphics
             get => sampleRegion;
             set => SetSampleRegion((int)value.X, (int)value.Y, (int)value.Width, (int)value.Height);
         }
-        public RenderOptions RenderProperties
+        public RenderOptions RenderOptions
         {
             get => renderOptions;
             set => SetRenderOptions(value);
@@ -119,7 +119,7 @@ namespace Relatus.Graphics
         {
             Tint = Color.White;
             Scale = Vector3.One;
-            RenderProperties = new RenderOptions();
+            RenderOptions = new RenderOptions();
 
             modelChanged = true;
             textureChanged = true;
@@ -291,9 +291,9 @@ namespace Relatus.Graphics
         public virtual void Draw(Camera camera)
         {
             graphicsDevice.RasterizerState = GraphicsManager.RasterizerState;
-            graphicsDevice.SamplerStates[0] = RenderProperties.SamplerState;
-            graphicsDevice.BlendState = RenderProperties.BlendState;
-            graphicsDevice.DepthStencilState = RenderProperties.DepthStencilState;
+            graphicsDevice.SamplerStates[0] = RenderOptions.SamplerState;
+            graphicsDevice.BlendState = RenderOptions.BlendState;
+            graphicsDevice.DepthStencilState = RenderOptions.DepthStencilState;
             graphicsDevice.SetVertexBuffers(vertexBufferBindings);
             graphicsDevice.Indices = geometry.IndexBuffer;
 
@@ -302,14 +302,14 @@ namespace Relatus.Graphics
 
             spritePass.Apply();
 
-            if (RenderProperties.Effect == null)
+            if (RenderOptions.Effect == null)
             {
                 graphicsDevice.Textures[0] = texture;
                 graphicsDevice.DrawInstancedPrimitives(PrimitiveType.TriangleList, 0, 0, geometry.TotalTriangles, 1);
             }
             else
             {
-                foreach (EffectPass pass in RenderProperties.Effect.CurrentTechnique.Passes)
+                foreach (EffectPass pass in RenderOptions.Effect.CurrentTechnique.Passes)
                 {
                     pass.Apply();
                     graphicsDevice.Textures[0] = texture;
