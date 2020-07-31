@@ -16,5 +16,13 @@ namespace Relatus.Graphics
             DepthStencilState = DepthStencilState.None;
             Effect = null;
         }
+
+        public bool Equals(RenderOptions other)
+        {
+            return SamplerState == other.SamplerState &&
+                   BlendState == other.BlendState &&
+                   DepthStencilState == other.DepthStencilState &&
+                   Effect == other.Effect;
+        }
     }
 }
