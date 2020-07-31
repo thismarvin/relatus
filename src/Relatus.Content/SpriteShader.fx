@@ -12,8 +12,8 @@
 struct VSInputTextureTransform
 {
 	float4 Position : POSITION0;
-    float4 Color: COLOR0;
-    float2 TextureCoordinates: TEXCOORD0;
+	float4 Color: COLOR0;
+	float2 TextureCoordinates: TEXCOORD0;
 	float3 Scale: POSITION1;
 	float3 RotationOffset: POSITION2;
 	float3 Translation: POSITION3;
@@ -23,7 +23,7 @@ struct VSInputTextureTransform
 struct VSOutput
 {
 	float4 Position : SV_POSITION;
-    float2 TextureCoordinates : TEXCOORD0;
+	float2 TextureCoordinates : TEXCOORD0;
 	float4 Color : COLOR0;
 };
 
@@ -48,8 +48,8 @@ VSOutput VSTextureTransformColor(in VSInputTextureTransform input)
 	// Transform = Scale * [(Translation to center) * Rotation * (Undo Translation to center)] * Translation;
 	float4x4 transform = mul(mul(mul(CreateScale(input.Scale), CreateTranslation(-input.RotationOffset)), CreateRotationZ(input.Rotation)), CreateTranslation(input.RotationOffset + input.Translation));
 	output.Position = mul(mul(input.Position, transform), WorldViewProjection);
-    output.TextureCoordinates = input.TextureCoordinates;
-    output.Color = input.Color;
+	output.TextureCoordinates = input.TextureCoordinates;
+	output.Color = input.Color;
 
 	return output;
 }
