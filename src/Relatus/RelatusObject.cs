@@ -32,7 +32,7 @@ namespace Relatus
             set => SetBounds(value.X, value.Y, value.Width, value.Height);
         }
 
-        public RelatusObject(float x, float y, int width, int height)
+        public RelatusObject(float x, float y, float width, float height)
         {
             X = x;
             Y = y;
