@@ -117,9 +117,9 @@ namespace Relatus.Graphics
 
         public BetterSprite()
         {
-            Tint = Color.White;
-            Scale = Vector3.One;
-            RenderOptions = new RenderOptions();
+            tint = Color.White;
+            scale = Vector3.One;
+            renderOptions = new RenderOptions();
 
             modelChanged = true;
             textureChanged = true;
@@ -134,7 +134,7 @@ namespace Relatus.Graphics
         {
             SpriteAtlasEntry entry = spriteAtlas.GetEntry(name);
 
-            return BetterSprite.Create()
+            return Create()
                 .SetTexture(spriteAtlas.GetPage(entry.Page))
                 .SetSampleRegion(entry.ImageRegion)
                 .ApplyChanges();
@@ -218,6 +218,11 @@ namespace Relatus.Graphics
             return this;
         }
 
+        public virtual BetterSprite SetSampleRegion(ImageRegion region)
+        {
+            return SetSampleRegion(region.X, region.Y, region.Width, region.Height);
+        }
+
         public virtual BetterSprite SetRenderOptions(RenderOptions options)
         {
             renderOptions = options;
@@ -225,28 +230,23 @@ namespace Relatus.Graphics
             return this;
         }
 
-        public virtual BetterSprite SetSampleRegion(ImageRegion region)
-        {
-            return SetSampleRegion(region.X, region.Y, region.Width, region.Height);
-        }
-
         public BetterSprite ApplyChanges()
         {
             if (textureChanged)
             {
-                Vector2 topLeft = new Vector2((float)MathExt.RemapRange(SampleRegion.X, 0, texture.Width, 0, 1), (float)MathExt.RemapRange(SampleRegion.Y, 0, texture.Height, 0, 1));
-                Vector2 topRight = topLeft + new Vector2(texelWidth * SampleRegion.Width, 0);
-                Vector2 bottomRight = topLeft + new Vector2(texelWidth * SampleRegion.Width, texelHeight * SampleRegion.Height);
-                Vector2 bottomLeft = topLeft + new Vector2(0, texelHeight * SampleRegion.Height);
+                Vector2 topLeft = new Vector2((float)MathExt.RemapRange(sampleRegion.X, 0, texture.Width, 0, 1), (float)MathExt.RemapRange(sampleRegion.Y, 0, texture.Height, 0, 1));
+                Vector2 topRight = topLeft + new Vector2(texelWidth * sampleRegion.Width, 0);
+                Vector2 bottomRight = topLeft + new Vector2(texelWidth * sampleRegion.Width, texelHeight * sampleRegion.Height);
+                Vector2 bottomLeft = topLeft + new Vector2(0, texelHeight * sampleRegion.Height);
 
                 textureBuffer?.Dispose();
                 textureBuffer = new DynamicVertexBuffer(graphicsDevice, typeof(VertexColorTexture), 4, BufferUsage.WriteOnly);
                 textureBuffer.SetData(new VertexColorTexture[]
                 {
-                    new VertexColorTexture(Tint, topLeft),
-                    new VertexColorTexture(Tint, bottomLeft),
-                    new VertexColorTexture(Tint, bottomRight),
-                    new VertexColorTexture(Tint, topRight),
+                    new VertexColorTexture(tint, topLeft),
+                    new VertexColorTexture(tint, bottomLeft),
+                    new VertexColorTexture(tint, bottomRight),
+                    new VertexColorTexture(tint, topRight),
                 });
             }
 
@@ -282,10 +282,10 @@ namespace Relatus.Graphics
 
         internal VertexTransform GetVertexTransformColor()
         {
-            Vector3 scale = new Vector3(SampleRegion.Width * Scale.X, SampleRegion.Height * Scale.Y, Scale.Z);
-            Vector3 translation = new Vector3(X + Translation.X, Y + Translation.Y, Z + Translation.Z);
+            Vector3 scale = new Vector3(sampleRegion.Width * this.scale.X, sampleRegion.Height * this.scale.Y, this.scale.Z);
+            Vector3 translation = new Vector3(x + this.translation.X, y + this.translation.Y, z + this.translation.Z);
 
-            return new VertexTransform(scale, RotationOffset, Rotation, translation);
+            return new VertexTransform(scale, rotationOffset, rotation, translation);
         }
 
         public virtual void Draw(Camera camera)
@@ -294,9 +294,9 @@ namespace Relatus.Graphics
                 throw new RelatusException("The sprite was modified, but ApplyChanges() was never called.", new MethodExpectedException());
 
             graphicsDevice.RasterizerState = GraphicsManager.RasterizerState;
-            graphicsDevice.SamplerStates[0] = RenderOptions.SamplerState;
-            graphicsDevice.BlendState = RenderOptions.BlendState;
-            graphicsDevice.DepthStencilState = RenderOptions.DepthStencilState;
+            graphicsDevice.SamplerStates[0] = renderOptions.SamplerState;
+            graphicsDevice.BlendState = renderOptions.BlendState;
+            graphicsDevice.DepthStencilState = renderOptions.DepthStencilState;
             graphicsDevice.SetVertexBuffers(vertexBufferBindings);
             graphicsDevice.Indices = geometry.IndexBuffer;
 
@@ -305,14 +305,14 @@ namespace Relatus.Graphics
 
             spritePass.Apply();
 
-            if (RenderOptions.Effect == null)
+            if (renderOptions.Effect == null)
             {
                 graphicsDevice.Textures[0] = texture;
                 graphicsDevice.DrawInstancedPrimitives(PrimitiveType.TriangleList, 0, 0, geometry.TotalTriangles, 1);
             }
             else
             {
-                foreach (EffectPass pass in RenderOptions.Effect.CurrentTechnique.Passes)
+                foreach (EffectPass pass in renderOptions.Effect.CurrentTechnique.Passes)
                 {
                     pass.Apply();
                     graphicsDevice.Textures[0] = texture;

@@ -64,6 +64,11 @@ namespace Relatus.Graphics
             get => geometry;
             set => AttachGeometry(value);
         }
+        public RenderOptions RenderOptions
+        {
+            get => renderOptions;
+            set => SetRenderOptions(value);
+        }
         #endregion
 
         public Vector3 Position
@@ -95,8 +100,9 @@ namespace Relatus.Graphics
         private Vector2 rotationOffset;
         private Vector3 translation;
         private Vector3 scale;
-
         private GeometryData geometry;
+        private RenderOptions renderOptions;
+
         private bool geometryChanged;
         private bool modelChanged;
         private bool transformNeedsUpdating;
@@ -105,15 +111,21 @@ namespace Relatus.Graphics
         private VertexBufferBinding[] vertexBufferBindings;
 
         private static readonly GraphicsDevice graphicsDevice;
+        private static readonly Effect polygonShader;
+        private static readonly EffectPass polygonPass;
+
         static Polygon()
         {
             graphicsDevice = Engine.Graphics.GraphicsDevice;
+            polygonShader = AssetManager.GetEffect("Relatus_PolygonShader");
+            polygonPass = polygonShader.Techniques[1].Passes[0];
         }
 
         public Polygon()
         {
             color = Color.White;
             scale = new Vector3(1);
+            renderOptions = new RenderOptions();
 
             transformNeedsUpdating = true;
             transformCache = Matrix.Identity;
@@ -221,6 +233,13 @@ namespace Relatus.Graphics
             return this;
         }
 
+        public virtual Polygon SetRenderOptions(RenderOptions options)
+        {
+            renderOptions = options;
+
+            return this;
+        }
+
         public Polygon ApplyChanges()
         {
             if (!geometryChanged && !modelChanged)
@@ -229,7 +248,7 @@ namespace Relatus.Graphics
             if (modelChanged)
             {
                 modelBuffer?.Dispose();
-                modelBuffer = new DynamicVertexBuffer(Engine.Graphics.GraphicsDevice, typeof(VertexTransformColor), 1, BufferUsage.WriteOnly);
+                modelBuffer = new DynamicVertexBuffer(graphicsDevice, typeof(VertexTransformColor), 1, BufferUsage.WriteOnly);
                 modelBuffer.SetData(new VertexTransformColor[] { GetVertexTransformColor() });
             }
 
@@ -299,15 +318,27 @@ namespace Relatus.Graphics
                 throw new RelatusException("The polygon was modified, but ApplyChanges() was never called.", new MethodExpectedException());
 
             graphicsDevice.RasterizerState = GraphicsManager.RasterizerState;
+            graphicsDevice.SamplerStates[0] = renderOptions.SamplerState;
+            graphicsDevice.BlendState = renderOptions.BlendState;
+            graphicsDevice.DepthStencilState = renderOptions.DepthStencilState;
             graphicsDevice.SetVertexBuffers(vertexBufferBindings);
             graphicsDevice.Indices = geometry.IndexBuffer;
 
-            GeometryManager.SetupPolygonShader(camera);
+            polygonShader.Parameters["WorldViewProjection"].SetValue(camera.WVP);
 
-            foreach (EffectPass pass in GeometryManager.PolygonShader.Techniques[1].Passes)
+            polygonPass.Apply();
+
+            if (renderOptions.Effect == null)
             {
-                pass.Apply();
                 graphicsDevice.DrawInstancedPrimitives(PrimitiveType.TriangleList, 0, 0, geometry.TotalTriangles, 1);
+            }
+            else
+            {
+                foreach (EffectPass pass in renderOptions.Effect.CurrentTechnique.Passes)
+                {
+                    pass.Apply();
+                    graphicsDevice.DrawInstancedPrimitives(PrimitiveType.TriangleList, 0, 0, geometry.TotalTriangles, 1);
+                }
             }
         }
 
