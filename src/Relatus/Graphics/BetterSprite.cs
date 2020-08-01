@@ -290,6 +290,9 @@ namespace Relatus.Graphics
 
         public virtual void Draw(Camera camera)
         {
+            if (textureChanged || modelChanged)
+                throw new RelatusException("The sprite was modified, but ApplyChanges() was never called.", new MethodExpectedException());
+
             graphicsDevice.RasterizerState = GraphicsManager.RasterizerState;
             graphicsDevice.SamplerStates[0] = RenderOptions.SamplerState;
             graphicsDevice.BlendState = RenderOptions.BlendState;
