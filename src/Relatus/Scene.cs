@@ -1,7 +1,5 @@
-using Relatus.ECS;
 using Relatus.Graphics;
 using Relatus.Graphics.Transitions;
-using Relatus.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -13,10 +11,9 @@ namespace Relatus
     /// </summary>
     public abstract class Scene
     {
+        public string Name { get; private set; }
         public Transition EnterTransition { get; set; }
         public Transition ExitTransition { get; set; }
-        public string Name { get; private set; }
-        public RectangleF SceneBounds { get; set; }
 
         /// <summary>
         /// Creates an abstract class that represents a collection of data, logic, and content for a given environment.
@@ -25,7 +22,6 @@ namespace Relatus
         public Scene(string name)
         {
             Name = name;
-
             EnterTransition = new Pinhole(TransitionType.Enter);
             ExitTransition = new Fade(TransitionType.Exit);
         }
