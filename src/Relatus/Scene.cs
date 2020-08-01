@@ -31,14 +31,14 @@ namespace Relatus
         }
 
         /// <summary>
-        /// Performs logic related to entering a scene. (Automatically called right after the previous scene was unloaded).
+        /// Called right after the scene is loaded.
         /// </summary>
-        public abstract void LoadScene();
+        public virtual void OnEnter() { }
 
         /// <summary>
-        /// Performs logic related to leaving a scene. (Automatically called right before the next scene is loaded).
+        /// Called right before the scene is unloaded.
         /// </summary>
-        public abstract void UnloadScene();
+        public virtual void OnExit() { }
 
         /// <summary>
         /// Updates everything and anything related to the scene.

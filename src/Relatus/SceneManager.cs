@@ -91,7 +91,7 @@ namespace Relatus
         private static void LoadNextScene()
         {
             CurrentScene = NextScene;
-            CurrentScene.LoadScene();
+            CurrentScene.OnEnter();
             NextScene = null;
         }
 
@@ -114,7 +114,7 @@ namespace Relatus
 
                     if (exitTransition.Done)
                     {
-                        CurrentScene?.UnloadScene();
+                        CurrentScene?.OnExit();
                         exitTransition.Reset();
                         exitTransition = null;
 
@@ -167,7 +167,7 @@ namespace Relatus
 
             if (DebugManager.Debugging && Input.KeyboardExt.Pressed(Keys.R))
             {
-                CurrentScene?.LoadScene();
+                CurrentScene?.OnEnter();
             }
         }
 
