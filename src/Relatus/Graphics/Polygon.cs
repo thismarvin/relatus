@@ -12,141 +12,57 @@ namespace Relatus.Graphics
         public float X
         {
             get => x;
-            set
-            {
-                if (x == value)
-                    return;
-
-                x = value;
-                modelChanged = true;
-                transformNeedsUpdating = true;
-            }
+            set => SetPosition(value, y, z);
         }
         public float Y
         {
             get => y;
-            set
-            {
-                if (y == value)
-                    return;
-
-                y = value;
-                modelChanged = true;
-                transformNeedsUpdating = true;
-            }
+            set => SetPosition(x, value, z);
         }
         public float Z
         {
             get => z;
-            set
-            {
-                if (z == value)
-                    return;
-
-                z = value;
-                modelChanged = true;
-                transformNeedsUpdating = true;
-            }
+            set => SetPosition(x, y, value);
         }
         public float Width
         {
             get => width;
-            set
-            {
-                if (width == value)
-                    return;
-
-                width = value;
-                modelChanged = true;
-                transformNeedsUpdating = true;
-            }
+            set => SetWidth(value);
         }
         public float Height
         {
             get => height;
-            set
-            {
-                if (height == value)
-                    return;
-
-                height = value;
-                modelChanged = true;
-                transformNeedsUpdating = true;
-            }
+            set => SetHeight(value);
         }
         public Color Color
         {
             get => color;
-            set
-            {
-                if (color == value)
-                    return;
-
-                color = value;
-                modelChanged = true;
-                transformNeedsUpdating = true;
-            }
+            set => SetColor(value);
         }
         public virtual float Rotation
         {
             get => rotation;
-            set
-            {
-                if (rotation == value)
-                    return;
-
-                rotation = value;
-                modelChanged = true;
-                transformNeedsUpdating = true;
-            }
+            set => SetRotation(value);
         }
         public Vector2 RotationOffset
         {
             get => rotationOffset;
-            set
-            {
-                if (rotationOffset == value)
-                    return;
-
-                rotationOffset = value;
-                modelChanged = true;
-                transformNeedsUpdating = true;
-            }
+            set => SetRotationOffset(value.X, value.Y);
         }
         public Vector3 Translation
         {
             get => translation;
-            set
-            {
-                if (translation == value)
-                    return;
-
-                translation = value;
-                modelChanged = true;
-                transformNeedsUpdating = true;
-            }
+            set => SetTranslation(value.X, value.Y, value.Z);
         }
         public Vector3 Scale
         {
             get => scale;
-            set
-            {
-                if (scale == value)
-                    return;
-
-                scale = value;
-                modelChanged = true;
-                transformNeedsUpdating = true;
-            }
+            set => SetScale(value.X, value.Y, value.Z);
         }
-
         public GeometryData Geometry
         {
             get => geometry;
-            set
-            {
-                AttachGeometry(value);
-            }
+            set => AttachGeometry(value);
         }
         #endregion
 
@@ -203,6 +119,11 @@ namespace Relatus.Graphics
             transformCache = Matrix.Identity;
         }
 
+        public static Polygon Create()
+        {
+            return new Polygon();
+        }
+
         public Polygon AttachGeometry(GeometryData geometry)
         {
             if (this.geometry == geometry)
@@ -215,6 +136,87 @@ namespace Relatus.Graphics
 
             this.geometry = geometry;
             geometryChanged = true;
+
+            return this;
+        }
+
+        public virtual Polygon SetPosition(float x, float y, float z)
+        {
+            this.x = x;
+            this.y = y;
+            this.z = z;
+
+            modelChanged = true;
+            transformNeedsUpdating = true;
+
+            return this;
+        }
+
+        public virtual Polygon SetWidth(float width)
+        {
+            this.width = width;
+
+            modelChanged = true;
+            transformNeedsUpdating = true;
+
+            return this;
+        }
+
+        public virtual Polygon SetHeight(float height)
+        {
+            this.height = height;
+
+            modelChanged = true;
+            transformNeedsUpdating = true;
+
+            return this;
+        }
+
+        public virtual Polygon SetColor(Color color)
+        {
+            this.color = color;
+
+            modelChanged = true;
+
+            return this;
+        }
+
+        public virtual Polygon SetTranslation(float x, float y, float z)
+        {
+            translation = new Vector3(x, y, z);
+
+            modelChanged = true;
+            transformNeedsUpdating = true;
+
+            return this;
+        }
+
+        public virtual Polygon SetScale(float x, float y, float z)
+        {
+            scale = new Vector3(x, y, z);
+
+            modelChanged = true;
+            transformNeedsUpdating = true;
+
+            return this;
+        }
+
+        public virtual Polygon SetRotationOffset(float x, float y)
+        {
+            rotationOffset = new Vector2(x, y);
+
+            modelChanged = true;
+            transformNeedsUpdating = true;
+
+            return this;
+        }
+
+        public virtual Polygon SetRotation(float rotation)
+        {
+            this.rotation = rotation;
+
+            modelChanged = true;
+            transformNeedsUpdating = true;
 
             return this;
         }
@@ -243,22 +245,10 @@ namespace Relatus.Graphics
             return this;
         }
 
-        public virtual Polygon SetPosition(float x, float y, float z)
-        {
-            this.x = x;
-            this.y = y;
-            this.z = z;
-
-            modelChanged = true;
-            transformNeedsUpdating = true;
-
-            return this;
-        }
-
         public virtual Polygon SetCenter(float x, float y)
         {
-            this.x = x - Width / 2;
-            this.y = y + Height / 2;
+            this.x = x - width / 2;
+            this.y = y + height / 2;
 
             modelChanged = true;
             transformNeedsUpdating = true;
@@ -306,9 +296,7 @@ namespace Relatus.Graphics
         public virtual void Draw(Camera camera)
         {
             if (geometryChanged || modelChanged)
-            {
                 throw new RelatusException("The polygon was modified, but ApplyChanges() was never called.", new MethodExpectedException());
-            }
 
             graphicsDevice.RasterizerState = GraphicsManager.RasterizerState;
             graphicsDevice.SetVertexBuffers(vertexBufferBindings);

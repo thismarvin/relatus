@@ -128,7 +128,7 @@ namespace Relatus
         /// <param name="path">The relative path to the BMFont contained in the Content folder.</param>
         public static void LoadFont(string name, string path)
         {
-            fonts.Register(name, Engine.Instance.Content.Load<BMFont>(path));
+            fonts.Register(name, Engine.Instance.Content.Load<BMFont>(path).LoadPages(path));
         }
 
         /// <summary>
@@ -159,7 +159,7 @@ namespace Relatus
         /// <param name="path">The relative path to the sprite atlas contained in the Content folder.</param>
         public static void LoadSpriteAtlas(string name, string path)
         {
-            atlases.Register(name, Engine.Instance.Content.Load<SpriteAtlas>(path));
+            atlases.Register(name, Engine.Instance.Content.Load<SpriteAtlas>(path).LoadSpriteSheet(path));
         }
 
         /// <summary>
@@ -184,11 +184,11 @@ namespace Relatus
 
         internal static void LoadContent()
         {
-            LoadEffect("Relatus_PolygonShader", "Assets/Effects/PolygonShader");
-            LoadEffect("Relatus_SpriteShader", "Assets/Effects/SpriteShader");
-            LoadEffect("Relatus_BMFontShader", "Assets/Effects/BMFontShader");
+            LoadEffect("Relatus_PolygonShader", "Relatus.Content/PolygonShader");
+            LoadEffect("Relatus_SpriteShader", "Relatus.Content/SpriteShader");
+            LoadEffect("Relatus_BMFontShader", "Relatus.Content/BMFontShader");
 
-            LoadFont("Relatus_Probity", "Assets/Fonts/probity");
+            LoadFont("Relatus_Probity", "Relatus.Content/probity");
         }
 
         internal static void UnloadContent()

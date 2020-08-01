@@ -33,6 +33,11 @@ namespace Relatus.Graphics
             Managed = managed;
         }
 
+        public bool Equals(GeometryData other)
+        {
+            return Mesh == other.Mesh;
+        }
+
         #region IDisposable Support
         private bool disposedValue = false; // To detect redundant calls
 

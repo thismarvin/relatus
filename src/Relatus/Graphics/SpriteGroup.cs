@@ -1,45 +1,85 @@
 using Microsoft.Xna.Framework.Graphics;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Relatus.Graphics
 {
-    internal class SpriteGroup : DrawGroup<Sprite>
+    public class SpriteGroup : DrawGroup<BetterSprite>, IDisposable
     {
-        private readonly BlendState sharedBlendState;
-        private readonly SamplerState sharedSamplerState;
-        private readonly Effect sharedEffect;
+        private readonly RenderOptions sharedRenderOptions;
+        private readonly Texture2D sharedTexture;
+        private readonly VertexColorTexture[] vertexColorTextures;
+        private readonly VertexTransform[] vertexTransforms;
 
-        private static readonly SpriteBatch spriteBatch;
+        private bool dataChanged;
 
-        static SpriteGroup()
-        {
-            spriteBatch = GraphicsManager.SpriteBatch;
+        private static readonly GraphicsDevice graphicsDevice;
+        static SpriteGroup() {
+            graphicsDevice = Engine.Graphics.GraphicsDevice;
         }
 
-        public SpriteGroup(BlendState sharedBlendState, SamplerState sharedSamplerState, Effect sharedEffect, int capacity) : base(capacity)
+        public SpriteGroup(RenderOptions sharedRenderOptions, Texture2D sharedTexture, int capacity) : base(capacity)
         {
-            this.sharedBlendState = sharedBlendState;
-            this.sharedSamplerState = sharedSamplerState;
-            this.sharedEffect = sharedEffect;
+            this.sharedRenderOptions = sharedRenderOptions;
+            this.sharedTexture = sharedTexture;
+
+            vertexColorTextures = new VertexColorTexture[capacity];
+            vertexTransforms = new VertexTransform[capacity];
         }
 
-        protected override bool ConditionToAdd(Sprite sprite)
+        protected override bool ConditionToAdd(BetterSprite entry)
         {
-            return sprite.BlendState == sharedBlendState && sprite.SamplerState == sharedSamplerState && sprite.Effect == sharedEffect;
+            return entry.RenderOptions.Equals(sharedRenderOptions) && entry.Texture == sharedTexture;
+        }
+
+        public override bool Add(BetterSprite entry){
+            if (groupIndex >= capacity)
+                return false;
+
+            if (ConditionToAdd(entry))
+            {
+                //vertexTransforms[groupIndex++] = entry.GetVertexTransform();
+                dataChanged = true;
+                return true;
+            }
+
+            return false;
         }
 
         public override void Draw(Camera camera)
         {
-            spriteBatch.Begin(SpriteSortMode.Deferred, sharedBlendState, sharedSamplerState, null, null, sharedEffect, camera.SpriteTransform);
-            {
-                for (int i = 0; i < groupIndex; i++)
-                {
-                    group[i]?.ManagedDraw();
-                }
-            }
-            spriteBatch.End();
         }
+
+        #region IDisposable Support
+        private bool disposedValue;
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    // TODO: dispose managed state (managed objects)
+                }
+
+                // TODO: free unmanaged resources (unmanaged objects) and override finalizer
+                // TODO: set large fields to null
+                disposedValue = true;
+            }
+        }
+
+        // // TODO: override finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources
+        // ~SpriteGroup()
+        // {
+        //     // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+        //     Dispose(disposing: false);
+        // }
+
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
+        }
+        #endregion
     }
 }

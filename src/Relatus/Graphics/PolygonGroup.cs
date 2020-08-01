@@ -7,7 +7,7 @@ namespace Relatus.Graphics
 {
     internal class PolygonGroup : DrawGroup<Polygon>, IDisposable
     {
-        private readonly GeometryData sharedShapeData;
+        private readonly GeometryData sharedGeometry;
         private readonly VertexTransformColor[] transforms;
 
         private DynamicVertexBuffer transformBuffer;
@@ -16,14 +16,14 @@ namespace Relatus.Graphics
 
         public PolygonGroup(GeometryData sharedShapeData, int capacity) : base(capacity)
         {
-            this.sharedShapeData = sharedShapeData;
+            this.sharedGeometry = sharedShapeData;
             transforms = new VertexTransformColor[capacity];
             group = null;
         }
 
         protected override bool ConditionToAdd(Polygon polygon)
         {
-            return polygon.Geometry == sharedShapeData;
+            return polygon.Geometry.Equals(sharedGeometry);
         }
 
         public override bool Add(Polygon polygon)
@@ -50,7 +50,7 @@ namespace Relatus.Graphics
 
             vertexBufferBindings = new VertexBufferBinding[]
             {
-                new VertexBufferBinding(sharedShapeData.VertexBuffer),
+                new VertexBufferBinding(sharedGeometry.VertexBuffer),
                 new VertexBufferBinding(transformBuffer, 0, 1)
             };
         }
@@ -65,14 +65,14 @@ namespace Relatus.Graphics
 
             Engine.Graphics.GraphicsDevice.RasterizerState = GraphicsManager.RasterizerState;
             Engine.Graphics.GraphicsDevice.SetVertexBuffers(vertexBufferBindings);
-            Engine.Graphics.GraphicsDevice.Indices = sharedShapeData.IndexBuffer;
+            Engine.Graphics.GraphicsDevice.Indices = sharedGeometry.IndexBuffer;
 
             GeometryManager.SetupPolygonShader(camera);
 
             foreach (EffectPass pass in GeometryManager.PolygonShader.Techniques[1].Passes)
             {
                 pass.Apply();
-                Engine.Graphics.GraphicsDevice.DrawInstancedPrimitives(PrimitiveType.TriangleList, 0, 0, sharedShapeData.TotalTriangles, transforms.Length);
+                Engine.Graphics.GraphicsDevice.DrawInstancedPrimitives(PrimitiveType.TriangleList, 0, 0, sharedGeometry.TotalTriangles, transforms.Length);
             }
         }
 

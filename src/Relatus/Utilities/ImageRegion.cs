@@ -2,23 +2,21 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Relatus.Graphics
+namespace Relatus.Utilities
 {
-    public struct SpriteData
+    public struct ImageRegion
     {
         public int X { get; private set; }
         public int Y { get; private set; }
         public int Width { get; private set; }
         public int Height { get; private set; }
-        public string SpriteSheet { get; private set; }        
 
-        public SpriteData(int x, int y, int width, int height, string spriteSheet)
+        public ImageRegion(int x, int y, int width, int height)
         {
             X = x;
             Y = y;
             Width = width;
             Height = height;
-            SpriteSheet = spriteSheet.ToLowerInvariant();
         }
     }
 }
