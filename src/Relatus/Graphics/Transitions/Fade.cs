@@ -7,8 +7,6 @@ namespace Relatus.Graphics.Transitions
 {
     public class Fade : Transition
     {
-        const int PADDING = 32;
-
         private float alpha;
         private Color defaultColor;
         private Color fadeColor;
@@ -28,8 +26,8 @@ namespace Relatus.Graphics.Transitions
 
         protected override void AccommodateToCamera()
         {
-            fade.Width = Camera.Bounds.Width + PADDING * 2;
-            fade.Height = Camera.Bounds.Height + PADDING * 2;
+            fade.Width = Camera.Bounds.Width * 1.4f;
+            fade.Height = Camera.Bounds.Height * 1.4f;
 
             fade.SetCenter(Camera.Position.X, Camera.Position.Y);
             fade.ApplyChanges();

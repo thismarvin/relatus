@@ -7,8 +7,6 @@ namespace Relatus.Graphics.Transitions
 {
     public class Pinhole : Transition
     {
-        const int PADDING = 64;
-
         private readonly Circle pinhole;
         private float radius;
         private float lineWidth;
@@ -26,15 +24,15 @@ namespace Relatus.Graphics.Transitions
 
         protected override void SetupTransition()
         {
-            lineWidth = Type == TransitionType.Enter ? radius : 1;            
+            lineWidth = Type == TransitionType.Enter ? radius : 1;
             pinhole.LineWidth = lineWidth;
-            pinhole.ApplyChanges();            
+            pinhole.ApplyChanges();
         }
 
         protected override void AccommodateToCamera()
         {
             radius = Camera.Bounds.Width > Camera.Bounds.Height ? Camera.Bounds.Width / 2 : Camera.Bounds.Height / 2;
-            radius += PADDING;
+            radius *= 1.2f;
             pinhole.Radius = radius;
             pinhole.SetCenter(Camera.Position.X, Camera.Position.Y);
             pinhole.ApplyChanges();
