@@ -12,10 +12,8 @@ namespace Relatus
         Perspective
     }
 
-
     public class Camera
     {
-        public string Name { get; private set; }
         public Matrix WVP { get; private set; }
 
         public RectangleF Bounds => new RectangleF(position.X, position.Y, width, height);
@@ -56,9 +54,6 @@ namespace Relatus
             }
         }
 
-        //public float Zoom { get; private set; }
-        //public float Rotation { get; private set; }
-
         private Vector3 target;
         private Vector3 position;
         private Vector3 up;
@@ -73,9 +68,8 @@ namespace Relatus
         private float width;
         private float height;
 
-        internal Camera(string name, float width, float height, float near, float far, ProjectionType projectionType)
+        internal Camera(float width, float height, float near, float far, ProjectionType projectionType)
         {
-            Name = name;
             target = Vector3.Zero;
             position = new Vector3(target.X, target.Y, target.Z + 1);
             up = Vector3.Up;
@@ -102,32 +96,32 @@ namespace Relatus
             WVP = world * view * projection;
         }
 
-        public static Camera CreateOrthographic(string name, float width, float height, float near, float far)
+        public static Camera CreateOrthographic(float width, float height, float near, float far)
         {
-            return new Camera(name, width, height, near, far, ProjectionType.Orthographic);
+            return new Camera(width, height, near, far, ProjectionType.Orthographic);
         }
 
-        public static Camera CreateOrthographicOffCenter(string name, float left, float right, float bottom, float top, float near, float far)
+        public static Camera CreateOrthographicOffCenter(float left, float right, float bottom, float top, float near, float far)
         {
-            return new Camera(name, right - left, top - bottom, near, far, ProjectionType.Orthographic);
+            return new Camera(right - left, top - bottom, near, far, ProjectionType.Orthographic);
         }
 
-        public static Camera CreatePerspective(string name, float width, float height, float near, float far)
+        public static Camera CreatePerspective(float width, float height, float near, float far)
         {
-            return new Camera(name, width, height, near, far, ProjectionType.Perspective);
+            return new Camera(width, height, near, far, ProjectionType.Perspective);
         }
 
-        public static Camera CreatePerspectiveOffCenter(string name, float left, float right, float bottom, float top, float near, float far)
+        public static Camera CreatePerspectiveOffCenter(float left, float right, float bottom, float top, float near, float far)
         {
-            return new Camera(name, right - left, top - bottom, near, far, ProjectionType.Perspective);
+            return new Camera(right - left, top - bottom, near, far, ProjectionType.Perspective);
         }
 
-        public static Camera CreatePerspectiveFieldOfView(string name, float fieldOfView, float aspectRatio, float near, float far)
+        public static Camera CreatePerspectiveFieldOfView(float fieldOfView, float aspectRatio, float near, float far)
         {
             float width = 2 * (float)Math.Tan(fieldOfView / 2);
             float height = width / aspectRatio;
 
-            return new Camera(name, width, height, near, far, ProjectionType.Perspective);
+            return new Camera(width, height, near, far, ProjectionType.Perspective);
         }
 
         public Camera SetPosition(float x, float y, float z)

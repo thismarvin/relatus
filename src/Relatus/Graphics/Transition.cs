@@ -10,14 +10,14 @@ namespace Relatus.Graphics
         Exit
     }
 
-    public abstract class Transition: IDisposable
+    public abstract class Transition : IDisposable
     {
         public bool Started { get; private set; }
         public bool Done { get; protected set; }
-        
+
         protected TransitionType Type { get; private set; }
         protected Camera Camera { get; private set; }
-        protected float Force { get; private set; }        
+        protected float Force { get; private set; }
 
         private bool setup;
         private bool lastDraw;
@@ -32,7 +32,7 @@ namespace Relatus.Graphics
         internal Transition(TransitionType type, float velocity, float acceleration)
         {
             Type = type;
-            Camera = CameraManager.Get(CameraType.Static);
+            Camera = CameraManager.Static;
 
             initialVelocity = velocity;
             this.velocity = initialVelocity;
@@ -89,7 +89,7 @@ namespace Relatus.Graphics
             AccommodateToCamera();
 
             if (!setup)
-            {                
+            {
                 SetupTransition();
                 setup = true;
             }

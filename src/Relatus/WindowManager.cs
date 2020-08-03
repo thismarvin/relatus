@@ -23,17 +23,17 @@ namespace Relatus
         public static float Scale { get; private set; }
         public static bool WideScreenSupported { get; private set; }
 
-        public static float AspectRatio => GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.AspectRatio; 
+        public static float AspectRatio => GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.AspectRatio;
         /// <summary>
         /// The width of the entire display/screen.
         /// </summary>
-        public static int DisplayWidth => GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width; 
+        public static int DisplayWidth => GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
         /// <summary>
         /// The height of the entire display/screen.
         /// </summary>
-        public static int DisplayHeight => GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height; 
-        public static bool IsWideScreen => GraphicsAdapter.DefaultAdapter.IsWideScreen; 
-        public static DisplayOrientation Orientation => Engine.Instance.Window.CurrentOrientation; 
+        public static int DisplayHeight => GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
+        public static bool IsWideScreen => GraphicsAdapter.DefaultAdapter.IsWideScreen;
+        public static DisplayOrientation Orientation => Engine.Instance.Window.CurrentOrientation;
         /// <summary>
         /// The current window height divided by the scale.
         /// </summary>
@@ -42,16 +42,16 @@ namespace Relatus
         /// The current window width divided by the scale.
         /// </summary>
         public static int ScaledWidth => (int)Math.Ceiling(WindowWidth / Scale);
-        public static string Title => Engine.Instance.Window.Title; 
-        public static GameWindow Window => Engine.Instance.Window; 
+        public static string Title => Engine.Instance.Window.Title;
+        public static GameWindow Window => Engine.Instance.Window;
         /// <summary>
         /// The current height of the window.
         /// </summary>
-        public static int WindowHeight => Engine.Graphics.PreferredBackBufferHeight; 
+        public static int WindowHeight => Engine.Graphics.PreferredBackBufferHeight;
         /// <summary>
         /// The current width of the window.
         /// </summary>
-        public static int WindowWidth => Engine.Graphics.PreferredBackBufferWidth; 
+        public static int WindowWidth => Engine.Graphics.PreferredBackBufferWidth;
 
         private static readonly PolygonCollection polygonCollection;
         private static readonly Queue<float> sampleFPS;
@@ -352,7 +352,7 @@ namespace Relatus
         {
             if (!WideScreenSupported)
             {
-                polygonCollection.Draw(CameraManager.Get(CameraType.Static));
+                polygonCollection.Draw(CameraManager.Static);
             }
         }
     }
