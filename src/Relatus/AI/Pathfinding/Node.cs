@@ -6,18 +6,24 @@ namespace Relatus.AI.Pathfinding
 {
     public class Node
     {
-        public float G { get; set; }
-        public float H { get; set; }
-        public float F { get; set; }
+        public float X { get; set; }
+        public float Y { get; set; }
+        public float Z { get; set; }
 
         public HashSet<NodeConnection> Neighbors { get; private set; }
-        public Node Previous { get; set; }
-
         public bool Disabled { get; set; }
 
-        public Node()
+        public Node(float x, float y, float z)
         {
+            X = x;
+            Y = y;
+            Z = z;
+
             Neighbors = new HashSet<NodeConnection>();
+        }
+
+        public Node() : this(0, 0, 0)
+        {
         }
 
         public Node AddNeighbor(params NodeConnection[] connections)
@@ -26,16 +32,6 @@ namespace Relatus.AI.Pathfinding
             {
                 Neighbors.Add(connections[i]);
             }
-            return this;
-        }
-
-        public Node Reset()
-        {
-            G = 0;
-            H = 0;
-            F = 0;
-            Previous = null;
-
             return this;
         }
     }

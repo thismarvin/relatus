@@ -10,13 +10,25 @@ namespace Relatus.AI.Pathfinding
         {
             HashSet<Node> openSet = new HashSet<Node>() { start };
 
+            Dictionary<Node, Node> cameFrom = new Dictionary<Node, Node>();
+
+            Dictionary<Node, float> gScores = new Dictionary<Node, float>
+            {
+                { start, float.MaxValue }
+            };
+
+            Dictionary<Node, float> fScores = new Dictionary<Node, float>
+            {
+                { start, float.MaxValue }
+            };
+
             while (openSet.Count > 0)
             {
-                Node current = MinF(openSet);
+                Node current = MinF(fScores);
 
                 if (current == end)
                 {
-                    return ReconstructPath(end);
+                    return ReconstructPath(end, cameFrom);
                 }
 
                 openSet.Remove(current);
@@ -26,13 +38,13 @@ namespace Relatus.AI.Pathfinding
                     if (neighbor.Target.Disabled)
                         continue;
 
-                    float tentativeGScore = current.G + neighbor.Weight;
+                    float tentativeGScore = gScores[current] + neighbor.Weight;
 
-                    if (tentativeGScore < neighbor.Target.G)
+                    if (tentativeGScore < gScores[neighbor.Target])
                     {
-                        neighbor.Target.Previous = current;
-                        neighbor.Target.G = tentativeGScore;
-                        neighbor.Target.F = neighbor.Target.G + heuristic(current, neighbor.Target);
+                        cameFrom[neighbor.Target] = current;
+                        gScores[neighbor.Target] = tentativeGScore;
+                        fScores[neighbor.Target] = tentativeGScore + heuristic(current, neighbor.Target);
 
                         if (!openSet.Contains(neighbor.Target))
                         {
@@ -44,26 +56,31 @@ namespace Relatus.AI.Pathfinding
 
             return new List<Node>();
 
-            Node MinF(HashSet<Node> nodes)
+            Node MinF(Dictionary<Node, float> _fScores)
             {
-                Node min = null;
+                Node result = null;
+                float min = float.MaxValue;
 
-                foreach (Node node in nodes)
+                foreach (KeyValuePair<Node, float> entry in _fScores)
                 {
-                    min = min == null || node.F < min.F ? node : min;
+                    if (entry.Value < min)
+                    {
+                        result = entry.Key;
+                        min = entry.Value;
+                    }
                 }
 
-                return min;
+                return result;
             }
 
-            List<Node> ReconstructPath(Node _start)
+            List<Node> ReconstructPath(Node _start, Dictionary<Node, Node> _cameFrom)
             {
-                List<Node> result = new List<Node>();
+                List<Node> result = new List<Node>() { _start };
 
-                while (_start != null)
+                while (_cameFrom.ContainsKey(_start))
                 {
+                    _start = _cameFrom[_start];
                     result.Add(_start);
-                    _start = _start.Previous;
                 }
 
                 result.Reverse();
