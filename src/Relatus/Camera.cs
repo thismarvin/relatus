@@ -17,7 +17,6 @@ namespace Relatus
     {
         public string Name { get; private set; }
         public Matrix WVP { get; private set; }
-        public Matrix SpriteTransform { get; private set; }
 
         public RectangleF Bounds => new RectangleF(position.X, position.Y, width, height);
 
@@ -101,14 +100,6 @@ namespace Relatus
             }
 
             WVP = world * view * projection;
-            SpriteTransform = CreateTransform();
-
-            WindowManager.WindowResize += HandleWindowResize;
-        }
-
-        internal void HandleWindowResize(object sender, EventArgs e)
-        {
-            SpriteTransform = CreateTransform();
         }
 
         public static Camera CreateOrthographic(string name, float width, float height, float near, float far)
@@ -148,7 +139,6 @@ namespace Relatus
 
             view = Matrix.CreateLookAt(position, target, up);
             WVP = world * view * projection;
-            SpriteTransform = CreateTransform();
 
             return this;
         }
@@ -212,13 +202,6 @@ namespace Relatus
             WVP = world * view * projection;
 
             return this;
-        }
-
-        private Matrix CreateTransform()
-        {
-            return
-                Matrix.CreateTranslation(WindowManager.PillarBox - position.X, WindowManager.LetterBox - position.Y, 0) *
-                Matrix.CreateScale(WindowManager.Scale);
         }
     }
 }
