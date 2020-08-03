@@ -67,28 +67,18 @@ namespace Relatus.ECS.Bundled
             switch (integrator)
             {
                 case Integrator.SemiImplictEuler:
-                    SemiImplictEulerIntegration();
+                    kinetic.Velocity += kinetic.Acceleration * deltaTime;
+
+                    position.X += kinetic.Velocity.X * deltaTime;
+                    position.Y += kinetic.Velocity.Y * deltaTime;
                     break;
 
                 case Integrator.VelocityVerlet:
-                    VelocityVerletIntegration();
+                    position.X += kinetic.Velocity.X * deltaTime + 0.5f * kinetic.Acceleration.X * deltaTime * deltaTime;
+                    position.Y += kinetic.Velocity.Y * deltaTime + 0.5f * kinetic.Acceleration.Y * deltaTime * deltaTime;
+
+                    kinetic.Velocity += kinetic.Acceleration * deltaTime;
                     break;
-            }
-
-            void SemiImplictEulerIntegration()
-            {
-                kinetic.Velocity += kinetic.Acceleration * deltaTime;
-
-                position.X += kinetic.Velocity.X * deltaTime;
-                position.Y += kinetic.Velocity.Y * deltaTime;
-            }
-
-            void VelocityVerletIntegration()
-            {
-                position.X += kinetic.Velocity.X * deltaTime + 0.5f * kinetic.Acceleration.X * deltaTime * deltaTime;
-                position.Y += kinetic.Velocity.Y * deltaTime + 0.5f * kinetic.Acceleration.Y * deltaTime * deltaTime;
-
-                kinetic.Velocity += kinetic.Acceleration * deltaTime;
             }
         }
     }
