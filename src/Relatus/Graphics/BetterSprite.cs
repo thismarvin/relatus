@@ -7,6 +7,19 @@ using System.Text;
 
 namespace Relatus.Graphics
 {
+    public enum SpriteMirroringType
+    {
+        None = 0,
+        /// <summary>
+        /// Reverse the x-axis of the sprite.
+        /// </summary>
+        FlipHorizontally = 1,
+        /// <summary>
+        /// Reverse the y-axis of the sprite.
+        /// </summary>
+        FlipVertically = 2
+    }
+
     public class BetterSprite
     {
         public Texture2D Texture
@@ -59,6 +72,11 @@ namespace Relatus.Graphics
             get => sampleRegion;
             set => SetSampleRegion((int)value.X, (int)value.Y, (int)value.Width, (int)value.Height);
         }
+        public SpriteMirroringType SpriteMirroring
+        {
+            get => spriteMirroring;
+            set => SetSpriteMirroring(value);
+        }
         public RenderOptions RenderOptions
         {
             get => renderOptions;
@@ -94,6 +112,7 @@ namespace Relatus.Graphics
         private float rotation;
         private Color tint;
         private ImageRegion sampleRegion;
+        private SpriteMirroringType spriteMirroring;
         private RenderOptions renderOptions;
 
         private bool modelChanged;
@@ -223,6 +242,15 @@ namespace Relatus.Graphics
             return SetSampleRegion(region.X, region.Y, region.Width, region.Height);
         }
 
+        public virtual BetterSprite SetSpriteMirroring(SpriteMirroringType mirroringType)
+        {
+            spriteMirroring = mirroringType;
+
+            textureChanged = true;
+
+            return this;
+        }
+
         public virtual BetterSprite SetRenderOptions(RenderOptions options)
         {
             renderOptions = options;
@@ -239,14 +267,39 @@ namespace Relatus.Graphics
                 Vector2 bottomRight = topLeft + new Vector2(texelWidth * sampleRegion.Width, texelHeight * sampleRegion.Height);
                 Vector2 bottomLeft = topLeft + new Vector2(0, texelHeight * sampleRegion.Height);
 
+                Vector2[] corners = new Vector2[] { topLeft, bottomLeft, bottomRight, topRight };
+
                 textureBuffer?.Dispose();
                 textureBuffer = new DynamicVertexBuffer(graphicsDevice, typeof(VertexColorTexture), 4, BufferUsage.WriteOnly);
+
+                if ((spriteMirroring & SpriteMirroringType.FlipHorizontally) != SpriteMirroringType.None)
+                {
+                    Vector2 temp = corners[0];
+                    corners[0] = corners[3];
+                    corners[3] = temp;
+
+                    temp = corners[1];
+                    corners[1] = corners[2];
+                    corners[2] = temp;
+                }
+
+                if ((spriteMirroring & SpriteMirroringType.FlipVertically) != SpriteMirroringType.None)
+                {
+                    Vector2 temp = corners[0];
+                    corners[0] = corners[1];
+                    corners[1] = temp;
+
+                    temp = corners[3];
+                    corners[3] = corners[2];
+                    corners[2] = temp;
+                }
+
                 textureBuffer.SetData(new VertexColorTexture[]
                 {
-                    new VertexColorTexture(tint, topLeft),
-                    new VertexColorTexture(tint, bottomLeft),
-                    new VertexColorTexture(tint, bottomRight),
-                    new VertexColorTexture(tint, topRight),
+                    new VertexColorTexture(tint, corners[0]),
+                    new VertexColorTexture(tint, corners[1]),
+                    new VertexColorTexture(tint, corners[2]),
+                    new VertexColorTexture(tint, corners[3]),
                 });
             }
 
