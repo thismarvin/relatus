@@ -6,20 +6,12 @@ namespace Relatus.AI.Pathfinding
 {
     public static class AStar
     {
-        public static List<Node> AStarAlgorithm(Node[] nodes, Node start, Node end, Func<Node, Node, float> heuristic)
+        public static List<Node> Pathfind(Node start, Node end, Func<Node, Node, float> heuristic)
         {
             HashSet<Node> openSet = new HashSet<Node>() { start };
-
             Dictionary<Node, Node> cameFrom = new Dictionary<Node, Node>();
-
             Dictionary<Node, float> gScores = new Dictionary<Node, float>();
             Dictionary<Node, float> fScores = new Dictionary<Node, float>();
-
-            for (int i = 0; i < nodes.Length; i++)
-            {
-                gScores[nodes[i]] = float.MaxValue;
-                fScores[nodes[i]] = float.MaxValue;
-            }
 
             gScores[start] = 0;
             fScores[start] = heuristic(start, end);
@@ -39,6 +31,15 @@ namespace Relatus.AI.Pathfinding
                 {
                     if (neighbor.Target.Disabled)
                         continue;
+
+                    if (!gScores.ContainsKey(current))
+                    {
+                        gScores[current] = float.MaxValue;
+                    }
+                    if (!gScores.ContainsKey(neighbor.Target))
+                    {
+                        gScores[neighbor.Target] = float.MaxValue;
+                    }
 
                     float tentativeGScore = gScores[current] + neighbor.Weight;
 
