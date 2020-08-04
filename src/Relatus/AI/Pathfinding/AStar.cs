@@ -4,27 +4,29 @@ using System.Text;
 
 namespace Relatus.AI.Pathfinding
 {
-    public class AStar
+    public static class AStar
     {
-        public static List<Node> AStarAlgorithm(Node start, Node end, Func<Node, Node, int> heuristic)
+        public static List<Node> AStarAlgorithm(Node[] nodes, Node start, Node end, Func<Node, Node, float> heuristic)
         {
             HashSet<Node> openSet = new HashSet<Node>() { start };
 
             Dictionary<Node, Node> cameFrom = new Dictionary<Node, Node>();
 
-            Dictionary<Node, float> gScores = new Dictionary<Node, float>
-            {
-                { start, float.MaxValue }
-            };
+            Dictionary<Node, float> gScores = new Dictionary<Node, float>();
+            Dictionary<Node, float> fScores = new Dictionary<Node, float>();
 
-            Dictionary<Node, float> fScores = new Dictionary<Node, float>
+            for (int i = 0; i < nodes.Length; i++)
             {
-                { start, float.MaxValue }
-            };
+                gScores[nodes[i]] = float.MaxValue;
+                fScores[nodes[i]] = float.MaxValue;
+            }
+
+            gScores[start] = 0;
+            fScores[start] = heuristic(start, end);
 
             while (openSet.Count > 0)
             {
-                Node current = MinF(fScores);
+                Node current = MinF(openSet, fScores);
 
                 if (current == end)
                 {
@@ -56,17 +58,17 @@ namespace Relatus.AI.Pathfinding
 
             return new List<Node>();
 
-            Node MinF(Dictionary<Node, float> _fScores)
+            Node MinF(HashSet<Node> _openSet, Dictionary<Node, float> _fScores)
             {
                 Node result = null;
                 float min = float.MaxValue;
 
-                foreach (KeyValuePair<Node, float> entry in _fScores)
+                foreach (Node node in _openSet)
                 {
-                    if (entry.Value < min)
+                    if (_fScores[node] < min)
                     {
-                        result = entry.Key;
-                        min = entry.Value;
+                        result = node;
+                        min = _fScores[node];
                     }
                 }
 
