@@ -44,7 +44,7 @@ namespace Relatus.Graphics
 
             if (ConditionToAdd(polygon))
             {
-                transforms[groupIndex++] = polygon.GetVertexTransformColor();
+                transforms[groupIndex++] = polygon.GetVertexTransform();
                 dataChanged = true;
                 return true;
             }
