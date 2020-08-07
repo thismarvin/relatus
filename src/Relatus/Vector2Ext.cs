@@ -53,5 +53,12 @@ namespace Relatus
                 self.SetMagnitude(maxLength);
             }
         }
+
+        public static bool AlmostEqual(this ref Vector2 self, Vector2 vector, float precision)
+        {
+            return
+                MathExt.AlmostEqual(self.X, vector.X, precision) &&
+                MathExt.AlmostEqual(self.Y, vector.Y, precision);
+        }
     }
 }

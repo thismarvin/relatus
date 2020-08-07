@@ -17,5 +17,14 @@ namespace Relatus
                 (float)(radius * Math.Cos(azimuth))
             );
         }
+
+        public static bool AlmostEqual(this ref Vector3 self, Vector3 vector, float precision)
+        {
+            return
+                MathExt.AlmostEqual(self.X, vector.X, precision) &&
+                MathExt.AlmostEqual(self.Y, vector.Y, precision) &&
+                MathExt.AlmostEqual(self.Z, vector.Z, precision);
+
+        }
     }
 }
