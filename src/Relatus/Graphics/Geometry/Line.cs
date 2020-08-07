@@ -166,16 +166,16 @@ namespace Relatus.Graphics
                 {
                     theta = (float)(-MathHelper.PiOver2 + Math.Atan2(remappedPoints[i].Y * height - remappedPoints[i - 1].Y * height, remappedPoints[i].X * width - remappedPoints[i - 1].X * width));
 
-                    _sloppyVertices[vertexIndex++] = new Vector2((float)(remappedPoints[i - 1].X - Math.Cos(theta) * (scaledLineWidthX / 2)), (float)(remappedPoints[i - 1].Y - Math.Sin(theta) * (scaledLineWidthY / 2)));
-                    _sloppyVertices[vertexIndex++] = new Vector2((float)(remappedPoints[i].X - Math.Cos(theta) * (scaledLineWidthX / 2)), (float)(remappedPoints[i].Y - Math.Sin(theta) * (scaledLineWidthY / 2)));
+                    _sloppyVertices[vertexIndex++] = new Vector2((float)(remappedPoints[i - 1].X - Math.Cos(theta) * (scaledLineWidthX * 0.5f)), (float)(remappedPoints[i - 1].Y - Math.Sin(theta) * (scaledLineWidthY * 0.5f)));
+                    _sloppyVertices[vertexIndex++] = new Vector2((float)(remappedPoints[i].X - Math.Cos(theta) * (scaledLineWidthX * 0.5f)), (float)(remappedPoints[i].Y - Math.Sin(theta) * (scaledLineWidthY * 0.5f)));
                 }
 
                 for (int i = TotalPoints - 1; i >= 1; i--)
                 {
                     theta = (float)(-MathHelper.PiOver2 + Math.Atan2(remappedPoints[i].Y * height - remappedPoints[i - 1].Y * height, remappedPoints[i].X * width - remappedPoints[i - 1].X * width));
 
-                    _sloppyVertices[vertexIndex++] = new Vector2((float)(remappedPoints[i].X + Math.Cos(theta) * (scaledLineWidthX / 2)), (float)(remappedPoints[i].Y + Math.Sin(theta) * (scaledLineWidthY / 2)));
-                    _sloppyVertices[vertexIndex++] = new Vector2((float)(remappedPoints[i - 1].X + Math.Cos(theta) * (scaledLineWidthX / 2)), (float)(remappedPoints[i - 1].Y + Math.Sin(theta) * (scaledLineWidthY / 2)));
+                    _sloppyVertices[vertexIndex++] = new Vector2((float)(remappedPoints[i].X + Math.Cos(theta) * (scaledLineWidthX * 0.5f)), (float)(remappedPoints[i].Y + Math.Sin(theta) * (scaledLineWidthY * 0.5f)));
+                    _sloppyVertices[vertexIndex++] = new Vector2((float)(remappedPoints[i - 1].X + Math.Cos(theta) * (scaledLineWidthX * 0.5f)), (float)(remappedPoints[i - 1].Y + Math.Sin(theta) * (scaledLineWidthY * 0.5f)));
                 }
 
                 return _sloppyVertices;

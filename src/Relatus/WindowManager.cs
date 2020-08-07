@@ -257,8 +257,8 @@ namespace Relatus
 
         private static void CalculateBoxing()
         {
-            LetterBox = (WindowHeight / Scale - PixelHeight) / 2;
-            PillarBox = (WindowWidth / Scale - PixelWidth) / 2;
+            LetterBox = (WindowHeight / Scale - PixelHeight) * 0.5f;
+            PillarBox = (WindowWidth / Scale - PixelWidth) * 0.5f;
         }
 
         private static void ToggleFullScreen()

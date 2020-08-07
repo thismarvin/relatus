@@ -18,7 +18,7 @@ namespace Relatus
         public float Right => X + Width;
 
         public Vector2 Position => new Vector2(X, Y);
-        public Vector2 Center => new Vector2(X + Width / 2, Y - Height / 2);
+        public Vector2 Center => new Vector2(X + Width * 0.5f, Y - Height * 0.5f);
 
         public RectangleF(float x, float y, float width, float height)
         {

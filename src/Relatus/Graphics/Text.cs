@@ -175,7 +175,7 @@ namespace Relatus.Graphics
             if (Rotation == 0)
                 return;
 
-            exactBounds.RotationOffset = new Vector2(Width / 2, Height / 2);
+            exactBounds.RotationOffset = new Vector2(Width * 0.5f, Height * 0.5f);
             exactBounds.Rotation = Rotation;
 
             SchemaShape2D collisionInformation = exactBounds.GetCollisionInformation();

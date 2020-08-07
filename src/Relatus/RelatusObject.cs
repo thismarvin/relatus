@@ -22,7 +22,7 @@ namespace Relatus
 
         public Vector2 Center
         {
-            get => new Vector2(X + Width / 2, Y - Height / 2);
+            get => new Vector2(X + Width * 0.5f, Y - Height * 0.5f);
             set => SetCenter(value.X, value.Y);
         }
 
@@ -51,8 +51,8 @@ namespace Relatus
 
         public virtual RelatusObject SetCenter(float x, float y)
         {
-            X = x - Width / 2;
-            Y = y + Height / 2;
+            X = x - Width * 0.5f;
+            Y = y + Height * 0.5f;
 
             return this;
         }

@@ -95,7 +95,7 @@ namespace Relatus.Graphics
         // I just want to note that although this is a Vector3, it is really treated like a Vector2.
         public Vector3 Center
         {
-            get => new Vector3(x + Width / 2, y - Height / 2, z);
+            get => new Vector3(x + Width * 0.5f, y - Height * 0.5f, z);
             set => SetCenter(value.X, value.Y);
         }
 
@@ -325,8 +325,8 @@ namespace Relatus.Graphics
 
         public BetterSprite SetCenter(float x, float y)
         {
-            this.x = x - Width / 2;
-            this.y = y + Height / 2;
+            this.x = x - Width * 0.5f;
+            this.y = y + Height * 0.5f;
 
             modelChanged = true;
 

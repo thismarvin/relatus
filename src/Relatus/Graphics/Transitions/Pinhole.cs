@@ -31,7 +31,7 @@ namespace Relatus.Graphics.Transitions
 
         protected override void AccommodateToCamera()
         {
-            radius = Camera.Bounds.Width > Camera.Bounds.Height ? Camera.Bounds.Width / 2 : Camera.Bounds.Height / 2;
+            radius = Camera.Bounds.Width > Camera.Bounds.Height ? Camera.Bounds.Width * 0.5f : Camera.Bounds.Height * 0.5f;
             radius *= 1.2f;
             pinhole.Radius = radius;
             pinhole.SetCenter(Camera.Position.X, Camera.Position.Y);

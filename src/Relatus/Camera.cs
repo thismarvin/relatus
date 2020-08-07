@@ -118,7 +118,7 @@ namespace Relatus
 
         public static Camera CreatePerspectiveFieldOfView(float fieldOfView, float aspectRatio, float near, float far)
         {
-            float width = 2 * (float)Math.Tan(fieldOfView / 2);
+            float width = 2 * (float)Math.Tan(fieldOfView * 0.5f);
             float height = width / aspectRatio;
 
             return new Camera(width, height, near, far, ProjectionType.Perspective);
