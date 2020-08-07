@@ -126,7 +126,7 @@ namespace Relatus.Graphics
         public Polygon()
         {
             color = Color.White;
-            scale = new Vector3(1);
+            scale = Vector3.One;
             renderOptions = new RenderOptions();
 
             geometryChanged = true;
@@ -248,7 +248,7 @@ namespace Relatus.Graphics
 
         public Polygon ApplyChanges()
         {
-            if (!geometryChanged && !modelChanged)
+            if (!geometryChanged && !modelChanged && !colorChanged)
                 return this;
 
             if (modelChanged)
@@ -331,7 +331,7 @@ namespace Relatus.Graphics
 
         public virtual void Draw(Camera camera)
         {
-            if (geometryChanged || modelChanged || colorChanged || colorChanged)
+            if (geometryChanged || modelChanged || colorChanged)
                 throw new RelatusException("The polygon was modified, but ApplyChanges() was never called.", new MethodExpectedException());
 
             graphicsDevice.RasterizerState = GraphicsManager.RasterizerState;
