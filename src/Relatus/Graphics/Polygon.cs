@@ -117,8 +117,8 @@ namespace Relatus.Graphics
         static Polygon()
         {
             graphicsDevice = Engine.Graphics.GraphicsDevice;
-            polygonShader = AssetManager.GetEffect("Relatus_PolygonShader");
-            polygonPass = polygonShader.Techniques[1].Passes[0];
+            polygonShader = AssetManager.GetEffect("Relatus_RelatusEffect");
+            polygonPass = polygonShader.Techniques[0].Passes[0];
         }
 
         public Polygon()
@@ -248,8 +248,8 @@ namespace Relatus.Graphics
             if (modelChanged)
             {
                 modelBuffer?.Dispose();
-                modelBuffer = new DynamicVertexBuffer(graphicsDevice, typeof(VertexTransformColor), 1, BufferUsage.WriteOnly);
-                modelBuffer.SetData(new VertexTransformColor[] { GetVertexTransformColor() });
+                modelBuffer = new DynamicVertexBuffer(graphicsDevice, typeof(VertexBetterTransform), 1, BufferUsage.WriteOnly);
+                modelBuffer.SetData(new VertexBetterTransform[] { GetVertexTransformColor() });
             }
 
             vertexBufferBindings = new VertexBufferBinding[]
@@ -304,12 +304,14 @@ namespace Relatus.Graphics
             return transformCache;
         }
 
-        internal VertexTransformColor GetVertexTransformColor()
+        internal VertexBetterTransform GetVertexTransformColor()
         {
-            Vector3 scale = new Vector3(width * this.scale.X, height * this.scale.Y, this.scale.Z);
             Vector3 translation = new Vector3(x + this.translation.X, y + this.translation.Y, z + this.translation.Z);
+            Vector3 scale = new Vector3(width * this.scale.X, height * this.scale.Y, this.scale.Z);
+            Vector3 origin = new Vector3(rotationOffset.X, rotationOffset.Y, 0);
+            Vector3 rotation = new Vector3(0, 0, this.rotation);
 
-            return new VertexTransformColor(scale, rotationOffset, rotation, translation, color);
+            return new VertexBetterTransform(translation, scale, origin, rotation);
         }
 
         public virtual void Draw(Camera camera)
@@ -324,7 +326,7 @@ namespace Relatus.Graphics
             graphicsDevice.SetVertexBuffers(vertexBufferBindings);
             graphicsDevice.Indices = geometry.IndexBuffer;
 
-            polygonShader.Parameters["WorldViewProjection"].SetValue(camera.WVP);
+            polygonShader.Parameters["WVP"].SetValue(camera.WVP);
 
             polygonPass.Apply();
 

@@ -8,16 +8,27 @@ namespace Relatus.Graphics
     internal class PolygonGroup : DrawGroup<Polygon>, IDisposable
     {
         private readonly GeometryData sharedGeometry;
-        private readonly VertexTransformColor[] transforms;
+        private readonly VertexBetterTransform[] transforms;
 
         private DynamicVertexBuffer transformBuffer;
         private VertexBufferBinding[] vertexBufferBindings;
         private bool dataChanged;
 
+        private static readonly GraphicsDevice graphicsDevice;
+        private static readonly Effect polygonShader;
+        private static readonly EffectPass polygonPass;
+
+        static PolygonGroup()
+        {
+            graphicsDevice = Engine.Graphics.GraphicsDevice;
+            polygonShader = AssetManager.GetEffect("Relatus_RelatusEffect");
+            polygonPass = polygonShader.Techniques[0].Passes[0];
+        }
+
         public PolygonGroup(GeometryData sharedShapeData, int capacity) : base(capacity)
         {
-            this.sharedGeometry = sharedShapeData;
-            transforms = new VertexTransformColor[capacity];
+            sharedGeometry = sharedShapeData;
+            transforms = new VertexBetterTransform[capacity];
             group = null;
         }
 
@@ -45,7 +56,7 @@ namespace Relatus.Graphics
         {
             transformBuffer?.Dispose();
 
-            transformBuffer = new DynamicVertexBuffer(Engine.Graphics.GraphicsDevice, typeof(VertexTransformColor), transforms.Length, BufferUsage.WriteOnly);
+            transformBuffer = new DynamicVertexBuffer(Engine.Graphics.GraphicsDevice, typeof(VertexBetterTransform), transforms.Length, BufferUsage.WriteOnly);
             transformBuffer.SetData(transforms);
 
             vertexBufferBindings = new VertexBufferBinding[]
@@ -63,16 +74,16 @@ namespace Relatus.Graphics
                 dataChanged = false;
             }
 
-            Engine.Graphics.GraphicsDevice.RasterizerState = GraphicsManager.RasterizerState;
-            Engine.Graphics.GraphicsDevice.SetVertexBuffers(vertexBufferBindings);
-            Engine.Graphics.GraphicsDevice.Indices = sharedGeometry.IndexBuffer;
+            graphicsDevice.RasterizerState = GraphicsManager.RasterizerState;
+            graphicsDevice.SetVertexBuffers(vertexBufferBindings);
+            graphicsDevice.Indices = sharedGeometry.IndexBuffer;
 
-            GeometryManager.SetupPolygonShader(camera);
+            polygonShader.Parameters["WVP"].SetValue(camera.WVP);
 
-            foreach (EffectPass pass in GeometryManager.PolygonShader.Techniques[1].Passes)
+            foreach (EffectPass pass in polygonShader.Techniques[0].Passes)
             {
                 pass.Apply();
-                Engine.Graphics.GraphicsDevice.DrawInstancedPrimitives(PrimitiveType.TriangleList, 0, 0, sharedGeometry.TotalTriangles, transforms.Length);
+                graphicsDevice.DrawInstancedPrimitives(PrimitiveType.TriangleList, 0, 0, sharedGeometry.TotalTriangles, transforms.Length);
             }
         }
 
