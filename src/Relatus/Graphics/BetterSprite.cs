@@ -70,7 +70,7 @@ namespace Relatus.Graphics
         public ImageRegion SampleRegion
         {
             get => sampleRegion;
-            set => SetSampleRegion((int)value.X, (int)value.Y, (int)value.Width, (int)value.Height);
+            set => SetSampleRegion(value.X, value.Y, value.Width, value.Height);
         }
         public SpriteMirroringType SpriteMirroring
         {
@@ -117,8 +117,10 @@ namespace Relatus.Graphics
 
         private bool modelChanged;
         private bool textureChanged;
+        private bool colorChanged;
         private DynamicVertexBuffer modelBuffer;
         private DynamicVertexBuffer textureBuffer;
+        private DynamicVertexBuffer colorBuffer;
         private VertexBufferBinding[] vertexBufferBindings;
 
         private static readonly GraphicsDevice graphicsDevice;
@@ -130,8 +132,8 @@ namespace Relatus.Graphics
         {
             graphicsDevice = Engine.Graphics.GraphicsDevice;
             geometry = GeometryManager.GetShapeData(ShapeType.Square);
-            spriteShader = AssetManager.GetEffect("Relatus_SpriteShader");
-            spritePass = spriteShader.CurrentTechnique.Passes[0];
+            spriteShader = AssetManager.GetEffect("Relatus_RelatusEffect");
+            spritePass = spriteShader.Techniques[2].Passes[0];
         }
 
         public BetterSprite()
@@ -142,6 +144,7 @@ namespace Relatus.Graphics
 
             modelChanged = true;
             textureChanged = true;
+            colorChanged = true;
         }
 
         public static BetterSprite Create()
@@ -222,7 +225,7 @@ namespace Relatus.Graphics
         {
             this.tint = tint;
 
-            textureChanged = true;
+            colorChanged = true;
 
             return this;
         }
@@ -260,6 +263,9 @@ namespace Relatus.Graphics
 
         public BetterSprite ApplyChanges()
         {
+            if (!modelChanged && !colorChanged && !textureChanged)
+                return this;
+
             if (textureChanged)
             {
                 Vector2 topLeft = new Vector2((float)MathExt.RemapRange(sampleRegion.X, 0, texture.Width, 0, 1), (float)MathExt.RemapRange(sampleRegion.Y, 0, texture.Height, 0, 1));
@@ -270,7 +276,7 @@ namespace Relatus.Graphics
                 Vector2[] corners = new Vector2[] { topLeft, bottomLeft, bottomRight, topRight };
 
                 textureBuffer?.Dispose();
-                textureBuffer = new DynamicVertexBuffer(graphicsDevice, typeof(VertexColorTexture), 4, BufferUsage.WriteOnly);
+                textureBuffer = new DynamicVertexBuffer(graphicsDevice, typeof(VertexTexture), 4, BufferUsage.WriteOnly);
 
                 if ((spriteMirroring & SpriteMirroringType.FlipHorizontally) != SpriteMirroringType.None)
                 {
@@ -294,31 +300,40 @@ namespace Relatus.Graphics
                     corners[2] = temp;
                 }
 
-                textureBuffer.SetData(new VertexColorTexture[]
+                textureBuffer.SetData(new VertexTexture[]
                 {
-                    new VertexColorTexture(tint, corners[0]),
-                    new VertexColorTexture(tint, corners[1]),
-                    new VertexColorTexture(tint, corners[2]),
-                    new VertexColorTexture(tint, corners[3]),
+                    new VertexTexture(corners[0]),
+                    new VertexTexture(corners[1]),
+                    new VertexTexture(corners[2]),
+                    new VertexTexture(corners[3])
                 });
             }
 
             if (modelChanged)
             {
                 modelBuffer?.Dispose();
-                modelBuffer = new DynamicVertexBuffer(graphicsDevice, typeof(VertexTransform), 1, BufferUsage.WriteOnly);
-                modelBuffer.SetData(new VertexTransform[] { GetVertexTransformColor() });
+                modelBuffer = new DynamicVertexBuffer(graphicsDevice, typeof(VertexBetterTransform), 1, BufferUsage.WriteOnly);
+                modelBuffer.SetData(new VertexBetterTransform[] { GetVertexTransform() });
+            }
+
+            if (colorChanged)
+            {
+                colorBuffer?.Dispose();
+                colorBuffer = new DynamicVertexBuffer(graphicsDevice, typeof(VertexColor), 1, BufferUsage.WriteOnly);
+                colorBuffer.SetData(new VertexColor[] { new VertexColor(tint) });
             }
 
             vertexBufferBindings = new VertexBufferBinding[]
             {
-                new VertexBufferBinding(modelBuffer, 0, 1),
-                new VertexBufferBinding(textureBuffer),
                 new VertexBufferBinding(geometry.VertexBuffer),
+                new VertexBufferBinding(modelBuffer, 0, 1),
+                new VertexBufferBinding(colorBuffer, 0, 1),
+                new VertexBufferBinding(textureBuffer),
             };
 
-            textureChanged = false;
             modelChanged = false;
+            textureChanged = false;
+            colorChanged = false;
 
             return this;
         }
@@ -333,17 +348,19 @@ namespace Relatus.Graphics
             return this;
         }
 
-        internal VertexTransform GetVertexTransformColor()
+        internal VertexBetterTransform GetVertexTransform()
         {
-            Vector3 scale = new Vector3(sampleRegion.Width * this.scale.X, sampleRegion.Height * this.scale.Y, this.scale.Z);
             Vector3 translation = new Vector3(x + this.translation.X, y + this.translation.Y, z + this.translation.Z);
+            Vector3 scale = new Vector3(Width * this.scale.X, Height * this.scale.Y, this.scale.Z);
+            Vector3 origin = new Vector3(rotationOffset.X, rotationOffset.Y, 0);
+            Vector3 rotation = new Vector3(0, 0, this.rotation);
 
-            return new VertexTransform(scale, rotationOffset, rotation, translation);
+            return new VertexBetterTransform(translation, scale, origin, rotation);
         }
 
         public virtual void Draw(Camera camera)
         {
-            if (textureChanged || modelChanged)
+            if (modelChanged || colorChanged || textureChanged)
                 throw new RelatusException("The sprite was modified, but ApplyChanges() was never called.", new MethodExpectedException());
 
             graphicsDevice.RasterizerState = GraphicsManager.RasterizerState;
@@ -353,8 +370,8 @@ namespace Relatus.Graphics
             graphicsDevice.SetVertexBuffers(vertexBufferBindings);
             graphicsDevice.Indices = geometry.IndexBuffer;
 
+            spriteShader.Parameters["WVP"].SetValue(camera.WVP);
             spriteShader.Parameters["SpriteTexture"].SetValue(texture);
-            spriteShader.Parameters["WorldViewProjection"].SetValue(camera.WVP);
 
             spritePass.Apply();
 
