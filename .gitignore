@@ -1,4 +1,6 @@
 .vs
+.tasks
 bin
 obj
 dev
+
