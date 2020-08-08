@@ -7,25 +7,25 @@ namespace Relatus.ECS.Bundled
 {
     public class CTransform : IComponent
     {
-        public Vector3 Scale { get; set; }
-        public float Rotation { get; set; }
-        public Vector2 RotationOffset { get; set; }
         public Vector3 Translation { get; set; }
+        public Vector3 Scale { get; set; }
+        public Vector3 Origin { get; set; }
+        public Vector3 Rotation { get; set; }
 
         public CTransform()
         {
-            Rotation = 0;
-            RotationOffset = Vector2.Zero;
+            Rotation = Vector3.Zero;
+            Origin = Vector3.Zero;
             Translation = Vector3.Zero;
-            Scale = new Vector3(1);
+            Scale = Vector3.One;
         }
 
-        public CTransform(Vector3 scale, float rotation, Vector2 rotationOffset, Vector3 translation)
+        public CTransform(Vector3 translation, Vector3 scale, Vector3 origin, Vector3 rotation)
         {
-            Scale = scale;
-            Rotation = rotation;
-            RotationOffset = rotationOffset;
             Translation = translation;
+            Scale = scale;
+            Origin = origin;
+            Rotation = rotation;
         }
     }
 }
