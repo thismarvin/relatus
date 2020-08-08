@@ -122,7 +122,7 @@ namespace Relatus
 
                 if (maxProjectionB < minProjectionA || maxProjectionA < minProjectionB)
                 {
-                    return new OverlapInformation(new LineSegment(), -1);
+                    return new OverlapInformation();
                 }
             }
 
