@@ -28,12 +28,9 @@ float4x4 CreateRotation(float3 rotation)
 	);
 }
 
-float4x4 CreateRotationZ(float theta)
+float4x4 CalculateTransform(float3 translation, float3 scale, float3 origin, float3 rotation)
 {
-	return float4x4 (
-		cos(theta), -sin(theta), 0, 0,
-		sin(theta), cos(theta), 0, 0,
-		0, 0, 1, 0,
-		0, 0, 0, 1
-	);
+	// Transform = Scale * [(Translation to origin) * Rotation * (Undo Translation to origin)] * Translation;
+	return mul(mul(mul(CreateScale(scale), CreateTranslation(-origin)), CreateRotation(rotation)), CreateTranslation(origin + translation));
 }
+

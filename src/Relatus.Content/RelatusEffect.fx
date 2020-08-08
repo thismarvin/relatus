@@ -64,8 +64,7 @@ VSBasicOutput VSGeometryBasic(in VSGeometryBasicInput input)
 {
 	VSBasicOutput output = (VSBasicOutput)0;
 
-	// Transform = Scale * [(Translation to origin) * Rotation * (Undo Translation to origin)] * Translation;
-	float4x4 transform = mul(mul(mul(CreateScale(input.Scale), CreateTranslation(-input.Origin)), CreateRotation(input.Rotation)), CreateTranslation(input.Origin + input.Translation));
+	float4x4 transform = CalculateTransform(input.Translation, input.Scale, input.Origin, input.Rotation);
 
 	output.Position = mul(mul(input.Position, transform), WVP);
 	output.Color = float4(1, 1, 1, 1);
@@ -77,8 +76,7 @@ VSBasicOutput VSGeometryColor(in VSGeometryColorInput input)
 {
 	VSBasicOutput output = (VSBasicOutput)0;
 
-	// Transform = Scale * [(Translation to origin) * Rotation * (Undo Translation to origin)] * Translation;
-	float4x4 transform = mul(mul(mul(CreateScale(input.Scale), CreateTranslation(-input.Origin)), CreateRotation(input.Rotation)), CreateTranslation(input.Origin + input.Translation));
+	float4x4 transform = CalculateTransform(input.Translation, input.Scale, input.Origin, input.Rotation);
 
 	output.Position = mul(mul(input.Position, transform), WVP);
 	output.Color = input.Color;
@@ -90,8 +88,7 @@ VSTextureOutput VSTextureBasic(in VSTextureBasicInput input)
 {
 	VSTextureOutput output = (VSTextureOutput)0;
 
-	// Transform = Scale * [(Translation to origin) * Rotation * (Undo Translation to origin)] * Translation;
-	float4x4 transform = mul(mul(mul(CreateScale(input.Scale), CreateTranslation(-input.Origin)), CreateRotation(input.Rotation)), CreateTranslation(input.Origin + input.Translation));
+	float4x4 transform = CalculateTransform(input.Translation, input.Scale, input.Origin, input.Rotation);
 
 	output.Position = mul(mul(input.Position, transform), WVP);
 	output.Color = input.Color;
