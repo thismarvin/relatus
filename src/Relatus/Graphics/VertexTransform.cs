@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Relatus.Graphics
 {
-    public struct VertexBetterTransform : IVertexType
+    public struct VertexTransform : IVertexType
     {
         public Vector3 Translation { get; private set; }
         public Vector3 Scale { get; private set; }
@@ -17,7 +17,7 @@ namespace Relatus.Graphics
 
         private static readonly VertexDeclaration vertexDeclaration;
 
-        static VertexBetterTransform()
+        static VertexTransform()
         {
             vertexDeclaration = new VertexDeclaration
             (
@@ -28,7 +28,7 @@ namespace Relatus.Graphics
             );
         }
 
-        public VertexBetterTransform(Vector3 translation, Vector3 scale, Vector3 origin, Vector3 rotation)
+        public VertexTransform(Vector3 translation, Vector3 scale, Vector3 origin, Vector3 rotation)
         {
             Translation = translation;
             Scale = scale;

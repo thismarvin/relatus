@@ -314,8 +314,8 @@ namespace Relatus.Graphics
             if (modelChanged)
             {
                 modelBuffer?.Dispose();
-                modelBuffer = new DynamicVertexBuffer(graphicsDevice, typeof(VertexBetterTransform), 1, BufferUsage.WriteOnly);
-                modelBuffer.SetData(new VertexBetterTransform[] { GetVertexTransform() });
+                modelBuffer = new DynamicVertexBuffer(graphicsDevice, typeof(VertexTransform), 1, BufferUsage.WriteOnly);
+                modelBuffer.SetData(new VertexTransform[] { GetVertexTransform() });
             }
 
             if (colorChanged)
@@ -350,12 +350,12 @@ namespace Relatus.Graphics
             return this;
         }
 
-        internal VertexBetterTransform GetVertexTransform()
+        internal VertexTransform GetVertexTransform()
         {
             Vector3 translation = new Vector3(x + this.translation.X, y + this.translation.Y, z + this.translation.Z);
             Vector3 scale = new Vector3(Width * this.scale.X, Height * this.scale.Y, this.scale.Z);
 
-            return new VertexBetterTransform(translation, scale, origin, rotation);
+            return new VertexTransform(translation, scale, origin, rotation);
         }
 
         public virtual void Draw(Camera camera)

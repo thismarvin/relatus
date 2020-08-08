@@ -10,7 +10,7 @@ namespace Relatus.Graphics
         private readonly GeometryData sharedGeometry;
         private readonly RenderOptions sharedRenderOptions;
 
-        private readonly VertexBetterTransform[] transforms;
+        private readonly VertexTransform[] transforms;
         private readonly VertexColor[] colors;
 
         private DynamicVertexBuffer transformBuffer;
@@ -34,7 +34,7 @@ namespace Relatus.Graphics
             this.sharedGeometry = sharedGeometry;
             this.sharedRenderOptions = sharedRenderOptions;
             
-            transforms = new VertexBetterTransform[capacity];
+            transforms = new VertexTransform[capacity];
             colors = new VertexColor[capacity];
             group = null;
         }
@@ -65,7 +65,7 @@ namespace Relatus.Graphics
         private void UpdateBuffer()
         {
             transformBuffer?.Dispose();
-            transformBuffer = new DynamicVertexBuffer(graphicsDevice, typeof(VertexBetterTransform), transforms.Length, BufferUsage.WriteOnly);
+            transformBuffer = new DynamicVertexBuffer(graphicsDevice, typeof(VertexTransform), transforms.Length, BufferUsage.WriteOnly);
             transformBuffer.SetData(transforms);
 
             colorBuffer?.Dispose();

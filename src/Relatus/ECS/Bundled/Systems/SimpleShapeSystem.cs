@@ -20,7 +20,7 @@ namespace Relatus.ECS.Bundled
         protected GeometryData geometry;
         protected RenderOptions renderOptions;
 
-        protected VertexBetterTransform[] transformData;
+        protected VertexTransform[] transformData;
         protected VertexColor[] colorData;
 
         protected DynamicVertexBuffer transformBuffer;
@@ -54,7 +54,7 @@ namespace Relatus.ECS.Bundled
             this.geometry = geometry;
             this.renderOptions = renderOptions;
 
-            transformData = new VertexBetterTransform[factory.EntityCapacity];
+            transformData = new VertexTransform[factory.EntityCapacity];
             colorData = new VertexColor[factory.EntityCapacity];
         }
 
@@ -79,12 +79,12 @@ namespace Relatus.ECS.Bundled
             throw new NotImplementedException();
         }
 
-        private VertexBetterTransform CreateVertexTransform(CPosition position, CDimension dimension, CTransform transform)
+        private VertexTransform CreateVertexTransform(CPosition position, CDimension dimension, CTransform transform)
         {
             Vector3 translation = new Vector3(position.X + transform.Translation.X, position.Y + transform.Translation.Y, position.Z + transform.Translation.Z);
             Vector3 scale = new Vector3(dimension.Width * transform.Scale.X, dimension.Height * transform.Scale.Y, transform.Scale.Z);
 
-            return new VertexBetterTransform(translation, scale, transform.Origin, transform.Rotation);
+            return new VertexTransform(translation, scale, transform.Origin, transform.Rotation);
         }
 
         private void CreateVertexBufferBindings()
@@ -93,7 +93,7 @@ namespace Relatus.ECS.Bundled
                 return;
 
             transformBuffer?.Dispose();
-            transformBuffer = new DynamicVertexBuffer(graphicsDevice, typeof(VertexBetterTransform), transformData.Length, BufferUsage.WriteOnly);
+            transformBuffer = new DynamicVertexBuffer(graphicsDevice, typeof(VertexTransform), transformData.Length, BufferUsage.WriteOnly);
             transformBuffer.SetData(transformData);
 
             colorBuffer?.Dispose();
