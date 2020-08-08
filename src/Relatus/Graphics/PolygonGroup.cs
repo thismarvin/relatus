@@ -8,9 +8,13 @@ namespace Relatus.Graphics
     internal class PolygonGroup : DrawGroup<Polygon>, IDisposable
     {
         private readonly GeometryData sharedGeometry;
+        private readonly RenderOptions sharedRenderOptions;
+
         private readonly VertexBetterTransform[] transforms;
+        private readonly VertexColor[] colors;
 
         private DynamicVertexBuffer transformBuffer;
+        private DynamicVertexBuffer colorBuffer;
         private VertexBufferBinding[] vertexBufferBindings;
         private bool dataChanged;
 
@@ -22,19 +26,22 @@ namespace Relatus.Graphics
         {
             graphicsDevice = Engine.Graphics.GraphicsDevice;
             polygonShader = AssetManager.GetEffect("Relatus_RelatusEffect");
-            polygonPass = polygonShader.Techniques[0].Passes[0];
+            polygonPass = polygonShader.Techniques[1].Passes[0];
         }
 
-        public PolygonGroup(GeometryData sharedShapeData, int capacity) : base(capacity)
+        public PolygonGroup(GeometryData sharedGeometry, RenderOptions sharedRenderOptions, int capacity) : base(capacity)
         {
-            sharedGeometry = sharedShapeData;
+            this.sharedGeometry = sharedGeometry;
+            this.sharedRenderOptions = sharedRenderOptions;
+            
             transforms = new VertexBetterTransform[capacity];
+            colors = new VertexColor[capacity];
             group = null;
         }
 
         protected override bool ConditionToAdd(Polygon polygon)
         {
-            return polygon.Geometry.Equals(sharedGeometry);
+            return polygon.Geometry.Equals(sharedGeometry) && polygon.RenderOptions.Equals(sharedRenderOptions);
         }
 
         public override bool Add(Polygon polygon)
@@ -44,8 +51,11 @@ namespace Relatus.Graphics
 
             if (ConditionToAdd(polygon))
             {
-                transforms[groupIndex++] = polygon.GetVertexTransform();
+                transforms[groupIndex] = polygon.GetVertexTransform();
+                colors[groupIndex] = new VertexColor(polygon.Color);
+                groupIndex++;
                 dataChanged = true;
+
                 return true;
             }
 
@@ -55,14 +65,18 @@ namespace Relatus.Graphics
         private void UpdateBuffer()
         {
             transformBuffer?.Dispose();
-
-            transformBuffer = new DynamicVertexBuffer(Engine.Graphics.GraphicsDevice, typeof(VertexBetterTransform), transforms.Length, BufferUsage.WriteOnly);
+            transformBuffer = new DynamicVertexBuffer(graphicsDevice, typeof(VertexBetterTransform), transforms.Length, BufferUsage.WriteOnly);
             transformBuffer.SetData(transforms);
+
+            colorBuffer?.Dispose();
+            colorBuffer = new DynamicVertexBuffer(graphicsDevice, typeof(VertexColor), colors.Length, BufferUsage.WriteOnly);
+            colorBuffer.SetData(colors);
 
             vertexBufferBindings = new VertexBufferBinding[]
             {
                 new VertexBufferBinding(sharedGeometry.VertexBuffer),
-                new VertexBufferBinding(transformBuffer, 0, 1)
+                new VertexBufferBinding(transformBuffer, 0, 1),
+                new VertexBufferBinding(colorBuffer, 0, 1)
             };
         }
 
@@ -75,15 +89,27 @@ namespace Relatus.Graphics
             }
 
             graphicsDevice.RasterizerState = GraphicsManager.RasterizerState;
+            graphicsDevice.SamplerStates[0] = sharedRenderOptions.SamplerState;
+            graphicsDevice.BlendState = sharedRenderOptions.BlendState;
+            graphicsDevice.DepthStencilState = sharedRenderOptions.DepthStencilState;
             graphicsDevice.SetVertexBuffers(vertexBufferBindings);
             graphicsDevice.Indices = sharedGeometry.IndexBuffer;
 
             polygonShader.Parameters["WVP"].SetValue(camera.WVP);
 
-            foreach (EffectPass pass in polygonShader.Techniques[0].Passes)
+            polygonPass.Apply();
+
+            if (sharedRenderOptions.Effect == null)
             {
-                pass.Apply();
-                graphicsDevice.DrawInstancedPrimitives(PrimitiveType.TriangleList, 0, 0, sharedGeometry.TotalTriangles, transforms.Length);
+                graphicsDevice.DrawInstancedPrimitives(PrimitiveType.TriangleList, 0, 0, sharedGeometry.TotalTriangles, capacity);
+            }
+            else
+            {
+                foreach (EffectPass pass in sharedRenderOptions.Effect.CurrentTechnique.Passes)
+                {
+                    pass.Apply();
+                    graphicsDevice.DrawInstancedPrimitives(PrimitiveType.TriangleList, 0, 0, sharedGeometry.TotalTriangles, capacity);
+                }
             }
         }
 

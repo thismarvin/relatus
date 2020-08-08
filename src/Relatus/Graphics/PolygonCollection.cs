@@ -12,7 +12,7 @@ namespace Relatus.Graphics
 
         protected override DrawGroup<Polygon> CreateDrawGroup(Polygon currentEntry, int capacity)
         {
-            return new PolygonGroup(currentEntry.Geometry, capacity);
+            return new PolygonGroup(currentEntry.Geometry, currentEntry.RenderOptions, capacity);
         }
 
         #region IDisposable Support
