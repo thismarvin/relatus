@@ -60,7 +60,7 @@ namespace Relatus
                     if (objects[i] == null)
                         continue;
 
-                    if (bounds.Intersects(objects[i].Bounds))
+                    if (bounds.Intersects(objects[i].Span))
                     {
                         result.Add(objects[i].Identifier);
                     }
@@ -80,7 +80,7 @@ namespace Relatus
 
         public override bool Add(T entry)
         {
-            if (!entry.Bounds.Intersects(Boundary))
+            if (!entry.Span.Intersects(Boundary))
                 return false;
 
             if (insertionIndex < capacity)

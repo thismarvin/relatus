@@ -111,10 +111,10 @@ namespace Relatus
 
         public override bool Add(T entry)
         {
-            if (!entry.Bounds.Intersects(Boundary))
+            if (!entry.Span.Intersects(Boundary))
                 return false;
 
-            HashSet<int> ids = GetHashIDs(entry.Bounds);
+            HashSet<int> ids = GetHashIDs(entry.Span);
 
             foreach (int id in ids)
             {

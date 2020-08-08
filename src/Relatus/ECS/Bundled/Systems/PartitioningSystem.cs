@@ -47,12 +47,12 @@ namespace Relatus.ECS.Bundled
         protected class PartitionerEntry : IPartitionable
         {
             public int Identifier { get; set; }
-            public RectangleF Bounds { get; set; }
+            public RectangleF Span { get; set; }
 
             public PartitionerEntry(int entity, CPosition position, CDimension dimension)
             {
                 Identifier = entity;
-                Bounds = new RectangleF(position.X, position.Y, dimension.Width, dimension.Height);
+                Span = new RectangleF(position.X, position.Y, dimension.Width, dimension.Height);
             }
         }
     }
