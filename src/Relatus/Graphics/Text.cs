@@ -141,7 +141,7 @@ namespace Relatus.Graphics
             float xFinal = X;
             char character;
             BMFontCharacter characterData;
-            Vector2 result;
+            //Vector2 result;
 
             for (int i = 0; i < Content.Length; i++)
             {
@@ -175,8 +175,8 @@ namespace Relatus.Graphics
             if (Rotation == 0)
                 return;
 
-            exactBounds.RotationOffset = new Vector2(Width * 0.5f, Height * 0.5f);
-            exactBounds.Rotation = Rotation;
+            exactBounds.Origin = new Vector3(Width * 0.5f, Height * 0.5f, 0);
+            exactBounds.Rotation = new Vector3(0, 0, Rotation);
 
             SchemaShape2D collisionInformation = exactBounds.GetCollisionInformation();
 

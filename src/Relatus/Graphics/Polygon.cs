@@ -39,15 +39,15 @@ namespace Relatus.Graphics
             get => color;
             set => SetColor(value);
         }
-        public virtual float Rotation
+        public virtual Vector3 Rotation
         {
             get => rotation;
-            set => SetRotation(value);
+            set => SetRotation(value.X, value.Y, value.Z);
         }
-        public Vector2 RotationOffset
+        public Vector3 Origin
         {
-            get => rotationOffset;
-            set => SetRotationOffset(value.X, value.Y);
+            get => origin;
+            set => SetOrigin(value.X, value.Y, value.Z);
         }
         public Vector3 Translation
         {
@@ -96,8 +96,8 @@ namespace Relatus.Graphics
         private float width;
         private float height;
         private Color color;
-        private float rotation;
-        private Vector2 rotationOffset;
+        private Vector3 rotation;
+        private Vector3 origin;
         private Vector3 translation;
         private Vector3 scale;
         private GeometryData geometry;
@@ -105,9 +105,11 @@ namespace Relatus.Graphics
 
         private bool geometryChanged;
         private bool modelChanged;
+        private bool colorChanged;
         private bool transformNeedsUpdating;
         private Matrix transformCache;
-        private DynamicVertexBuffer modelBuffer;
+        private DynamicVertexBuffer transformBuffer;
+        private DynamicVertexBuffer colorBuffer;
         private VertexBufferBinding[] vertexBufferBindings;
 
         private static readonly GraphicsDevice graphicsDevice;
@@ -117,15 +119,19 @@ namespace Relatus.Graphics
         static Polygon()
         {
             graphicsDevice = Engine.Graphics.GraphicsDevice;
-            polygonShader = AssetManager.GetEffect("Relatus_PolygonShader");
+            polygonShader = AssetManager.GetEffect("Relatus_RelatusEffect");
             polygonPass = polygonShader.Techniques[1].Passes[0];
         }
 
         public Polygon()
         {
             color = Color.White;
-            scale = new Vector3(1);
+            scale = Vector3.One;
             renderOptions = new RenderOptions();
+
+            geometryChanged = true;
+            modelChanged = true;
+            colorChanged = true;
 
             transformNeedsUpdating = true;
             transformCache = Matrix.Identity;
@@ -188,7 +194,7 @@ namespace Relatus.Graphics
         {
             this.color = color;
 
-            modelChanged = true;
+            colorChanged = true;
 
             return this;
         }
@@ -213,9 +219,9 @@ namespace Relatus.Graphics
             return this;
         }
 
-        public virtual Polygon SetRotationOffset(float x, float y)
+        public virtual Polygon SetOrigin(float x, float y, float z)
         {
-            rotationOffset = new Vector2(x, y);
+            origin = new Vector3(x, y, z);
 
             modelChanged = true;
             transformNeedsUpdating = true;
@@ -223,9 +229,9 @@ namespace Relatus.Graphics
             return this;
         }
 
-        public virtual Polygon SetRotation(float rotation)
+        public virtual Polygon SetRotation(float roll, float pitch, float yaw)
         {
-            this.rotation = rotation;
+            rotation = new Vector3(roll, pitch, yaw);
 
             modelChanged = true;
             transformNeedsUpdating = true;
@@ -242,24 +248,33 @@ namespace Relatus.Graphics
 
         public Polygon ApplyChanges()
         {
-            if (!geometryChanged && !modelChanged)
+            if (!geometryChanged && !modelChanged && !colorChanged)
                 return this;
 
             if (modelChanged)
             {
-                modelBuffer?.Dispose();
-                modelBuffer = new DynamicVertexBuffer(graphicsDevice, typeof(VertexTransformColor), 1, BufferUsage.WriteOnly);
-                modelBuffer.SetData(new VertexTransformColor[] { GetVertexTransformColor() });
+                transformBuffer?.Dispose();
+                transformBuffer = new DynamicVertexBuffer(graphicsDevice, typeof(VertexTransform), 1, BufferUsage.WriteOnly);
+                transformBuffer.SetData(new VertexTransform[] { GetVertexTransform() });
+            }
+
+            if (colorChanged)
+            {
+                colorBuffer?.Dispose();
+                colorBuffer = new DynamicVertexBuffer(graphicsDevice, typeof(VertexColor), 1, BufferUsage.WriteOnly);
+                colorBuffer.SetData(new VertexColor[] { new VertexColor(color) });
             }
 
             vertexBufferBindings = new VertexBufferBinding[]
             {
                 new VertexBufferBinding(geometry.VertexBuffer),
-                new VertexBufferBinding(modelBuffer, 0, 1)
+                new VertexBufferBinding(transformBuffer, 0, 1),
+                new VertexBufferBinding(colorBuffer, 0, 1)
             };
 
             geometryChanged = false;
             modelChanged = false;
+            colorChanged = false;
 
             return this;
         }
@@ -296,25 +311,25 @@ namespace Relatus.Graphics
 
                 transformCache =
                 Matrix.CreateScale(width * scale.X, height * scale.Y, 1 * scale.Z) *
-                Matrix.CreateTranslation(-new Vector3(rotationOffset.X, rotationOffset.Y, 0)) *
-                Matrix.CreateRotationZ(rotation) *
-                Matrix.CreateTranslation(x + translation.X + rotationOffset.X, y + translation.Y + rotationOffset.Y, translation.Z);
+                Matrix.CreateTranslation(-new Vector3(origin.X, origin.Y, 0)) *
+                Matrix.CreateFromYawPitchRoll(rotation.Z, rotation.Y, rotation.X) *
+                Matrix.CreateTranslation(x + translation.X + origin.X, y + translation.Y + origin.Y, translation.Z);
             }
 
             return transformCache;
         }
 
-        internal VertexTransformColor GetVertexTransformColor()
+        internal VertexTransform GetVertexTransform()
         {
-            Vector3 scale = new Vector3(width * this.scale.X, height * this.scale.Y, this.scale.Z);
             Vector3 translation = new Vector3(x + this.translation.X, y + this.translation.Y, z + this.translation.Z);
+            Vector3 scale = new Vector3(width * this.scale.X, height * this.scale.Y, this.scale.Z);
 
-            return new VertexTransformColor(scale, rotationOffset, rotation, translation, color);
+            return new VertexTransform(translation, scale, origin, rotation);
         }
 
         public virtual void Draw(Camera camera)
         {
-            if (geometryChanged || modelChanged)
+            if (geometryChanged || modelChanged || colorChanged)
                 throw new RelatusException("The polygon was modified, but ApplyChanges() was never called.", new MethodExpectedException());
 
             graphicsDevice.RasterizerState = GraphicsManager.RasterizerState;
@@ -324,7 +339,7 @@ namespace Relatus.Graphics
             graphicsDevice.SetVertexBuffers(vertexBufferBindings);
             graphicsDevice.Indices = geometry.IndexBuffer;
 
-            polygonShader.Parameters["WorldViewProjection"].SetValue(camera.WVP);
+            polygonShader.Parameters["WVP"].SetValue(camera.WVP);
 
             polygonPass.Apply();
 
@@ -352,7 +367,7 @@ namespace Relatus.Graphics
                 if (disposing)
                 {
                     Geometry.Dispose();
-                    modelBuffer.Dispose();
+                    transformBuffer.Dispose();
                 }
 
                 // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
