@@ -25,13 +25,10 @@ namespace Relatus
     /// </summary>
     public static class GeometryManager
     {
-        public static Effect PolygonShader { get; private set; }
-
         private static readonly ResourceHandler<GeometryData> shapes;
 
         static GeometryManager()
         {
-            PolygonShader = AssetManager.GetEffect("Relatus_PolygonShader").Clone();
             shapes = new ResourceHandler<GeometryData>();
 
             RegisterTriangle();
@@ -81,15 +78,6 @@ namespace Relatus
             shapes.Remove(name);
         }
         #endregion
-
-        /// <summary>
-        /// Sets <see cref="PolygonShader"/>'s "WorldViewProjection" parameter to the camera's <see cref="Camera.WVP"/>.
-        /// </summary>
-        /// <param name="camera">The target camera.</param>
-        public static void SetupPolygonShader(Camera camera)
-        {
-            PolygonShader.Parameters["WorldViewProjection"].SetValue(camera.WVP);
-        }
 
         /// <summary>
         /// Creates a filled regular polygon given a specific amount of vertices.
