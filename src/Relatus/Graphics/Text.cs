@@ -141,7 +141,7 @@ namespace Relatus.Graphics
             float xFinal = X;
             char character;
             BMFontCharacter characterData;
-            Vector2 result;
+            //Vector2 result;
 
             for (int i = 0; i < Content.Length; i++)
             {

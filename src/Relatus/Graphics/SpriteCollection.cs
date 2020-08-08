@@ -10,7 +10,7 @@ namespace Relatus.Graphics
 
         protected override DrawGroup<BetterSprite> CreateDrawGroup(BetterSprite currentEntry, int capacity)
         {
-            return new SpriteGroup(currentEntry.RenderOptions, currentEntry.Texture, capacity);
+            return new SpriteGroup(currentEntry.RenderOptions, capacity);
         }
 
         #region IDisposable Support
