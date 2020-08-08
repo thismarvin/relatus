@@ -39,15 +39,15 @@ namespace Relatus.Graphics
             get => color;
             set => SetColor(value);
         }
-        public virtual float Rotation
+        public virtual Vector3 Rotation
         {
             get => rotation;
-            set => SetRotation(value);
+            set => SetRotation(value.X, value.Y, value.Z);
         }
-        public Vector2 RotationOffset
+        public Vector3 Origin
         {
-            get => rotationOffset;
-            set => SetRotationOffset(value.X, value.Y);
+            get => origin;
+            set => SetOrigin(value.X, value.Y, value.Z);
         }
         public Vector3 Translation
         {
@@ -96,8 +96,8 @@ namespace Relatus.Graphics
         private float width;
         private float height;
         private Color color;
-        private float rotation;
-        private Vector2 rotationOffset;
+        private Vector3 rotation;
+        private Vector3 origin;
         private Vector3 translation;
         private Vector3 scale;
         private GeometryData geometry;
@@ -219,9 +219,9 @@ namespace Relatus.Graphics
             return this;
         }
 
-        public virtual Polygon SetRotationOffset(float x, float y)
+        public virtual Polygon SetOrigin(float x, float y, float z)
         {
-            rotationOffset = new Vector2(x, y);
+            origin = new Vector3(x, y, z);
 
             modelChanged = true;
             transformNeedsUpdating = true;
@@ -229,9 +229,9 @@ namespace Relatus.Graphics
             return this;
         }
 
-        public virtual Polygon SetRotation(float rotation)
+        public virtual Polygon SetRotation(float roll, float pitch, float yaw)
         {
-            this.rotation = rotation;
+            rotation = new Vector3(roll, pitch, yaw);
 
             modelChanged = true;
             transformNeedsUpdating = true;
@@ -311,9 +311,9 @@ namespace Relatus.Graphics
 
                 transformCache =
                 Matrix.CreateScale(width * scale.X, height * scale.Y, 1 * scale.Z) *
-                Matrix.CreateTranslation(-new Vector3(rotationOffset.X, rotationOffset.Y, 0)) *
-                Matrix.CreateRotationZ(rotation) *
-                Matrix.CreateTranslation(x + translation.X + rotationOffset.X, y + translation.Y + rotationOffset.Y, translation.Z);
+                Matrix.CreateTranslation(-new Vector3(origin.X, origin.Y, 0)) *
+                Matrix.CreateFromYawPitchRoll(rotation.Z, rotation.Y, rotation.X) *
+                Matrix.CreateTranslation(x + translation.X + origin.X, y + translation.Y + origin.Y, translation.Z);
             }
 
             return transformCache;
@@ -323,8 +323,6 @@ namespace Relatus.Graphics
         {
             Vector3 translation = new Vector3(x + this.translation.X, y + this.translation.Y, z + this.translation.Z);
             Vector3 scale = new Vector3(width * this.scale.X, height * this.scale.Y, this.scale.Z);
-            Vector3 origin = new Vector3(rotationOffset.X, rotationOffset.Y, 0);
-            Vector3 rotation = new Vector3(0, 0, this.rotation);
 
             return new VertexBetterTransform(translation, scale, origin, rotation);
         }

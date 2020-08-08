@@ -22,6 +22,7 @@ namespace Relatus.Graphics
 
     public class BetterSprite
     {
+        #region Properties
         public Texture2D Texture
         {
             get => texture;
@@ -52,15 +53,15 @@ namespace Relatus.Graphics
             get => scale;
             set => SetScale(value.X, value.Y, value.Z);
         }
-        public Vector2 RotationOffset
+        public Vector3 Origin
         {
-            get => rotationOffset;
-            set => SetRotationOffset(value.X, value.Y);
+            get => origin;
+            set => SetOrigin(value.X, value.Y, value.Z);
         }
-        public float Rotation
+        public Vector3 Rotation
         {
             get => rotation;
-            set => SetRotation(value);
+            set => SetRotation(value.X, value.Y, value.Z);
         }
         public Color Tint
         {
@@ -82,6 +83,7 @@ namespace Relatus.Graphics
             get => renderOptions;
             set => SetRenderOptions(value);
         }
+        #endregion
 
         public int Width => SampleRegion.Width;
         public int Height => SampleRegion.Height;
@@ -108,8 +110,8 @@ namespace Relatus.Graphics
         private float z;
         private Vector3 translation;
         private Vector3 scale;
-        private Vector2 rotationOffset;
-        private float rotation;
+        private Vector3 origin;
+        private Vector3 rotation;
         private Color tint;
         private ImageRegion sampleRegion;
         private SpriteMirroringType spriteMirroring;
@@ -203,18 +205,18 @@ namespace Relatus.Graphics
             return this;
         }
 
-        public virtual BetterSprite SetRotationOffset(float x, float y)
+        public virtual BetterSprite SetOrigin(float x, float y, float z)
         {
-            rotationOffset = new Vector2(x, y);
+            origin = new Vector3(x, y, z);
 
             modelChanged = true;
 
             return this;
         }
 
-        public virtual BetterSprite SetRotation(float rotation)
+        public virtual BetterSprite SetRotation(float roll, float pitch, float yaw)
         {
-            this.rotation = rotation;
+            rotation = new Vector3(roll, pitch, yaw);
 
             modelChanged = true;
 
@@ -352,8 +354,6 @@ namespace Relatus.Graphics
         {
             Vector3 translation = new Vector3(x + this.translation.X, y + this.translation.Y, z + this.translation.Z);
             Vector3 scale = new Vector3(Width * this.scale.X, Height * this.scale.Y, this.scale.Z);
-            Vector3 origin = new Vector3(rotationOffset.X, rotationOffset.Y, 0);
-            Vector3 rotation = new Vector3(0, 0, this.rotation);
 
             return new VertexBetterTransform(translation, scale, origin, rotation);
         }
