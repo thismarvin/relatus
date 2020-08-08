@@ -13,21 +13,15 @@ namespace Relatus.ECS.Bundled
         private IComponent[] positions;
         private IComponent[] transforms;
 
-        private VertexColorTexture[] vertexData;
-        private VertexBufferBinding[] vertexBufferBindings;
-        private DynamicVertexBuffer transformsBuffer;
-
-        private static readonly SpriteBatch spriteBatch;
-        private static readonly GraphicsDevice graphicsDevice;
-        private static readonly Effect spriteShader;
-        private static readonly GeometryData geometry;
+        //private static readonly GraphicsDevice graphicsDevice;
+        //private static readonly Effect spriteShader;
+        //private static readonly GeometryData geometry;
 
         static SSprite()
         {
-            spriteBatch = GraphicsManager.SpriteBatch;
-            graphicsDevice = Engine.Graphics.GraphicsDevice;
-            spriteShader = AssetManager.GetEffect("Relatus_SpriteShader");
-            geometry = GeometryManager.GetShapeData(ShapeType.Square);
+            //graphicsDevice = Engine.Graphics.GraphicsDevice;
+            //spriteShader = AssetManager.GetEffect("Relatus_SpriteShader");
+            //geometry = GeometryManager.GetShapeData(ShapeType.Square);
         }
 
         public SSprite(MorroFactory factory) : base(factory)
@@ -50,26 +44,6 @@ namespace Relatus.ECS.Bundled
             sprites = sprites ?? factory.GetData<CSprite>();
             positions = positions ?? factory.GetData<CPosition>();
             transforms = transforms ?? factory.GetData<CTransform>();
-
-            graphicsDevice.RasterizerState = GraphicsManager.RasterizerState;
-            graphicsDevice.SamplerStates[0] = SamplerState.PointClamp;
-            graphicsDevice.Indices = geometry.IndexBuffer;
-
-            spriteShader.Parameters["WorldViewProjection"].SetValue(camera.WVP);
-
-            foreach (int entity in Entities)
-            {
-                CSprite sprite = (CSprite)sprites[entity];
-                graphicsDevice.SetVertexBuffers(vertexBufferBindings);
-                graphicsDevice.Textures[0] = sprite.Texture;
-                spriteShader.Parameters["SpriteTexture"].SetValue(sprite.Texture);
-
-                foreach (EffectPass pass in spriteShader.CurrentTechnique.Passes)
-                {
-                    pass.Apply();
-                    graphicsDevice.DrawInstancedPrimitives(PrimitiveType.TriangleList, 0, 0, geometry.TotalTriangles, 1);
-                }
-            }
 
             //spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, camera.SpriteTransform);
             //{
