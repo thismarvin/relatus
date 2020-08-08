@@ -319,6 +319,30 @@ namespace Relatus.Graphics
             return transformCache;
         }
 
+        public PolygonSchema CalculateShapeSceme2D()
+        {
+            int totalVertices = Geometry.TotalVertices;
+            Matrix polygonTransform = CalculateTransform();
+
+            Vector2[] transformedVertices = new Vector2[totalVertices];
+
+            for (int i = 0; i < totalVertices; i++)
+            {
+                transformedVertices[i] = Vector2.Transform(new Vector2(Geometry.Mesh.Vertices[i].X, Geometry.Mesh.Vertices[i].Y), polygonTransform);
+            }
+
+            LineSegment[] transformedLineSegments = new LineSegment[totalVertices];
+
+            transformedLineSegments[0] = new LineSegment(transformedVertices[totalVertices - 1].X, transformedVertices[totalVertices - 1].Y, transformedVertices[0].X, transformedVertices[0].Y);
+
+            for (int i = 1; i < totalVertices; i++)
+            {
+                transformedLineSegments[i] = new LineSegment(transformedVertices[i - 1].X, transformedVertices[i - 1].Y, transformedVertices[i].X, transformedVertices[i].Y);
+            }
+
+            return new PolygonSchema(transformedVertices, transformedLineSegments);
+        }
+
         internal VertexTransform GetVertexTransform()
         {
             Vector3 translation = new Vector3(x + this.translation.X, y + this.translation.Y, z + this.translation.Z);

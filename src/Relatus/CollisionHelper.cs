@@ -5,7 +5,6 @@ using System.Text;
 
 namespace Relatus
 {
-
     public static class CollisionHelper
     {
         private struct OverlapInformation
@@ -22,7 +21,7 @@ namespace Relatus
             }
         }
 
-        public static Vector2 GetResolution(IShape2D a, IShape2D b)
+        public static Vector2 GetResolution(PolygonSchema a, PolygonSchema b)
         {
             RectangleF aAABB = CalculateAABB(a.Vertices);
             RectangleF bAABB = CalculateAABB(b.Vertices);
@@ -80,7 +79,7 @@ namespace Relatus
             return new RectangleF(xMin, yMax, xMax - xMin, yMax - yMin);
         }
 
-        private static OverlapInformation CalculateOverlap(IShape2D a, IShape2D b)
+        private static OverlapInformation CalculateOverlap(PolygonSchema a, PolygonSchema b)
         {
             LineSegment edge = new LineSegment(0, 0, 0, 0);
             float minOverlap = float.MaxValue;

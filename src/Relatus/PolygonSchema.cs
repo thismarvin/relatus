@@ -3,12 +3,12 @@ using System;
 
 namespace Relatus
 {
-    internal struct SchemaShape2D : IShape2D
+    public class PolygonSchema 
     {
         public Vector2[] Vertices { get; set; }
         public LineSegment[] Edges { get; set; }
 
-        public SchemaShape2D(Vector2[] vertices, LineSegment[] edges)
+        public PolygonSchema(Vector2[] vertices, LineSegment[] edges)
         {
             Vertices = vertices;
             Edges = edges;
