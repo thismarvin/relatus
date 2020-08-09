@@ -24,9 +24,9 @@ namespace Relatus
 
         static CameraManager()
         {
-            Static = Camera.CreateOrthographic(WindowManager.ScaledWidth, WindowManager.ScaledHeight, 1, 16);
-            TopLeftAligned = Camera.CreateOrthographic(WindowManager.ScaledWidth, WindowManager.ScaledHeight, 1, 16);
-            TopRightAligned = Camera.CreateOrthographic(WindowManager.ScaledWidth, WindowManager.ScaledHeight, 1, 16);
+            Static = Camera.CreateOrthographic(WindowManager.ScaledWidth, WindowManager.ScaledHeight, 0.25f, 16);
+            TopLeftAligned = Camera.CreateOrthographic(WindowManager.ScaledWidth, WindowManager.ScaledHeight, 0.25f, 16);
+            TopRightAligned = Camera.CreateOrthographic(WindowManager.ScaledWidth, WindowManager.ScaledHeight, 0.25f, 16);
 
             WindowManager.WindowResize += HandleWindowResize;
         }
