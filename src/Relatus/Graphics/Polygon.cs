@@ -310,10 +310,13 @@ namespace Relatus.Graphics
                 transformNeedsUpdating = false;
 
                 transformCache =
-                Matrix.CreateScale(width * scale.X, height * scale.Y, 1 * scale.Z) *
-                Matrix.CreateTranslation(-new Vector3(origin.X, origin.Y, 0)) *
+                Matrix.CreateScale(width * scale.X, height * scale.Y, scale.Z) *
+                Matrix.CreateTranslation(-origin) *
+                Matrix.CreateRotationZ(rotation.Z) *
+                Matrix.CreateRotationY(rotation.Y) *
+                Matrix.CreateRotationX(rotation.X) *
                 Matrix.CreateFromYawPitchRoll(rotation.Z, rotation.Y, rotation.X) *
-                Matrix.CreateTranslation(x + translation.X + origin.X, y + translation.Y + origin.Y, translation.Z);
+                Matrix.CreateTranslation(origin + translation);
             }
 
             return transformCache;
