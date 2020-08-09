@@ -315,8 +315,7 @@ namespace Relatus.Graphics
                 Matrix.CreateRotationZ(rotation.Z) *
                 Matrix.CreateRotationY(rotation.Y) *
                 Matrix.CreateRotationX(rotation.X) *
-                Matrix.CreateFromYawPitchRoll(rotation.Z, rotation.Y, rotation.X) *
-                Matrix.CreateTranslation(origin + translation);
+                Matrix.CreateTranslation(origin + translation + Position);
             }
 
             return transformCache;
