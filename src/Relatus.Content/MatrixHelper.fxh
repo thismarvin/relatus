@@ -21,9 +21,9 @@ float4x4 CreateTranslation(float3 translation)
 float4x4 CreateRotation(float3 rotation)
 {
 	return float4x4 (
-		cos(rotation.z) * cos(rotation.y), cos(rotation.z) * sin(rotation.y) * sin(rotation.x) - sin(rotation.z) * cos(rotation.x), cos(rotation.z) * sin(rotation.y) * cos(rotation.x) + sin(rotation.z) * sin(rotation.x), 0,
-		sin(rotation.z) * cos(rotation.y), sin(rotation.z) * sin(rotation.y) * sin(rotation.x) + cos(rotation.z) * cos(rotation.x), sin(rotation.z) * sin(rotation.y) * cos(rotation.x) - cos(rotation.z) * sin(rotation.x), 0,
-		-sin(rotation.y), cos(rotation.y) * sin(rotation.x), cos(rotation.y) * cos(rotation.x), 0,
+		cos(rotation.z) * cos(rotation.y), sin(rotation.z) * cos(rotation.y), -sin(rotation.y), 0,
+		cos(rotation.z) * sin(rotation.y) * sin(rotation.x) - sin(rotation.z) * cos(rotation.x), sin(rotation.z) * sin(rotation.y) * sin(rotation.x) + cos(rotation.z) * cos(rotation.x), cos(rotation.y) * sin(rotation.x), 0,
+		cos(rotation.z) * sin(rotation.y) * cos(rotation.x) + sin(rotation.z) * sin(rotation.x), sin(rotation.z) * sin(rotation.y) * cos(rotation.x) - cos(rotation.z) * sin(rotation.x), cos(rotation.y) * cos(rotation.x), 0,
 		0, 0, 0, 1
 	);
 }
