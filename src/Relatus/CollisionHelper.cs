@@ -9,16 +9,34 @@ namespace Relatus
     {
         private struct OverlapInformation
         {
-            public bool Valid { get; private set; }
-            public LineSegment Edge { get; private set; }
+            public Vector2 Normal { get; private set; }
             public float Overlap { get; private set; }
+            public bool Valid { get; private set; }
 
-            public OverlapInformation(LineSegment edge, float overlap)
+            public OverlapInformation(Vector2 normal, float overlap)
             {
-                Valid = true;
-                Edge = edge;
+                Normal = normal;
                 Overlap = overlap;
+
+                Valid = true;
             }
+        }
+
+        public static bool Intersects(PolygonSchema a, PolygonSchema b)
+        {
+            RectangleF aAABB = CalculateAABB(a.Vertices);
+            RectangleF bAABB = CalculateAABB(b.Vertices);
+
+            if (!aAABB.Intersects(bAABB))
+                return false;
+
+            OverlapInformation pass0 = CalculateOverlap(a, b);
+            OverlapInformation pass1 = CalculateOverlap(b, a);
+
+            if (!pass0.Valid || !pass1.Valid)
+                return false;
+
+            return true;
         }
 
         public static Vector2 GetResolution(PolygonSchema a, PolygonSchema b)
@@ -27,38 +45,19 @@ namespace Relatus
             RectangleF bAABB = CalculateAABB(b.Vertices);
 
             if (!aAABB.Intersects(bAABB))
-            {
                 return new Vector2(0, 0);
-            }
 
             OverlapInformation pass0 = CalculateOverlap(a, b);
             OverlapInformation pass1 = CalculateOverlap(b, a);
 
             if (!pass0.Valid || !pass1.Valid)
-            {
                 return new Vector2(0, 0);
-            }
 
             OverlapInformation minPass = pass0.Overlap < pass1.Overlap ? pass0 : pass1;
+            Vector2 resolution = -minPass.Normal * minPass.Overlap;
+            resolution.Normalize();
 
-            Vector2 axis = new Vector2(
-                -(minPass.Edge.Y2 - minPass.Edge.Y1),
-                minPass.Edge.X2 - minPass.Edge.X1
-            );
-
-            float axisLength = axis.Length();
-            double angle = Math.Acos(Vector2.Dot(axis, new Vector2(1, 0)) / axisLength);
-
-            double xFactor = Math.Round(axisLength * Math.Cos(angle));
-            double yFactor = Math.Round(axisLength * Math.Sin(angle));
-
-            int xResolutionDirection = aAABB.Left > bAABB.Left ? 1 : -1;
-            int yResolutionDirection = aAABB.Bottom > bAABB.Bottom ? 1 : -1;
-
-            double xResolution = xFactor == 0 ? 0 : (minPass.Overlap / xFactor) * xResolutionDirection;
-            double yResolution = yFactor == 0 ? 0 : (minPass.Overlap / yFactor) * yResolutionDirection;
-
-            return new Vector2((float)xResolution, (float)yResolution);
+            return resolution;
         }
 
         private static RectangleF CalculateAABB(Vector2[] vertices)
@@ -81,7 +80,7 @@ namespace Relatus
 
         private static OverlapInformation CalculateOverlap(PolygonSchema a, PolygonSchema b)
         {
-            LineSegment edge = new LineSegment(0, 0, 0, 0);
+            Vector2 minNormal = Vector2.Zero;
             float minOverlap = float.MaxValue;
 
             for (int i = 0; i < a.Edges.Length; i++)
@@ -91,20 +90,20 @@ namespace Relatus
                     a.Edges[i].X2 - a.Edges[i].X1
                 );
 
-                float minProjectionA = Vector2.Dot(a.Vertices[0], normal);
-                float maxProjectionA = minProjectionA;
+                float minProjectionA = float.MaxValue;
+                float maxProjectionA = float.MinValue;
 
-                for (int j = 1; j < a.Vertices.Length; j++)
+                for (int j = 0; j < a.Vertices.Length; j++)
                 {
                     float projection = Vector2.Dot(a.Vertices[j], normal);
                     minProjectionA = Math.Min(minProjectionA, projection);
                     maxProjectionA = Math.Max(maxProjectionA, projection);
                 }
 
-                float minProjectionB = Vector2.Dot(b.Vertices[0], normal);
-                float maxProjectionB = minProjectionB;
+                float minProjectionB = float.MaxValue;
+                float maxProjectionB = float.MinValue;
 
-                for (int j = 1; j < b.Vertices.Length; j++)
+                for (int j = 0; j < b.Vertices.Length; j++)
                 {
                     float projection = Vector2.Dot(b.Vertices[j], normal);
                     minProjectionB = Math.Min(minProjectionB, projection);
@@ -116,16 +115,14 @@ namespace Relatus
                 if (overlap < minOverlap)
                 {
                     minOverlap = overlap;
-                    edge = a.Edges[i];
+                    minNormal = normal;
                 }
 
                 if (maxProjectionB < minProjectionA || maxProjectionA < minProjectionB)
-                {
                     return new OverlapInformation();
-                }
             }
 
-            return new OverlapInformation(edge, minOverlap);
+            return new OverlapInformation(minNormal, minOverlap);
         }
     }
 }
