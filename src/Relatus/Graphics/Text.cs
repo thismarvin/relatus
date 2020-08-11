@@ -25,7 +25,7 @@ namespace Relatus.Graphics
 
         //private readonly SpriteCollection spriteCollection;
 
-        public Text(float x, float y, string content, BMFont font) : base(x, y, 1, 1)
+        public Text(float x, float y, string content, BMFont font) : base(x, y, 0, 1, 1, 0)
         {
             Content = content;
             this.font = font;
@@ -43,12 +43,12 @@ namespace Relatus.Graphics
             CreateText();
         }
 
-        public override RelatusObject SetPosition(float x, float y)
+        public override RelatusObject SetPosition(float x, float y, float z)
         {
-            if (X == x && Y == y)
+            if (X == x && Y == y && Z == z)
                 return this;
 
-            base.SetPosition(x, y);
+            base.SetPosition(x, y, z);
 
             UpdateText();
 
@@ -127,7 +127,7 @@ namespace Relatus.Graphics
             }
 
             //spriteCollection.SetCollection(sprites);
-            SetBounds(X, Y, (int)Math.Ceiling(xFinal - X), (int)Math.Ceiling(font.Size * Scale.Y));
+            SetDimensions((int)Math.Ceiling(xFinal - X), (int)Math.Ceiling(font.Size * Scale.Y), Depth);
 
             exactBounds.SetBounds(X, Y, Width, Height);
             literalBounds.SetBounds(X, Y, Width, Height);
@@ -162,7 +162,7 @@ namespace Relatus.Graphics
             }
 
             //spriteCollection.SetCollection(sprites);
-            SetBounds(X, Y, (int)Math.Ceiling(xFinal - X), (int)Math.Ceiling(font.Size * Scale.Y));
+            SetDimensions((int)Math.Ceiling(xFinal - X), (int)Math.Ceiling(font.Size * Scale.Y), Depth);
 
             exactBounds.SetBounds(X, Y, Width, Height);
             literalBounds.SetBounds(X, Y, Width, Height);
@@ -178,7 +178,7 @@ namespace Relatus.Graphics
             exactBounds.Origin = new Vector3(Width * 0.5f, Height * 0.5f, 0);
             exactBounds.Rotation = new Vector3(0, 0, Rotation);
 
-            PolygonSchema collisionInformation = exactBounds.CalculateShapeSceme2D(); 
+            PolygonSchema collisionInformation = exactBounds.CalculateShapeSceme2D();
 
             float xMin = VertexFinder(collisionInformation.Vertices, "x", "minimum");
             float xMax = VertexFinder(collisionInformation.Vertices, "x", "maximum");
