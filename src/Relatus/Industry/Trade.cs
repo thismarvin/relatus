@@ -2,11 +2,17 @@ namespace Relatus.Industry
 {
     public class Trade : Behavior
     {
-        protected Factory workplace;
+        public Factory Workplace { get; private set; }
 
-        public Trade(Factory workplace)
+        public Trade()
         {
-            this.workplace = workplace;
+        }
+
+        public Trade AttachFactory(Factory factory)
+        {
+            Workplace = factory;
+
+            return this;
         }
     }
 }

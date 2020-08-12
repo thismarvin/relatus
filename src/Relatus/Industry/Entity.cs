@@ -10,26 +10,22 @@ namespace Relatus.Industry
 
         private Dictionary<Type, Behavior> behaviorLookup;
 
-        private Stack<Behavior> behaviorAddition;
-        private Stack<Type> behaviorSubtraction;
-        private bool modified;
-
         public Entity()
         {
             behaviorLookup = new Dictionary<Type, Behavior>();
-            behaviorAddition = new Stack<Behavior>();
-            behaviorSubtraction = new Stack<Type>();
         }
 
-        public Entity AddBehavior(Behavior behavior)
+        public Entity AddBehavior(params Behavior[] behaviors)
         {
-            Type type = behavior.GetType();
+            for (int i = 0; i < behaviors.Length; i++)
+            {
+                Type type = behaviors[i].GetType();
 
-            if (behaviorLookup.ContainsKey(type))
-                throw new RelatusException("An entity cannot have two behaviors of the same Type.", new ArgumentException());
+                if (behaviorLookup.ContainsKey(type))
+                    throw new RelatusException("An entity cannot have two behaviors of the same Type.", new ArgumentException());
 
-            behaviorAddition.Push(behavior);
-            modified = true;
+                behaviorLookup.Add(type, behaviors[i]);
+            }
 
             return this;
         }
@@ -39,32 +35,23 @@ namespace Relatus.Industry
             Type type = typeof(T);
 
             if (!behaviorLookup.ContainsKey(type))
-                throw new RelatusException("The current entity does not contain a Behavior of that type.", new KeyNotFoundException());
+                return this;
 
-            behaviorSubtraction.Push(type);
-            modified = true;
+            behaviorLookup.Remove(type);
 
             return this;
         }
 
-        public Entity ApplyChanges()
+        public Entity RemoveBehaviors(params Type[] behaviorTypes)
         {
-            if (!modified)
-                return this;
-
-            while (behaviorSubtraction.Count > 0)
+            for (int i = 0; i < behaviorTypes.Length; i++)
             {
-                behaviorLookup.Remove(behaviorSubtraction.Pop());
+                if (!behaviorLookup.ContainsKey(behaviorTypes[i]))
+                    continue;
+
+                behaviorLookup.Remove(behaviorTypes[i]);
+
             }
-
-            while (behaviorAddition.Count > 0)
-            {
-                Behavior behavior = behaviorAddition.Pop();
-                behaviorLookup.Add(behavior.GetType(), behavior);
-            }
-
-            modified = false;
-
             return this;
         }
 
@@ -93,9 +80,6 @@ namespace Relatus.Industry
 
         public void Update()
         {
-            if (modified)
-                throw new RelatusException("The entity was modified, but ApplyChanges() was never called.", new MethodExpectedException());
-
             foreach (Behavior b in behaviorLookup.Values)
             {
                 if (b is IUpdateableBehavior behavior)
@@ -107,9 +91,6 @@ namespace Relatus.Industry
 
         public void Draw(Camera camera)
         {
-            if (modified)
-                throw new RelatusException("The entity was modified, but ApplyChanges() was never called.", new MethodExpectedException());
-
             foreach (Behavior b in behaviorLookup.Values)
             {
                 if (b is IDrawableBehavior behavior)
