@@ -1,4 +1,4 @@
-namespace Relatus.EB
+namespace Relatus.Industry
 {
     public abstract class Behavior
     {

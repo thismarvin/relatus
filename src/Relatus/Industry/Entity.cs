@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Relatus.EB
+namespace Relatus.Industry
 {
     public class Entity
     {
