@@ -321,7 +321,7 @@ namespace Relatus.Graphics
             return transformCache;
         }
 
-        public PolygonSchema CalculateShapeSceme2D()
+        public PolygonSchema CalculatePolygonSchema()
         {
             int totalVertices = Geometry.TotalVertices;
             Matrix polygonTransform = CalculateTransform();
@@ -335,12 +335,12 @@ namespace Relatus.Graphics
 
             LineSegment[] transformedLineSegments = new LineSegment[totalVertices];
 
-            transformedLineSegments[0] = new LineSegment(transformedVertices[totalVertices - 1].X, transformedVertices[totalVertices - 1].Y, transformedVertices[0].X, transformedVertices[0].Y);
-
-            for (int i = 1; i < totalVertices; i++)
+            for (int i = 0; i < totalVertices - 1; i++)
             {
-                transformedLineSegments[i] = new LineSegment(transformedVertices[i - 1].X, transformedVertices[i - 1].Y, transformedVertices[i].X, transformedVertices[i].Y);
+                transformedLineSegments[i] = new LineSegment(transformedVertices[i + 1].X, transformedVertices[i + 1].Y, transformedVertices[i].X, transformedVertices[i].Y);
             }
+
+            transformedLineSegments[totalVertices - 1] = new LineSegment(transformedVertices[0].X, transformedVertices[0].Y, transformedVertices[totalVertices - 1].X, transformedVertices[totalVertices - 1].Y);
 
             return new PolygonSchema(transformedVertices, transformedLineSegments);
         }

@@ -57,6 +57,9 @@ namespace Relatus
             Vector2 resolution = -minPass.Normal * minPass.Overlap;
             resolution.Normalize();
 
+            Vector2 temp = aAABB.Center - bAABB.Center;
+            resolution = Vector2.Dot(temp, resolution) < 0 ? -resolution : resolution;
+
             return resolution;
         }
 
@@ -89,6 +92,8 @@ namespace Relatus
                     -(a.Edges[i].Y2 - a.Edges[i].Y1),
                     a.Edges[i].X2 - a.Edges[i].X1
                 );
+
+                normal.Normalize();
 
                 float minProjectionA = float.MaxValue;
                 float maxProjectionA = float.MinValue;

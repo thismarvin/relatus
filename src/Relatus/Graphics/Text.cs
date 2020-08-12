@@ -178,7 +178,7 @@ namespace Relatus.Graphics
             exactBounds.Origin = new Vector3(Width * 0.5f, Height * 0.5f, 0);
             exactBounds.Rotation = new Vector3(0, 0, Rotation);
 
-            PolygonSchema collisionInformation = exactBounds.CalculateShapeSceme2D();
+            PolygonSchema collisionInformation = exactBounds.CalculatePolygonSchema();
 
             float xMin = VertexFinder(collisionInformation.Vertices, "x", "minimum");
             float xMax = VertexFinder(collisionInformation.Vertices, "x", "maximum");
