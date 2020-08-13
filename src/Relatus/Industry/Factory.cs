@@ -6,26 +6,26 @@ namespace Relatus.Industry
 {
     public class Factory
     {
-        public int Capacity { get; private set; }
+        public uint Capacity { get; private set; }
 
         private readonly Worker[] workers;
-        private int workerIndex;
+        private uint workerIndex;
 
-        private readonly Stack<Tuple<int, Trade[]>> behaviorAddition;
-        private readonly Stack<Tuple<int, Type[]>> behaviorSubtraction;
-        private readonly Queue<int> vacancies;
+        private readonly Stack<Tuple<uint, Trade[]>> behaviorAddition;
+        private readonly Stack<Tuple<uint, Type[]>> behaviorSubtraction;
+        private readonly Queue<uint> vacancies;
         private readonly SparseSet entityRemoval;
         private bool dataModified;
 
-        public Factory(int capacity)
+        public Factory(uint capacity)
         {
             Capacity = capacity;
             workers = new Worker[Capacity];
 
-            behaviorAddition = new Stack<Tuple<int, Trade[]>>(capacity);
-            behaviorSubtraction = new Stack<Tuple<int, Type[]>>(capacity);
-            vacancies = new Queue<int>(capacity);
-            entityRemoval = new SparseSet(capacity);
+            behaviorAddition = new Stack<Tuple<uint, Trade[]>>((int)capacity);
+            behaviorSubtraction = new Stack<Tuple<uint, Type[]>>((int)capacity);
+            vacancies = new Queue<uint>((int)capacity);
+            entityRemoval = new SparseSet((int)capacity);
         }
 
         public Worker RecruitWorker()
@@ -33,7 +33,7 @@ namespace Relatus.Industry
             // Prioritize creating an entity in an empty slot.
             if (vacancies.Count > 0)
             {
-                int index = vacancies.Dequeue();
+                uint index = vacancies.Dequeue();
 
                 Worker replacement = new Worker(index);
                 workers[index] = replacement;
@@ -70,25 +70,31 @@ namespace Relatus.Industry
             return this;
         }
 
-        public Factory FireWorker(int ssn)
+        public Factory FireWorker(uint ssn)
         {
+            VerifySSN(ssn);
+
             vacancies.Enqueue(ssn);
             dataModified = true;
 
             return this;
         }
 
-        public Factory TrainWorker(int ssn, params Trade[] behaviors)
+        public Factory TrainWorker(uint ssn, params Trade[] behaviors)
         {
-            behaviorAddition.Push(new Tuple<int, Trade[]>(ssn, behaviors));
+            VerifySSN(ssn);
+
+            behaviorAddition.Push(new Tuple<uint, Trade[]>(ssn, behaviors));
             dataModified = true;
 
             return this;
         }
 
-        public Factory GaslightWorker(int ssn, params Type[] behaviorsTypes)
+        public Factory GaslightWorker(uint ssn, params Type[] behaviorsTypes)
         {
-            behaviorSubtraction.Push(new Tuple<int, Type[]>(ssn, behaviorsTypes));
+            VerifySSN(ssn);
+
+            behaviorSubtraction.Push(new Tuple<uint, Type[]>(ssn, behaviorsTypes));
             dataModified = true;
 
             return this;
@@ -101,13 +107,13 @@ namespace Relatus.Industry
 
             while (behaviorSubtraction.Count > 0)
             {
-                Tuple<int, Type[]> modification = behaviorSubtraction.Pop();
+                Tuple<uint, Type[]> modification = behaviorSubtraction.Pop();
                 workers[modification.Item1].RemoveBehaviors(modification.Item2);
             }
 
             while (behaviorAddition.Count > 0)
             {
-                Tuple<int, Trade[]> modification = behaviorAddition.Pop();
+                Tuple<uint, Trade[]> modification = behaviorAddition.Pop();
 
                 for (int i = 0; i < modification.Item2.Length; i++)
                 {
@@ -125,7 +131,7 @@ namespace Relatus.Industry
                     int temp = (int)entity;
                     workers[temp].Dispose();
                     workers[temp] = null;
-                    vacancies.Enqueue(temp);
+                    vacancies.Enqueue(entity);
                 }
                 entityRemoval.Clear();
             }
@@ -135,8 +141,10 @@ namespace Relatus.Industry
             return this;
         }
 
-        public Worker GetWorker(int ssn)
+        public Worker GetWorker(uint ssn)
         {
+            VerifySSN(ssn);
+
             return workers[ssn];
         }
 
@@ -195,6 +203,12 @@ namespace Relatus.Industry
             }
 
             return this;
+        }
+
+        private void VerifySSN(uint ssn)
+        {
+            if (ssn >= workerIndex)
+                throw new RelatusException("A worker with that SSN does not exist.", new ArgumentOutOfRangeException());
         }
     }
 }

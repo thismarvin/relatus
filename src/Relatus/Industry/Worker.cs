@@ -4,9 +4,9 @@ namespace Relatus.Industry
 {
     public class Worker : Entity, IDisposable
     {
-        public int SSN { get; private set; }
+        public uint SSN { get; private set; }
 
-        public Worker(int ssn)
+        public Worker(uint ssn)
         {
             SSN = ssn;
         }
