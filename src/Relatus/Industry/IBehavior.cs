@@ -1,6 +1,6 @@
 namespace Relatus.Industry
 {
-    public abstract class Behavior
+    public interface IBehavior
     {
 
     }

@@ -1,6 +1,6 @@
 namespace Relatus.Industry
 {
-    public class Trade : Behavior
+    public class Trade : IBehavior
     {
         public Factory Workplace { get; private set; }
 
@@ -8,7 +8,7 @@ namespace Relatus.Industry
         {
         }
 
-        public Trade AttachFactory(Factory factory)
+        internal Trade AttachFactory(Factory factory)
         {
             Workplace = factory;
 

@@ -11,7 +11,7 @@ namespace Relatus.Industry
         private readonly Worker[] workers;
         private int workerIndex;
 
-        private readonly Stack<Tuple<int, Behavior[]>> behaviorAddition;
+        private readonly Stack<Tuple<int, Trade[]>> behaviorAddition;
         private readonly Stack<Tuple<int, Type[]>> behaviorSubtraction;
         private readonly Queue<int> vacancies;
         private readonly SparseSet entityRemoval;
@@ -22,7 +22,7 @@ namespace Relatus.Industry
             Capacity = capacity;
             workers = new Worker[Capacity];
 
-            behaviorAddition = new Stack<Tuple<int, Behavior[]>>(capacity);
+            behaviorAddition = new Stack<Tuple<int, Trade[]>>(capacity);
             behaviorSubtraction = new Stack<Tuple<int, Type[]>>(capacity);
             vacancies = new Queue<int>(capacity);
             entityRemoval = new SparseSet(capacity);
@@ -64,9 +64,9 @@ namespace Relatus.Industry
             return this;
         }
 
-        public Factory TrainWorker(int ssn, params Behavior[] behaviors)
+        public Factory TrainWorker(int ssn, params Trade[] behaviors)
         {
-            behaviorAddition.Push(new Tuple<int, Behavior[]>(ssn, behaviors));
+            behaviorAddition.Push(new Tuple<int, Trade[]>(ssn, behaviors));
 
             return this;
         }
@@ -91,7 +91,13 @@ namespace Relatus.Industry
 
             while (behaviorAddition.Count > 0)
             {
-                Tuple<int, Behavior[]> modification = behaviorAddition.Pop();
+                Tuple<int, Trade[]> modification = behaviorAddition.Pop();
+
+                for (int i = 0; i < modification.Item2.Length; i++)
+                {
+                    modification.Item2[i].AttachFactory(this);
+                }
+
                 workers[modification.Item1].AddBehavior(modification.Item2);
             }
 
@@ -111,7 +117,7 @@ namespace Relatus.Industry
             return this;
         }
 
-        public List<Worker> RequestWorkersWith<T>() where T : Behavior
+        public List<Worker> RequestWorkersWith<T>() where T : IBehavior
         {
             List<Worker> result = new List<Worker>();
             Type type = typeof(T);

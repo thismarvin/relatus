@@ -5,17 +5,17 @@ namespace Relatus.Industry
 {
     public class Entity
     {
-        public List<Behavior> Behaviors => new List<Behavior>(behaviorLookup.Values);
+        public List<IBehavior> Behaviors => new List<IBehavior>(behaviorLookup.Values);
         public HashSet<Type> BehaviorTypes => new HashSet<Type>(behaviorLookup.Keys);
 
-        private Dictionary<Type, Behavior> behaviorLookup;
+        private Dictionary<Type, IBehavior> behaviorLookup;
 
         public Entity()
         {
-            behaviorLookup = new Dictionary<Type, Behavior>();
+            behaviorLookup = new Dictionary<Type, IBehavior>();
         }
 
-        public Entity AddBehavior(params Behavior[] behaviors)
+        public Entity AddBehavior(params IBehavior[] behaviors)
         {
             for (int i = 0; i < behaviors.Length; i++)
             {
@@ -68,19 +68,19 @@ namespace Relatus.Industry
             return true;
         }
 
-        public Behavior GetBehavior<T>() where T : Behavior
+        public T GetBehavior<T>() where T : IBehavior
         {
             Type type = typeof(T);
 
             if (!Contains(type))
                 throw new RelatusException("The current entity does not contain a Behavior of that type.", new KeyNotFoundException());
 
-            return behaviorLookup[type];
+            return (T)behaviorLookup[type];
         }
 
         public void Update()
         {
-            foreach (Behavior b in behaviorLookup.Values)
+            foreach (IBehavior b in behaviorLookup.Values)
             {
                 if (b is IUpdateableBehavior behavior)
                 {
@@ -91,7 +91,7 @@ namespace Relatus.Industry
 
         public void Draw(Camera camera)
         {
-            foreach (Behavior b in behaviorLookup.Values)
+            foreach (IBehavior b in behaviorLookup.Values)
             {
                 if (b is IDrawableBehavior behavior)
                 {

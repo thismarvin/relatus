@@ -1,6 +1,6 @@
 namespace Relatus.Industry
 {
-    public interface IUpdateableBehavior
+    public interface IUpdateableBehavior : IBehavior
     {
         void Update();
     }

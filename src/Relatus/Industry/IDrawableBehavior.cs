@@ -1,6 +1,6 @@
 namespace Relatus.Industry
 {
-    public interface IDrawableBehavior
+    public interface IDrawableBehavior : IBehavior
     {
         void Draw(Camera camera);
     }
