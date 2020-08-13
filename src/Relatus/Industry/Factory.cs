@@ -56,6 +56,20 @@ namespace Relatus.Industry
             return worker;
         }
 
+        public Factory RecruitWorker(params Trade[] behaviors)
+        {
+            Worker worker = RecruitWorker();
+
+            for (int i = 0; i < behaviors.Length; i++)
+            {
+                behaviors[i].Attach(worker, this);
+            }
+
+            worker.AddBehavior(behaviors);
+
+            return this;
+        }
+
         public Factory FireWorker(int ssn)
         {
             vacancies.Enqueue(ssn);
@@ -97,7 +111,7 @@ namespace Relatus.Industry
 
                 for (int i = 0; i < modification.Item2.Length; i++)
                 {
-                    modification.Item2[i].AttachFactory(this);
+                    modification.Item2[i].Attach(workers[modification.Item1], this);
                 }
 
                 workers[modification.Item1].AddBehavior(modification.Item2);
@@ -119,6 +133,11 @@ namespace Relatus.Industry
             dataModified = false;
 
             return this;
+        }
+
+        public Worker GetWorker(int ssn)
+        {
+            return workers[ssn];
         }
 
         public List<Worker> RequestWorkersWith<T>() where T : IBehavior
