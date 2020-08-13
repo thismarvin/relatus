@@ -55,7 +55,13 @@ namespace Relatus.Industry
             return this;
         }
 
-        public bool Contains(params Type[] behaviorTypes)
+        public bool Contains<T>() where T : IBehavior
+        {
+            Type type = typeof(T);
+            return behaviorLookup.ContainsKey(type);
+        }
+
+        public bool ContainsBehaviors(params Type[] behaviorTypes)
         {
             for (int i = 0; i < behaviorTypes.Length; i++)
             {
@@ -72,7 +78,7 @@ namespace Relatus.Industry
         {
             Type type = typeof(T);
 
-            if (!Contains(type))
+            if (!behaviorLookup.ContainsKey(type))
                 throw new RelatusException("The current entity does not contain a Behavior of that type.", new KeyNotFoundException());
 
             return (T)behaviorLookup[type];

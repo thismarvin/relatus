@@ -147,7 +147,7 @@ namespace Relatus.Industry
 
             for (int i = 0; i < workerIndex; i++)
             {
-                if (workers[i]?.Contains(type) ?? false)
+                if (workers[i]?.ContainsBehaviors(type) ?? false)
                 {
                     result.Add(workers[i]);
                 }
@@ -162,7 +162,7 @@ namespace Relatus.Industry
 
             for (int i = 0; i < workerIndex; i++)
             {
-                if (workers[i]?.Contains(behaviorsTypes) ?? false)
+                if (workers[i]?.ContainsBehaviors(behaviorsTypes) ?? false)
                 {
                     result.Add(workers[i]);
                 }
@@ -171,7 +171,7 @@ namespace Relatus.Industry
             return result;
         }
 
-        public void Update()
+        public Factory RunUpdateableBehaviors()
         {
             if (dataModified)
                 throw new RelatusException("The Factory's data was modified, but ApplyChanges() was never called.", new MethodExpectedException());
@@ -180,9 +180,11 @@ namespace Relatus.Industry
             {
                 workers[i]?.Update();
             }
+
+            return this;
         }
 
-        public void Draw(Camera camera)
+        public Factory RunDrawableBehaviors(Camera camera)
         {
             if (dataModified)
                 throw new RelatusException("The Factory's data was modified, but ApplyChanges() was never called.", new MethodExpectedException());
@@ -191,6 +193,8 @@ namespace Relatus.Industry
             {
                 workers[i]?.Draw(camera);
             }
+
+            return this;
         }
     }
 }
