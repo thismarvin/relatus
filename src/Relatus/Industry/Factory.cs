@@ -28,7 +28,7 @@ namespace Relatus.Industry
             entityRemoval = new SparseSet(capacity);
         }
 
-        public Entity RecruitWorker()
+        public Worker RecruitWorker()
         {
             // Prioritize creating an entity in an empty slot.
             if (vacancies.Count > 0)
@@ -67,6 +67,7 @@ namespace Relatus.Industry
         public Factory TrainWorker(int ssn, params Trade[] behaviors)
         {
             behaviorAddition.Push(new Tuple<int, Trade[]>(ssn, behaviors));
+            dataModified = true;
 
             return this;
         }
@@ -74,6 +75,7 @@ namespace Relatus.Industry
         public Factory GaslightWorker(int ssn, params Type[] behaviorsTypes)
         {
             behaviorSubtraction.Push(new Tuple<int, Type[]>(ssn, behaviorsTypes));
+            dataModified = true;
 
             return this;
         }
@@ -114,6 +116,8 @@ namespace Relatus.Industry
                 entityRemoval.Clear();
             }
 
+            dataModified = false;
+
             return this;
         }
 
@@ -150,6 +154,9 @@ namespace Relatus.Industry
 
         public void Update()
         {
+            if (dataModified)
+                throw new RelatusException("The Factory's data was modified, but ApplyChanges() was never called.", new MethodExpectedException());
+
             for (int i = 0; i < workerIndex; i++)
             {
                 workers[i]?.Update();
@@ -158,6 +165,9 @@ namespace Relatus.Industry
 
         public void Draw(Camera camera)
         {
+            if (dataModified)
+                throw new RelatusException("The Factory's data was modified, but ApplyChanges() was never called.", new MethodExpectedException());
+
             for (int i = 0; i < workerIndex; i++)
             {
                 workers[i]?.Draw(camera);
