@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace Relatus.Industry
 {
@@ -11,10 +12,6 @@ namespace Relatus.Industry
             SSN = ssn;
         }
 
-        protected virtual void OnDispose()
-        {
-        }
-
         #region IDisposable Support
         private bool disposedValue;
 
@@ -24,7 +21,14 @@ namespace Relatus.Industry
             {
                 if (disposing)
                 {
-                    OnDispose();
+                    List<IBehavior> behaviors = Behaviors;
+                    for (int i = 0; i < behaviors.Count; i++)
+                    {
+                        if (behaviors[i] is IDisposable disposable)
+                        {
+                            disposable.Dispose();
+                        }
+                    }
                 }
 
                 disposedValue = true;
