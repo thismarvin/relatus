@@ -148,6 +148,21 @@ namespace Relatus.Industry
             return workers[ssn];
         }
 
+        public bool TryGetWorker(uint ssn, out Worker worker)
+        {
+            worker = null;
+
+            if (ssn >= workerIndex)
+                return false;
+
+            worker = workers[ssn];
+
+            if (worker == null)
+                return false;
+
+            return true;
+        }
+
         public List<Worker> RequestWorkersWith<T>() where T : IBehavior
         {
             List<Worker> result = new List<Worker>();

@@ -84,6 +84,20 @@ namespace Relatus.Industry
             return (T)behaviorLookup[type];
         }
 
+        public bool TryGetBehavior<T>(out T behavior) where T : IBehavior
+        {
+            behavior = default(T);
+
+            Type type = typeof(T);
+
+            if (!behaviorLookup.ContainsKey(type))
+                return false;
+
+            behavior = (T)behaviorLookup[type];
+
+            return true;
+        }
+
         public void Update()
         {
             foreach (IBehavior b in behaviorLookup.Values)
