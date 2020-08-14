@@ -163,14 +163,13 @@ namespace Relatus.Industry
             return true;
         }
 
-        public List<Worker> RequestWorkersWith<T>() where T : IBehavior
+        public List<Worker> RequestWorkersWithBehavior<T>() where T : IBehavior
         {
-            List<Worker> result = new List<Worker>();
-            Type type = typeof(T);
+            List<Worker> result = new List<Worker>((int)Capacity);
 
             for (int i = 0; i < workerIndex; i++)
             {
-                if (workers[i]?.ContainsBehaviors(type) ?? false)
+                if (workers[i]?.ContainsBehavior<T>() ?? false)
                 {
                     result.Add(workers[i]);
                 }
@@ -181,13 +180,29 @@ namespace Relatus.Industry
 
         public List<Worker> RequestWorkersWithBehaviors(params Type[] behaviorsTypes)
         {
-            List<Worker> result = new List<Worker>();
+            List<Worker> result = new List<Worker>((int)Capacity);
 
             for (int i = 0; i < workerIndex; i++)
             {
                 if (workers[i]?.ContainsBehaviors(behaviorsTypes) ?? false)
                 {
                     result.Add(workers[i]);
+                }
+            }
+
+            return result;
+        }
+
+        public List<T> RequestBehavior<T>() where T : IBehavior
+        {
+            List<T> result = new List<T>((int)Capacity);
+
+            for (int i = 0; i < workerIndex; i++)
+            {
+                T behavior = default(T);
+                if (workers[i]?.TryGetBehavior<T>(out behavior) ?? false)
+                {
+                    result.Add(behavior);
                 }
             }
 

@@ -55,7 +55,7 @@ namespace Relatus.Industry
             return this;
         }
 
-        public bool Contains<T>() where T : IBehavior
+        public bool ContainsBehavior<T>() where T : IBehavior
         {
             Type type = typeof(T);
             return behaviorLookup.ContainsKey(type);
