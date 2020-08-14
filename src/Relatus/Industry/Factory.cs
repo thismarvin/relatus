@@ -28,46 +28,16 @@ namespace Relatus.Industry
             entityRemoval = new SparseSet((int)capacity);
         }
 
-        public Worker RecruitWorker()
+        public Factory RecruitWorker(params Trade[] trades)
         {
-            // Prioritize creating an entity in an empty slot.
-            if (vacancies.Count > 0)
-            {
-                uint index = vacancies.Dequeue();
-
-                Worker replacement = new Worker(index);
-                workers[index] = replacement;
-
-                return replacement;
-            }
-
-            // Overwrite the last entity if the factory is at capacity.
-            if (workerIndex >= Capacity)
-            {
-                workerIndex = Capacity - 1;
-                workers[workerIndex].Dispose();
-            }
-
-            Worker worker = new Worker(workerIndex);
-            workers[workerIndex] = worker;
-
-            workerIndex++;
-
-            return worker;
-        }
-
-        public Factory RecruitWorker(params Trade[] behaviors)
-        {
-            Worker worker = RecruitWorker();
-
-            for (int i = 0; i < behaviors.Length; i++)
-            {
-                behaviors[i].Attach(worker, this);
-            }
-
-            worker.AddBehavior(behaviors);
+            RegisterWorker(trades);
 
             return this;
+        }
+
+        public Worker AdoptWorker(params Trade[] trades)
+        {
+            return RegisterWorker(trades);
         }
 
         public Factory FireWorker(uint ssn)
@@ -233,6 +203,48 @@ namespace Relatus.Industry
             }
 
             return this;
+        }
+
+        private Worker AllocateWorker()
+        {
+            // Prioritize creating an entity in an empty slot.
+            if (vacancies.Count > 0)
+            {
+                uint index = vacancies.Dequeue();
+
+                Worker replacement = new Worker(index);
+                workers[index] = replacement;
+
+                return replacement;
+            }
+
+            // Overwrite the last entity if the factory is at capacity.
+            if (workerIndex >= Capacity)
+            {
+                workerIndex = Capacity - 1;
+                workers[workerIndex].Dispose();
+            }
+
+            Worker worker = new Worker(workerIndex);
+            workers[workerIndex] = worker;
+
+            workerIndex++;
+
+            return worker;
+        }
+
+        private Worker RegisterWorker(Trade[] trades)
+        {
+            Worker worker = AllocateWorker();
+
+            for (int i = 0; i < trades.Length; i++)
+            {
+                trades[i].Attach(worker, this);
+            }
+
+            worker.AddBehavior(trades);
+
+            return worker;
         }
 
         private void VerifySSN(uint ssn)
