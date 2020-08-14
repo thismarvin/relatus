@@ -8,6 +8,8 @@ namespace Relatus.Industry
     {
         public uint Capacity { get; private set; }
 
+        public uint WorkerCount => workerIndex - (uint)vacancies.Count;
+
         private readonly Worker[] workers;
         private uint workerIndex;
 
@@ -44,7 +46,7 @@ namespace Relatus.Industry
         {
             VerifySSN(ssn);
 
-            vacancies.Enqueue(ssn);
+            entityRemoval.Add(ssn);
             dataModified = true;
 
             return this;
