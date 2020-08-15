@@ -34,6 +34,9 @@ namespace Relatus.Industry
         {
             Worker worker = AllocateWorker();
 
+            if (trades.Length == 0)
+                return this;
+
             behaviorAddition.Push(new Tuple<uint, Trade[]>(worker.SSN, trades));
             dataModified = true;
 
@@ -43,6 +46,9 @@ namespace Relatus.Industry
         public Worker AdoptWorker(params Trade[] trades)
         {
             Worker worker = AllocateWorker();
+
+            if (trades.Length == 0)
+                return worker;
 
             behaviorAddition.Push(new Tuple<uint, Trade[]>(worker.SSN, trades));
             dataModified = true;
@@ -64,6 +70,9 @@ namespace Relatus.Industry
         {
             VerifySSN(ssn);
 
+            if (behaviors.Length == 0)
+                return this;
+
             behaviorAddition.Push(new Tuple<uint, Trade[]>(ssn, behaviors));
             dataModified = true;
 
@@ -73,6 +82,9 @@ namespace Relatus.Industry
         public Factory GaslightWorker(uint ssn, params Type[] behaviorsTypes)
         {
             VerifySSN(ssn);
+
+            if (behaviorsTypes.Length == 0)
+                return this;
 
             behaviorSubtraction.Push(new Tuple<uint, Type[]>(ssn, behaviorsTypes));
             dataModified = true;
@@ -161,6 +173,9 @@ namespace Relatus.Industry
         public List<Worker> RequestWorkersWithBehaviors(params Type[] behaviorsTypes)
         {
             List<Worker> result = new List<Worker>((int)Capacity);
+
+            if (behaviorsTypes.Length == 0)
+                return result;
 
             for (int i = 0; i < workerIndex; i++)
             {
