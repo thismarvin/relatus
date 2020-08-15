@@ -9,10 +9,17 @@ namespace Relatus.Industry
         {
         }
 
+        protected virtual void OnAttach()
+        {
+
+        }
+
         internal Trade Attach(Worker worker, Factory workplace)
         {
             Worker = worker;
             Workplace = workplace;
+
+            OnAttach();
 
             return this;
         }
