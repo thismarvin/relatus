@@ -32,14 +32,22 @@ namespace Relatus.Industry
 
         public Factory RecruitWorker(params Trade[] trades)
         {
-            RegisterWorker(trades);
+            Worker worker = AllocateWorker();
+
+            behaviorAddition.Push(new Tuple<uint, Trade[]>(worker.SSN, trades));
+            dataModified = true;
 
             return this;
         }
 
         public Worker AdoptWorker(params Trade[] trades)
         {
-            return RegisterWorker(trades);
+            Worker worker = AllocateWorker();
+
+            behaviorAddition.Push(new Tuple<uint, Trade[]>(worker.SSN, trades));
+            dataModified = true;
+
+            return worker;
         }
 
         public Factory FireWorker(uint ssn)
@@ -231,20 +239,6 @@ namespace Relatus.Industry
             workers[workerIndex] = worker;
 
             workerIndex++;
-
-            return worker;
-        }
-
-        private Worker RegisterWorker(Trade[] trades)
-        {
-            Worker worker = AllocateWorker();
-
-            for (int i = 0; i < trades.Length; i++)
-            {
-                trades[i].Attach(worker, this);
-            }
-
-            worker.AddBehavior(trades);
 
             return worker;
         }
