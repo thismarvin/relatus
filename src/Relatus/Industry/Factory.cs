@@ -92,6 +92,40 @@ namespace Relatus.Industry
             return this;
         }
 
+        public Factory Clear()
+        {
+            // Clean up all workers.
+            for (int i = 0; i < Capacity; i++)
+            {
+                workers[i]?.Dispose();
+                workers[i]?.ClearBehaviors();
+                // ? Not entirely sure if this is necessary, but I am going to keep it.
+                workers[i] = null;
+            }
+
+            // Make sure to dispose of any behaviors that were about to be added.
+            foreach (Tuple<uint, Trade[]> entry in behaviorAddition)
+            {
+                for (int i = 0; i < entry.Item2.Length; i++)
+                {
+                    if (entry.Item2[i] is IDisposable disposable)
+                    {
+                        disposable.Dispose();
+                    }
+                }
+            }
+
+            behaviorAddition.Clear();
+            behaviorSubtraction.Clear();
+            entityRemoval.Clear();
+            vacancies.Clear();
+
+            workerIndex = 0;
+            dataModified = false;
+
+            return this;
+        }
+
         public Factory ApplyChanges()
         {
             if (!dataModified)

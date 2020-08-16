@@ -55,6 +55,13 @@ namespace Relatus.Industry
             return this;
         }
 
+        public Entity ClearBehaviors()
+        {
+            behaviorLookup.Clear();
+
+            return this;
+        }
+
         public bool ContainsBehavior<T>() where T : IBehavior
         {
             Type type = typeof(T);
