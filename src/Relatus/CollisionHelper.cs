@@ -54,8 +54,7 @@ namespace Relatus
                 return new Vector2(0, 0);
 
             OverlapInformation minPass = pass0.Overlap < pass1.Overlap ? pass0 : pass1;
-            Vector2 resolution = -minPass.Normal * minPass.Overlap;
-            resolution.Normalize();
+            Vector2 resolution = minPass.Normal * minPass.Overlap;
 
             Vector2 temp = aAABB.Center - bAABB.Center;
             resolution = Vector2.Dot(temp, resolution) < 0 ? -resolution : resolution;
