@@ -29,12 +29,12 @@ namespace Relatus
         /// <summary>
         /// Called right after the scene is loaded.
         /// </summary>
-        public virtual void OnEnter() { }
+        protected internal virtual void OnEnter() { }
 
         /// <summary>
         /// Called right before the scene is unloaded.
         /// </summary>
-        public virtual void OnExit() { }
+        protected internal virtual void OnExit() { }
 
         /// <summary>
         /// Updates everything and anything related to the scene.
