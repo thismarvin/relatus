@@ -247,7 +247,7 @@ namespace Relatus.Industry
 
             for (int i = 0; i < workerIndex; i++)
             {
-                T behavior = default(T);
+                T behavior = default;
                 if (workers[i]?.TryGetBehavior<T>(out behavior) ?? false)
                 {
                     result.Add(behavior);

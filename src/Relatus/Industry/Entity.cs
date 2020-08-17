@@ -8,7 +8,7 @@ namespace Relatus.Industry
         public List<IBehavior> Behaviors => new List<IBehavior>(behaviorLookup.Values);
         public HashSet<Type> BehaviorTypes => new HashSet<Type>(behaviorLookup.Keys);
 
-        private Dictionary<Type, IBehavior> behaviorLookup;
+        private readonly Dictionary<Type, IBehavior> behaviorLookup;
 
         public Entity()
         {
@@ -93,7 +93,7 @@ namespace Relatus.Industry
 
         public bool TryGetBehavior<T>(out T behavior) where T : IBehavior
         {
-            behavior = default(T);
+            behavior = default;
 
             Type type = typeof(T);
 
