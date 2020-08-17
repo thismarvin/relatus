@@ -24,14 +24,14 @@ namespace Relatus
             return RNG.Next(lowerBound, upperBound);
         }
 
+        public static float NextFloat(float lowerBound, float upperBound)
+        {
+            return lowerBound + (float)RNG.NextDouble() * (upperBound - lowerBound);
+        }
+
         public static double NextDouble(double lowerBound, double upperBound)
         {
             return lowerBound + RNG.NextDouble() * (upperBound - lowerBound);
-        }
-
-        public static double NextFloat(float lowerBound, float upperBound)
-        {
-            return lowerBound + (float)RNG.NextDouble() * (upperBound - lowerBound);
         }
 
         /// <summary>
