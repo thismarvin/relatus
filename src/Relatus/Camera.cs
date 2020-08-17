@@ -175,7 +175,7 @@ namespace Relatus
             return this;
         }
 
-        public Camera SetBounds(float width, float height)
+        public Camera SetDimensions(float width, float height)
         {
             if (this.width == width && this.height == height)
                 return this;

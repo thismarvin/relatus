@@ -33,9 +33,9 @@ namespace Relatus
 
         private static void HandleWindowResize(object sender, EventArgs e)
         {
-            Static.SetBounds(WindowManager.ScaledWidth, WindowManager.ScaledHeight);
-            TopLeftAligned.SetBounds(WindowManager.ScaledWidth, WindowManager.ScaledHeight);
-            TopRightAligned.SetBounds(WindowManager.ScaledWidth, WindowManager.ScaledHeight);
+            Static.SetDimensions(WindowManager.ScaledWidth, WindowManager.ScaledHeight);
+            TopLeftAligned.SetDimensions(WindowManager.ScaledWidth, WindowManager.ScaledHeight);
+            TopRightAligned.SetDimensions(WindowManager.ScaledWidth, WindowManager.ScaledHeight);
         }
 
         private static void ManageManagedCameras()
