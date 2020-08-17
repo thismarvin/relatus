@@ -24,12 +24,12 @@ namespace Relatus.Utilities
         private uint n;
 
         /// <summary>
-        /// Creates a data structure that stores a set of <see cref="uint"/> that all fall within a given range. 
+        /// Creates a data structure that stores a set of <see cref="uint"/> that all fall within a given range.
         /// </summary>
         /// <param name="range">The maximum amount of elements allowed inside the sparse set AND the maximum value allowed inside the set.</param>
-        public SparseSet(int range)
+        public SparseSet(uint range)
         {
-            u = (uint)range;
+            u = range;
             dense = new uint[u];
             sparse = new uint[u];
         }
@@ -68,7 +68,7 @@ namespace Relatus.Utilities
         }
 
         /// <summary>
-        /// Removes a given <see cref="uint"/> from the set. 
+        /// Removes a given <see cref="uint"/> from the set.
         /// </summary>
         /// <param name="k">The element to remove from the set.</param>
         public bool Remove(uint k)

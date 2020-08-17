@@ -27,7 +27,7 @@ namespace Relatus.Industry
             behaviorAddition = new Stack<Tuple<uint, Trade[]>>((int)capacity);
             behaviorSubtraction = new Stack<Tuple<uint, Type[]>>((int)capacity);
             vacancies = new Queue<uint>((int)capacity);
-            entityRemoval = new SparseSet((int)capacity);
+            entityRemoval = new SparseSet(capacity);
         }
 
         // My implementation is somewhat jank, but having the ability to send a pseudo event once all

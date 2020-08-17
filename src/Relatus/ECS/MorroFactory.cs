@@ -29,7 +29,7 @@ namespace Relatus.ECS
 
             componentAddition = new Stack<Tuple<int, IComponent[]>>();
             componentSubtraction = new Stack<Tuple<int, Type[]>>();
-            entityRemovalQueue = new SparseSet(EntityCapacity);
+            entityRemovalQueue = new SparseSet((uint)EntityCapacity);
 
             // System Setup
             systems = new MorroSystem[SystemCapacity];
@@ -53,8 +53,8 @@ namespace Relatus.ECS
 
             for (int i = 0; i < EntityCapacity; i++)
             {
-                attachedComponents[i] = new SparseSet(ComponentCapacity);
-                attachedSystems[i] = new SparseSet(SystemCapacity);
+                attachedComponents[i] = new SparseSet((uint)ComponentCapacity);
+                attachedSystems[i] = new SparseSet((uint)SystemCapacity);
             }
         }
 
