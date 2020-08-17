@@ -30,6 +30,25 @@ namespace Relatus.Industry
             entityRemoval = new SparseSet((int)capacity);
         }
 
+        // My implementation is somewhat jank, but having the ability to send a pseudo event once all
+        // workers have been initialized seems valueable.
+        public Factory Jumpstart()
+        {
+            for (int i = 0; i < workerIndex; i++)
+            {
+                List<IBehavior> behaviors = workers[i].Behaviors;
+                for (int j = 0; j < behaviors.Count; j++)
+                {
+                    if (behaviors[j] is Trade trade)
+                    {
+                        trade.OnJumpstart();
+                    }
+                }
+            }
+
+            return this;
+        }
+
         public Factory RecruitWorker(params Trade[] trades)
         {
             Worker worker = AllocateWorker();

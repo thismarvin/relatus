@@ -14,6 +14,11 @@ namespace Relatus.Industry
 
         }
 
+        protected internal virtual void OnJumpstart()
+        {
+
+        }
+
         internal Trade Attach(Worker worker, Factory workplace)
         {
             Worker = worker;
