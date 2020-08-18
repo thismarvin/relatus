@@ -47,7 +47,7 @@ namespace Relatus.ECS
             // Entity Setup
             attachedComponents = new SparseSet[EntityCapacity];
             attachedSystems = new SparseSet[EntityCapacity];
-            entityBuffer = new Stack<int>(EntityCapacity);
+            vacancies = new Queue<int>(EntityCapacity);
 
             for (int i = 0; i < EntityCapacity; i++)
             {

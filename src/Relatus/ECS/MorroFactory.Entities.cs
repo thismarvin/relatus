@@ -7,11 +7,11 @@ namespace Relatus.ECS
 {
     public partial class MorroFactory
     {
-        public int EntityCount => totalEntitiesCreated - entityBuffer.Count;
+        public int EntityCount => totalEntitiesCreated - vacancies.Count;
 
         private readonly SparseSet[] attachedComponents;
         private readonly SparseSet[] attachedSystems;
-        private readonly Stack<int> entityBuffer;
+        private readonly Queue<int> vacancies;
         private int nextEntity;
         private int totalEntitiesCreated;
 
@@ -37,7 +37,7 @@ namespace Relatus.ECS
             attachedComponents[entity].Clear();
             attachedSystems[entity].Clear();
 
-            entityBuffer.Push(entity);
+            vacancies.Enqueue(entity);
         }
 
         /// <summary>
@@ -92,9 +92,9 @@ namespace Relatus.ECS
         {
             int entity = nextEntity;
 
-            if (entityBuffer.Count > 0)
+            if (vacancies.Count > 0)
             {
-                entity = entityBuffer.Pop();
+                entity = vacancies.Dequeue();
             }
             else
             {
