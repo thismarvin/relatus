@@ -36,7 +36,7 @@ namespace Relatus.ECS.Bundled
 
         public override void UpdateEntity(int entity)
         {
-            Simultate(entity);
+            Simulate(entity);
         }
 
         public override void Update()
@@ -47,7 +47,7 @@ namespace Relatus.ECS.Bundled
             base.Update();
         }
 
-        private void Simultate(int entity)
+        private void Simulate(int entity)
         {
             CPosition position = (CPosition)positions[entity];
             CKinetic kinetic = (CKinetic)kinetics[entity];
