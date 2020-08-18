@@ -27,8 +27,8 @@ namespace Relatus.ECS
             ComponentCapacity = componentCapacity;
             SystemCapacity = systemCapacity;
 
-            componentAddition = new Stack<Tuple<int, IComponent[]>>();
-            componentSubtraction = new Stack<Tuple<int, Type[]>>();
+            componentAddition = new Stack<Tuple<int, IComponent[]>>(EntityCapacity);
+            componentSubtraction = new Stack<Tuple<int, Type[]>>(EntityCapacity);
             entityRemovalQueue = new SparseSet((uint)EntityCapacity);
 
             // System Setup
