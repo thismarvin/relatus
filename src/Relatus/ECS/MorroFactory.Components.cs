@@ -6,11 +6,9 @@ namespace Relatus.ECS
 {
     public partial class MorroFactory
     {
-        private readonly IComponent[][] componentData;
-        private int componentIndex; 
-
-        private readonly HashSet<Type> registeredComponents;
         private readonly Dictionary<Type, int> componentLookup;
+        private readonly IComponent[][] componentData;
+        private int componentIndex;
 
         /// <summary>
         /// Returns an array of all of the data of a given <see cref="IComponent"/> type.
@@ -20,7 +18,7 @@ namespace Relatus.ECS
         public IComponent[] GetData<T>() where T : IComponent
         {
             Type componentType = typeof(T);
-            if (!registeredComponents.Contains(componentType))
+            if (!componentLookup.ContainsKey(componentType))
                 return new IComponent[0];
 
             return componentData[componentLookup[componentType]];
@@ -47,10 +45,9 @@ namespace Relatus.ECS
             {
                 Type componentType = components[i].GetType();
 
-                if (registeredComponents.Contains(componentType))
+                if (componentLookup.ContainsKey(componentType))
                     continue;
 
-                registeredComponents.Add(componentType);
                 componentLookup.Add(componentType, componentIndex);
                 componentIndex++;
             }

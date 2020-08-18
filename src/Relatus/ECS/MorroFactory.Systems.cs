@@ -6,11 +6,9 @@ namespace Relatus.ECS
 {
     public partial class MorroFactory
     {
+        private readonly Dictionary<Type, int> systemLookup;
         private readonly MorroSystem[] systems;
         private int systemIndex;
-
-        private readonly HashSet<Type> registeredSystems;
-        private readonly Dictionary<Type, int> systemLookup;
 
         /// <summary>
         /// Returns a <see cref="MorroSystem"/> of a given type.
@@ -21,7 +19,7 @@ namespace Relatus.ECS
         {
             Type systemType = typeof(T);
 
-            if (!registeredSystems.Contains(systemType))
+            if (!systemLookup.ContainsKey(systemType))
                 return default;
 
             return (T)systems[systemLookup[systemType]];
@@ -36,10 +34,9 @@ namespace Relatus.ECS
             {
                 Type systemType = systems[i].GetType();
 
-                if (registeredSystems.Contains(systemType))
+                if (systemLookup.ContainsKey(systemType))
                     throw new RelatusException("A factory cannot have multiple systems of the same type.", new ArgumentException());
 
-                registeredSystems.Add(systemType);
                 systemLookup.Add(systemType, systemIndex);
                 this.systems[systemIndex] = systems[i];
                 systemIndex++;

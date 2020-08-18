@@ -33,13 +33,11 @@ namespace Relatus.ECS
 
             // System Setup
             systems = new MorroSystem[SystemCapacity];
-            registeredSystems = new HashSet<Type>();
-            systemLookup = new Dictionary<Type, int>();
+            systemLookup = new Dictionary<Type, int>(SystemCapacity);
 
             // Component Setup
-            registeredComponents = new HashSet<Type>();
-            componentLookup = new Dictionary<Type, int>();
             componentData = new IComponent[ComponentCapacity][];
+            componentLookup = new Dictionary<Type, int>(ComponentCapacity);
 
             for (int i = 0; i < ComponentCapacity; i++)
             {
