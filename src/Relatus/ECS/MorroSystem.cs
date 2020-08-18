@@ -21,8 +21,8 @@ namespace Relatus.ECS
 
         protected MorroFactory factory;
 
-        private readonly Stack<int> entityRemoval;
-        private readonly Stack<int> entityAddition;
+        private readonly Queue<int> entityRemoval;
+        private readonly Queue<int> entityAddition;
         private bool entityDataChanged;
 
         public MorroSystem(MorroFactory factory)
@@ -34,8 +34,8 @@ namespace Relatus.ECS
             Subscriptions = new HashSet<Type>();
             Entities = new HashSet<int>();
             EntitiesAsArray = new int[factory.EntityCapacity];
-            entityRemoval = new Stack<int>(factory.EntityCapacity);
-            entityAddition = new Stack<int>(factory.EntityCapacity);
+            entityRemoval = new Queue<int>(factory.EntityCapacity);
+            entityAddition = new Queue<int>(factory.EntityCapacity);
 
             Enabled = true;
         }
@@ -84,13 +84,13 @@ namespace Relatus.ECS
 
         internal void AddEntity(int entity)
         {
-            entityAddition.Push(entity);
+            entityAddition.Enqueue(entity);
             entityDataChanged = true;
         }
 
         internal void RemoveEntity(int entity)
         {
-            entityRemoval.Push(entity);
+            entityRemoval.Enqueue(entity);
             entityDataChanged = true;
         }
 
@@ -107,7 +107,7 @@ namespace Relatus.ECS
 
             while (entityRemoval.Count > 0)
             {
-                int entity = entityRemoval.Pop();
+                int entity = entityRemoval.Dequeue();
 
                 if (!Entities.Contains(entity))
                     continue;
@@ -117,7 +117,7 @@ namespace Relatus.ECS
 
             while (entityAddition.Count > 0)
             {
-                Entities.Add(entityAddition.Pop());
+                Entities.Add(entityAddition.Dequeue());
             }
 
             int entityIndex = 0;
