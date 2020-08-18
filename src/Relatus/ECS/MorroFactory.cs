@@ -133,6 +133,46 @@ namespace Relatus.ECS
         }
         #endregion
 
+        ///<summary>
+        /// Clears all entities of any attached components and systems.
+        ///</summary>
+        public MorroFactory ClearEntities()
+        {
+            // Remove any attached components and systems from each entity.
+            for (int i = 0; i < EntityCapacity; i++)
+            {
+                attachedComponents[i].Clear();
+                attachedSystems[i].Clear();
+            }
+
+            // Make sure the component for each entity is empty.
+            for (int i = 0; i < componentIndex; i++)
+            {
+                for (int j = 0; j < EntityCapacity; j++)
+                {
+                    // ! Might want to have Dispose() here.
+                    componentData[i][j] = null;
+                }
+            }
+
+            // Remove all references to entities from each system.
+            for (int i = 0; i < systemIndex; i++)
+            {
+                systems[i].ClearEntities();
+            }
+
+            componentAddition.Clear();
+            componentSubtraction.Clear();
+            entityRemovalQueue.Clear();
+            vacancies.Clear();
+
+            nextEntity = 0;
+            totalEntitiesCreated = 0;
+            dataModified = false;
+
+            return this;
+        }
+
         /// <summary>
         /// Applies any recent changes to entity data, and maintains the integrity of all of the factory's systems.
         /// </summary>

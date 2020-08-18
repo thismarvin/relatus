@@ -94,6 +94,12 @@ namespace Relatus.ECS
             entityDataChanged = true;
         }
 
+        internal void ClearEntities()
+        {
+            Entities.Clear();
+            EntitiesAsArray = new int[factory.EntityCapacity];
+        }
+
         internal void ApplyChanges()
         {
             if (!entityDataChanged)
