@@ -13,8 +13,8 @@ namespace Relatus.Industry
         private readonly Worker[] workers;
         private uint workerIndex;
 
-        private readonly Stack<Tuple<uint, Trade[]>> behaviorAddition;
-        private readonly Stack<Tuple<uint, Type[]>> behaviorSubtraction;
+        private readonly Queue<Tuple<uint, Trade[]>> behaviorAddition;
+        private readonly Queue<Tuple<uint, Type[]>> behaviorSubtraction;
         private readonly Queue<uint> vacancies;
         private readonly SparseSet entityRemoval;
         private bool dataModified;
@@ -24,8 +24,8 @@ namespace Relatus.Industry
             Capacity = capacity;
             workers = new Worker[Capacity];
 
-            behaviorAddition = new Stack<Tuple<uint, Trade[]>>((int)capacity);
-            behaviorSubtraction = new Stack<Tuple<uint, Type[]>>((int)capacity);
+            behaviorAddition = new Queue<Tuple<uint, Trade[]>>((int)capacity);
+            behaviorSubtraction = new Queue<Tuple<uint, Type[]>>((int)capacity);
             vacancies = new Queue<uint>((int)capacity);
             entityRemoval = new SparseSet(capacity);
         }
@@ -56,7 +56,7 @@ namespace Relatus.Industry
             if (trades.Length == 0)
                 return this;
 
-            behaviorAddition.Push(new Tuple<uint, Trade[]>(worker.SSN, trades));
+            behaviorAddition.Enqueue(new Tuple<uint, Trade[]>(worker.SSN, trades));
             dataModified = true;
 
             return this;
@@ -69,7 +69,7 @@ namespace Relatus.Industry
             if (trades.Length == 0)
                 return worker;
 
-            behaviorAddition.Push(new Tuple<uint, Trade[]>(worker.SSN, trades));
+            behaviorAddition.Enqueue(new Tuple<uint, Trade[]>(worker.SSN, trades));
             dataModified = true;
 
             return worker;
@@ -92,7 +92,7 @@ namespace Relatus.Industry
             if (behaviors.Length == 0)
                 return this;
 
-            behaviorAddition.Push(new Tuple<uint, Trade[]>(ssn, behaviors));
+            behaviorAddition.Enqueue(new Tuple<uint, Trade[]>(ssn, behaviors));
             dataModified = true;
 
             return this;
@@ -105,7 +105,7 @@ namespace Relatus.Industry
             if (behaviorsTypes.Length == 0)
                 return this;
 
-            behaviorSubtraction.Push(new Tuple<uint, Type[]>(ssn, behaviorsTypes));
+            behaviorSubtraction.Enqueue(new Tuple<uint, Type[]>(ssn, behaviorsTypes));
             dataModified = true;
 
             return this;
@@ -152,13 +152,13 @@ namespace Relatus.Industry
 
             while (behaviorSubtraction.Count > 0)
             {
-                Tuple<uint, Type[]> modification = behaviorSubtraction.Pop();
+                Tuple<uint, Type[]> modification = behaviorSubtraction.Dequeue();
                 workers[modification.Item1].RemoveBehaviors(modification.Item2);
             }
 
             while (behaviorAddition.Count > 0)
             {
-                Tuple<uint, Trade[]> modification = behaviorAddition.Pop();
+                Tuple<uint, Trade[]> modification = behaviorAddition.Dequeue();
 
                 for (int i = 0; i < modification.Item2.Length; i++)
                 {

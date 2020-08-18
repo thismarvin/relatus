@@ -11,8 +11,8 @@ namespace Relatus.ECS
         public int ComponentCapacity { get; private set; }
         public int EntityCapacity { get; private set; }
 
-        private readonly Stack<Tuple<int, IComponent[]>> componentAddition;
-        private readonly Stack<Tuple<int, Type[]>> componentSubtraction;
+        private readonly Queue<Tuple<int, IComponent[]>> componentAddition;
+        private readonly Queue<Tuple<int, Type[]>> componentSubtraction;
         private readonly SparseSet entityRemovalQueue;
 
         /// <summary>
@@ -27,8 +27,8 @@ namespace Relatus.ECS
             ComponentCapacity = componentCapacity;
             SystemCapacity = systemCapacity;
 
-            componentAddition = new Stack<Tuple<int, IComponent[]>>(EntityCapacity);
-            componentSubtraction = new Stack<Tuple<int, Type[]>>(EntityCapacity);
+            componentAddition = new Queue<Tuple<int, IComponent[]>>(EntityCapacity);
+            componentSubtraction = new Queue<Tuple<int, Type[]>>(EntityCapacity);
             entityRemovalQueue = new SparseSet((uint)EntityCapacity);
 
             // System Setup
@@ -87,7 +87,7 @@ namespace Relatus.ECS
         public int CreateEntity(params IComponent[] components)
         {
             int entity = AllocateEntity();
-            componentAddition.Push(new Tuple<int, IComponent[]>(entity, components));
+            componentAddition.Enqueue(new Tuple<int, IComponent[]>(entity, components));
 
             return entity;
         }
@@ -110,7 +110,7 @@ namespace Relatus.ECS
         /// <param name="components">The collection of <see cref="IComponent"/> data that will be added.</param>
         public MorroFactory AddComponents(int entity, params IComponent[] components)
         {
-            componentAddition.Push(new Tuple<int, IComponent[]>(entity, components));
+            componentAddition.Enqueue(new Tuple<int, IComponent[]>(entity, components));
 
             return this;
         }
@@ -122,7 +122,7 @@ namespace Relatus.ECS
         /// <param name="componentTypes">The collection of <see cref="IComponent"/> types that will be removed.</param>
         public MorroFactory RemoveComponents(int entity, params Type[] componentTypes)
         {
-            componentSubtraction.Push(new Tuple<int, Type[]>(entity, componentTypes));
+            componentSubtraction.Enqueue(new Tuple<int, Type[]>(entity, componentTypes));
 
             return this;
         }
@@ -136,14 +136,14 @@ namespace Relatus.ECS
             // Handles removing components from entities.
             while (componentSubtraction.Count > 0)
             {
-                Tuple<int, Type[]> modification = componentSubtraction.Pop();
+                Tuple<int, Type[]> modification = componentSubtraction.Dequeue();
                 RemoveComponent(modification.Item1, modification.Item2);
             }
 
             // Handles adding components to entities.
             while (componentAddition.Count > 0)
             {
-                Tuple<int, IComponent[]> modification = componentAddition.Pop();
+                Tuple<int, IComponent[]> modification = componentAddition.Dequeue();
                 AddComponent(modification.Item1, modification.Item2);
             }
 
