@@ -14,6 +14,7 @@ namespace Relatus.ECS
         private readonly Queue<Tuple<int, IComponent[]>> componentAddition;
         private readonly Queue<Tuple<int, Type[]>> componentSubtraction;
         private readonly SparseSet entityRemovalQueue;
+        private bool dataModified;
 
         /// <summary>
         /// Creates a factory that provides ECS funcitonality.
@@ -88,6 +89,7 @@ namespace Relatus.ECS
         {
             int entity = AllocateEntity();
             componentAddition.Enqueue(new Tuple<int, IComponent[]>(entity, components));
+            dataModified = true;
 
             return entity;
         }
@@ -99,6 +101,7 @@ namespace Relatus.ECS
         public MorroFactory RemoveEntity(int entity)
         {
             entityRemovalQueue.Add((uint)entity);
+            dataModified = true;
 
             return this;
         }
@@ -111,6 +114,7 @@ namespace Relatus.ECS
         public MorroFactory AddComponents(int entity, params IComponent[] components)
         {
             componentAddition.Enqueue(new Tuple<int, IComponent[]>(entity, components));
+            dataModified = true;
 
             return this;
         }
@@ -123,6 +127,7 @@ namespace Relatus.ECS
         public MorroFactory RemoveComponents(int entity, params Type[] componentTypes)
         {
             componentSubtraction.Enqueue(new Tuple<int, Type[]>(entity, componentTypes));
+            dataModified = true;
 
             return this;
         }
@@ -133,6 +138,9 @@ namespace Relatus.ECS
         /// </summary>
         public MorroFactory ApplyChanges()
         {
+            if (!dataModified)
+                return this;
+
             // Handles removing components from entities.
             while (componentSubtraction.Count > 0)
             {
@@ -160,6 +168,8 @@ namespace Relatus.ECS
             // Update all systems with the new entity data.
             UpdateSystems();
 
+            dataModified = false;
+
             return this;
         }
 
@@ -168,6 +178,9 @@ namespace Relatus.ECS
         /// </summary>
         public MorroFactory RunUpdateableSystems(params SystemGroup[] groups)
         {
+            if (dataModified)
+                throw new RelatusException("The Factory's data was modified, but ApplyChanges() was never called.", new MethodExpectedException());
+
             for (int i = 0; i < groups.Length; i++)
             {
                 groups[i].RunUpdateableSystems();
@@ -181,6 +194,9 @@ namespace Relatus.ECS
         /// </summary>
         public MorroFactory RunDrawableSystems(Camera camera, params SystemGroup[] groups)
         {
+            if (dataModified)
+                throw new RelatusException("The Factory's data was modified, but ApplyChanges() was never called.", new MethodExpectedException());
+
             for (int i = 0; i < groups.Length; i++)
             {
                 groups[i].RunDrawableSystems(camera);
