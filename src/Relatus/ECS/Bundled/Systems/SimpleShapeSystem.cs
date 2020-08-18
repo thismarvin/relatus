@@ -63,7 +63,7 @@ namespace Relatus.ECS.Bundled
             throw new RelatusException("SimpleShapeSystem was not designed to run using a fixed update.", new NotSupportedException());
         }
 
-        public override void UpdateEntity(int entity)
+        public override void UpdateEntity(uint entity)
         {
             CPosition position = (CPosition)positions[entity];
             CDimension dimension = (CDimension)dimensions[entity];
@@ -74,7 +74,7 @@ namespace Relatus.ECS.Bundled
             colorData[entity] = new VertexColor(color.Color);
         }
 
-        public override void DrawEntity(int entity, Camera camera)
+        public override void DrawEntity(uint entity, Camera camera)
         {
             throw new NotImplementedException();
         }
@@ -141,14 +141,14 @@ namespace Relatus.ECS.Bundled
 
             if (renderOptions.Effect == null)
             {
-                graphicsDevice.DrawInstancedPrimitives(PrimitiveType.TriangleList, 0, 0, geometry.TotalTriangles, factory.EntityCapacity);
+                graphicsDevice.DrawInstancedPrimitives(PrimitiveType.TriangleList, 0, 0, geometry.TotalTriangles, (int)factory.EntityCapacity);
             }
             else
             {
                 foreach (EffectPass pass in renderOptions.Effect.CurrentTechnique.Passes)
                 {
                     pass.Apply();
-                    graphicsDevice.DrawInstancedPrimitives(PrimitiveType.TriangleList, 0, 0, geometry.TotalTriangles, factory.EntityCapacity);
+                    graphicsDevice.DrawInstancedPrimitives(PrimitiveType.TriangleList, 0, 0, geometry.TotalTriangles, (int)factory.EntityCapacity);
                 }
             }
         }

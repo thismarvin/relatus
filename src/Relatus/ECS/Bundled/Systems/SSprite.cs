@@ -34,7 +34,7 @@ namespace Relatus.ECS.Bundled
         //    throw new RelatusException("SSprite was not designed to run using a fixed update.", new NotSupportedException());
         //}
 
-        public override void DrawEntity(int entity, Camera camera)
+        public override void DrawEntity(uint entity, Camera camera)
         {
             throw new NotImplementedException();
         }

@@ -26,7 +26,7 @@ namespace Relatus.ECS.Bundled
             return partitioner.Query(new RectangleF(bounds.X - buffer, bounds.Y + buffer, bounds.Width + buffer * 2, bounds.Height + buffer * 2));
         }
 
-        public override void UpdateEntity(int entity)
+        public override void UpdateEntity(uint entity)
         {
             CPosition position = (CPosition)positions[entity];
             CDimension dimension = (CDimension)dimensions[entity];
@@ -49,9 +49,9 @@ namespace Relatus.ECS.Bundled
             public int Identifier { get; set; }
             public RectangleF Span { get; set; }
 
-            public PartitionerEntry(int entity, CPosition position, CDimension dimension)
+            public PartitionerEntry(uint entity, CPosition position, CDimension dimension)
             {
-                Identifier = entity;
+                Identifier = (int)entity;
                 Span = new RectangleF(position.X, position.Y, dimension.Width, dimension.Height);
             }
         }

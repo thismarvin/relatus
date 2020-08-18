@@ -16,13 +16,13 @@ namespace Relatus.ECS
 
         // The following properties need to be internal for the UpdateHandlers to work.
         // This probably isn't the best design, but it works for now!
-        protected internal HashSet<int> Entities { get; private set; }
-        protected internal int[] EntitiesAsArray { get; private set; }
+        protected internal HashSet<uint> Entities { get; private set; }
+        protected internal uint[] EntitiesAsArray { get; private set; }
 
         protected MorroFactory factory;
 
-        private readonly Queue<int> entityRemoval;
-        private readonly Queue<int> entityAddition;
+        private readonly Queue<uint> entityRemoval;
+        private readonly Queue<uint> entityAddition;
         private bool entityDataChanged;
 
         public MorroSystem(MorroFactory factory)
@@ -32,10 +32,10 @@ namespace Relatus.ECS
             RequiredComponents = new HashSet<Type>();
             BlacklistedComponents = new HashSet<Type>();
             Subscriptions = new HashSet<Type>();
-            Entities = new HashSet<int>();
-            EntitiesAsArray = new int[factory.EntityCapacity];
-            entityRemoval = new Queue<int>(factory.EntityCapacity);
-            entityAddition = new Queue<int>(factory.EntityCapacity);
+            Entities = new HashSet<uint>();
+            EntitiesAsArray = new uint[factory.EntityCapacity];
+            entityRemoval = new Queue<uint>((int)factory.EntityCapacity);
+            entityAddition = new Queue<uint>((int)factory.EntityCapacity);
 
             Enabled = true;
         }
@@ -82,13 +82,13 @@ namespace Relatus.ECS
             }
         }
 
-        internal void AddEntity(int entity)
+        internal void AddEntity(uint entity)
         {
             entityAddition.Enqueue(entity);
             entityDataChanged = true;
         }
 
-        internal void RemoveEntity(int entity)
+        internal void RemoveEntity(uint entity)
         {
             entityRemoval.Enqueue(entity);
             entityDataChanged = true;
@@ -97,7 +97,7 @@ namespace Relatus.ECS
         internal void ClearEntities()
         {
             Entities.Clear();
-            EntitiesAsArray = new int[factory.EntityCapacity];
+            EntitiesAsArray = new uint[factory.EntityCapacity];
         }
 
         internal void ApplyChanges()
@@ -107,7 +107,7 @@ namespace Relatus.ECS
 
             while (entityRemoval.Count > 0)
             {
-                int entity = entityRemoval.Dequeue();
+                uint entity = entityRemoval.Dequeue();
 
                 if (!Entities.Contains(entity))
                     continue;
@@ -121,7 +121,7 @@ namespace Relatus.ECS
             }
 
             int entityIndex = 0;
-            foreach (int entity in Entities)
+            foreach (uint entity in Entities)
             {
                 EntitiesAsArray[entityIndex++] = entity;
             }

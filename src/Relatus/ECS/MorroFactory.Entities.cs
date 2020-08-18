@@ -7,19 +7,19 @@ namespace Relatus.ECS
 {
     public partial class MorroFactory
     {
-        public int EntityCount => totalEntitiesCreated - vacancies.Count;
+        public int EntityCount => (int)totalEntitiesCreated - vacancies.Count;
 
         private readonly SparseSet[] attachedComponents;
         private readonly SparseSet[] attachedSystems;
-        private readonly Queue<int> vacancies;
-        private int nextEntity;
-        private int totalEntitiesCreated;
+        private readonly Queue<uint> vacancies;
+        private uint nextEntity;
+        private uint totalEntitiesCreated;
 
         /// <summary>
         /// Clears an entity of all attached components and systems.
         /// </summary>
         /// <param name="entity">The target entity to clear.</param>
-        public void ClearEntity(int entity)
+        public void ClearEntity(uint entity)
         {
             if (attachedComponents[entity].Count == 0 && attachedSystems[entity].Count == 0)
                 return;
@@ -46,17 +46,22 @@ namespace Relatus.ECS
         /// <param name="entity">The entity that will be checked.</param>
         /// <param name="components">The set of <see cref="IComponent"/> types that will be checked for.</param>
         /// <returns>Whether or not a given entity contains a given collection of <see cref="IComponent"/> types.</returns>
-        public bool EntityContains(int entity, HashSet<Type> components)
+        public bool EntityContains(uint entity, HashSet<Type> components)
         {
             if (components.Count == 0)
                 return false;
 
             foreach (Type component in components)
             {
-                int componentID = GetComponentID(component);
-
-                if (componentID == -1 || !attachedComponents[entity].Contains((uint)componentID))
+                if (TryGetComponentID(component, out uint id))
+                {
+                    if (!attachedComponents[entity].Contains(id))
+                        return false;
+                }
+                else
+                {
                     return false;
+                }
             }
 
             return true;
@@ -68,17 +73,22 @@ namespace Relatus.ECS
         /// <param name="entity">The entity that will be checked.</param>
         /// <param name="components">The collection of <see cref="IComponent"/> types that will be checked for.</param>
         /// <returns>Whether or not a given entity contains a given collection of <see cref="IComponent"/> types.</returns>
-        public bool EntityContains(int entity, params Type[] components)
+        public bool EntityContains(uint entity, params Type[] components)
         {
             if (components.Length == 0)
                 return false;
 
             for (int i = 0; i < components.Length; i++)
             {
-                int componentID = GetComponentID(components[i]);
-
-                if (componentID == -1 || !attachedComponents[entity].Contains((uint)componentID))
+                if (TryGetComponentID(components[i].GetType(), out uint id))
+                {
+                    if (!attachedComponents[entity].Contains(id))
+                        return false;
+                }
+                else
+                {
                     return false;
+                }
             }
 
             return true;
@@ -88,9 +98,9 @@ namespace Relatus.ECS
         /// Returns the next available entity.
         /// </summary>
         /// <returns>The next available entity.</returns>
-        private int AllocateEntity()
+        private uint AllocateEntity()
         {
-            int entity = nextEntity;
+            uint entity = nextEntity;
 
             if (vacancies.Count > 0)
             {
@@ -108,7 +118,7 @@ namespace Relatus.ECS
             return entity;
         }
 
-        private void AddComponent(int entity, params IComponent[] components)
+        private void AddComponent(uint entity, params IComponent[] components)
         {
             RegisterComponent(components);
 
@@ -116,43 +126,39 @@ namespace Relatus.ECS
             AssignSystems(entity);
         }
 
-        private void RemoveComponent(int entity, params Type[] componentTypes)
+        private void RemoveComponent(uint entity, params Type[] componentTypes)
         {
             for (int i = 0; i < componentTypes.Length; i++)
             {
-                int componentID = GetComponentID(componentTypes[i]);
-
-                if (componentID == -1)
-                    continue;
-
-                componentData[componentID][entity] = null;
-                attachedComponents[entity].Remove((uint)componentID);
-
-                foreach (uint j in attachedSystems[entity])
+                if (TryGetComponentID(componentTypes[i], out uint id))
                 {
-                    if (systems[j].RequiredComponents.Contains(componentTypes[i]))
+                    componentData[id][entity] = null;
+                    attachedComponents[entity].Remove(id);
+
+                    foreach (uint j in attachedSystems[entity])
                     {
-                        systems[j].RemoveEntity(entity);
+                        if (systems[j].RequiredComponents.Contains(componentTypes[i]))
+                        {
+                            systems[j].RemoveEntity(entity);
+                        }
                     }
                 }
             }
         }
 
-        private void AssignComponents(int entity, params IComponent[] components)
+        private void AssignComponents(uint entity, params IComponent[] components)
         {
             for (int i = 0; i < components.Length; i++)
             {
-                int componentID = GetComponentID(components[i]);
-
-                if (componentID == -1)
-                    continue;
-
-                componentData[componentID][entity] = components[i];
-                attachedComponents[entity].Add((uint)componentID);
+                if (TryGetComponentID(components[i].GetType(), out uint id))
+                {
+                    componentData[id][entity] = components[i];
+                    attachedComponents[entity].Add(id);
+                }
             }
         }
 
-        private void AssignSystems(int entity)
+        private void AssignSystems(uint entity)
         {
             for (int i = 0; i < systemIndex; i++)
             {

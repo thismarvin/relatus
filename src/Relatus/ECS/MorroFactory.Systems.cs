@@ -6,9 +6,9 @@ namespace Relatus.ECS
 {
     public partial class MorroFactory
     {
-        private readonly Dictionary<Type, int> systemLookup;
+        private readonly Dictionary<Type, uint> systemLookup;
         private readonly MorroSystem[] systems;
-        private int systemIndex;
+        private uint systemIndex;
 
         /// <summary>
         /// Returns a <see cref="MorroSystem"/> of a given type.

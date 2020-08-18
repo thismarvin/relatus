@@ -34,7 +34,7 @@ namespace Relatus.ECS.Bundled
             throw new RelatusException("SPhysics is not compatible with the default fixed update functionality (it implements its own).", new NotSupportedException());
         }
 
-        public override void UpdateEntity(int entity)
+        public override void UpdateEntity(uint entity)
         {
             Simulate(entity);
         }
@@ -47,7 +47,7 @@ namespace Relatus.ECS.Bundled
             base.Update();
         }
 
-        private void Simulate(int entity)
+        private void Simulate(uint entity)
         {
             CPosition position = (CPosition)positions[entity];
             CKinetic kinetic = (CKinetic)kinetics[entity];

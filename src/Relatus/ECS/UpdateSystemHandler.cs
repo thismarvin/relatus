@@ -33,13 +33,13 @@ namespace Relatus.ECS
         }
 
         private readonly MorroSystem parent;
-        private readonly Action<int> onUpdate;
+        private readonly Action<uint> onUpdate;
 
         private uint totalTasks;
         private float threshold;
         private float accumulator;
 
-        public UpdateSystemHandler(MorroSystem parent, Action<int> onUpdate)
+        public UpdateSystemHandler(MorroSystem parent, Action<uint> onUpdate)
         {
             this.parent = parent;
             this.onUpdate = onUpdate;
@@ -86,7 +86,7 @@ namespace Relatus.ECS
 
         private void NormalUpdate()
         {
-            int[] entities = parent.EntitiesAsArray;
+            uint[] entities = parent.EntitiesAsArray;
             for (int i = 0; i < parent.Entities.Count; i++)
             {
                 onUpdate(entities[i]);
@@ -95,7 +95,7 @@ namespace Relatus.ECS
 
         private void ParallelUpdate()
         {
-            int[] entities = parent.EntitiesAsArray;
+            uint[] entities = parent.EntitiesAsArray;
             Task.WaitAll(DivideUpdateIntoTasks(TotalTasks));
 
             Task[] DivideUpdateIntoTasks(uint totalTasks)

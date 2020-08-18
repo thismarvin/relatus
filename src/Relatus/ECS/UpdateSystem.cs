@@ -58,6 +58,6 @@ namespace Relatus.ECS
             updateSystemHandler.Update();
         }
 
-        public abstract void UpdateEntity(int entity);
+        public abstract void UpdateEntity(uint entity);
     }
 }
