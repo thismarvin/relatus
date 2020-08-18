@@ -20,16 +20,19 @@ namespace Relatus.Graphics
         public DrawCollection<T> SetCollection(T[] entries)
         {
             int totalGroups = (int)Math.Ceiling((float)entries.Length / maximumGroupCapacity);
-            groups = new DrawGroup<T>[totalGroups];
             int groupIndex = -1;
             int remaining = entries.Length;
 
-            int capacity;
+            groups = new DrawGroup<T>[totalGroups];
+
             for (int i = 0; i < entries.Length; i++)
             {
+                if (entries[i] == null)
+                    continue;
+
                 if (groupIndex == -1 || !groups[groupIndex].Add(entries[i]))
                 {
-                    capacity = remaining / maximumGroupCapacity > 0 ? maximumGroupCapacity : remaining % maximumGroupCapacity;
+                    int capacity = remaining / maximumGroupCapacity > 0 ? maximumGroupCapacity : remaining % maximumGroupCapacity;
                     remaining -= maximumGroupCapacity;
 
                     groupIndex++;

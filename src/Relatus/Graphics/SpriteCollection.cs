@@ -4,13 +4,13 @@ namespace Relatus.Graphics
 {
     public class SpriteCollection : DrawCollection<BetterSprite>, IDisposable
     {
-        public SpriteCollection() : base(1000)
+        public SpriteCollection() : base(short.MaxValue / 6)
         {
         }
 
         protected override DrawGroup<BetterSprite> CreateDrawGroup(BetterSprite currentEntry, int capacity)
         {
-            return new SpriteGroup(currentEntry.RenderOptions, capacity);
+            return new SpriteGroup(currentEntry.RenderOptions, currentEntry.Texture, capacity);
         }
 
         #region IDisposable Support
@@ -22,7 +22,13 @@ namespace Relatus.Graphics
             {
                 if (disposing)
                 {
-                    // TODO: dispose managed state (managed objects)
+                    for (int i = 0; i < groups.Length; i++)
+                    {
+                        if (groups[i] is IDisposable disposable)
+                        {
+                            disposable.Dispose();
+                        }
+                    }
                 }
 
                 // TODO: free unmanaged resources (unmanaged objects) and override finalizer

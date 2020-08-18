@@ -26,7 +26,10 @@ namespace Relatus.Graphics
                 {
                     for (int i = 0; i < groups.Length; i++)
                     {
-                        ((IDisposable)groups[i]).Dispose();
+                        if (groups[i] is IDisposable disposable)
+                        {
+                            disposable.Dispose();
+                        }
                     }
                 }
 

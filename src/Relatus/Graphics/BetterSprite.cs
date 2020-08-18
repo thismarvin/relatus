@@ -270,45 +270,9 @@ namespace Relatus.Graphics
 
             if (textureChanged)
             {
-                Vector2 topLeft = new Vector2((float)MathExt.RemapRange(sampleRegion.X, 0, texture.Width, 0, 1), (float)MathExt.RemapRange(sampleRegion.Y, 0, texture.Height, 0, 1));
-                Vector2 topRight = topLeft + new Vector2(texelWidth * sampleRegion.Width, 0);
-                Vector2 bottomRight = topLeft + new Vector2(texelWidth * sampleRegion.Width, texelHeight * sampleRegion.Height);
-                Vector2 bottomLeft = topLeft + new Vector2(0, texelHeight * sampleRegion.Height);
-
-                Vector2[] corners = new Vector2[] { topLeft, bottomLeft, bottomRight, topRight };
-
                 textureBuffer?.Dispose();
                 textureBuffer = new DynamicVertexBuffer(graphicsDevice, typeof(VertexTexture), 4, BufferUsage.WriteOnly);
-
-                if ((spriteMirroring & SpriteMirroringType.FlipHorizontally) != SpriteMirroringType.None)
-                {
-                    Vector2 temp = corners[0];
-                    corners[0] = corners[3];
-                    corners[3] = temp;
-
-                    temp = corners[1];
-                    corners[1] = corners[2];
-                    corners[2] = temp;
-                }
-
-                if ((spriteMirroring & SpriteMirroringType.FlipVertically) != SpriteMirroringType.None)
-                {
-                    Vector2 temp = corners[0];
-                    corners[0] = corners[1];
-                    corners[1] = temp;
-
-                    temp = corners[3];
-                    corners[3] = corners[2];
-                    corners[2] = temp;
-                }
-
-                textureBuffer.SetData(new VertexTexture[]
-                {
-                    new VertexTexture(corners[0]),
-                    new VertexTexture(corners[1]),
-                    new VertexTexture(corners[2]),
-                    new VertexTexture(corners[3])
-                });
+                textureBuffer.SetData(GetTextureCoords());
             }
 
             if (modelChanged)
@@ -322,7 +286,7 @@ namespace Relatus.Graphics
             {
                 colorBuffer?.Dispose();
                 colorBuffer = new DynamicVertexBuffer(graphicsDevice, typeof(VertexColor), 1, BufferUsage.WriteOnly);
-                colorBuffer.SetData(new VertexColor[] { new VertexColor(tint) });
+                colorBuffer.SetData(new VertexColor[] { GetVertexColor() });
             }
 
             vertexBufferBindings = new VertexBufferBinding[]
@@ -356,6 +320,51 @@ namespace Relatus.Graphics
             Vector3 scale = new Vector3(Width * this.scale.X, Height * this.scale.Y, this.scale.Z);
 
             return new VertexTransform(translation, scale, origin, rotation);
+        }
+
+        internal VertexColor GetVertexColor()
+        {
+            return new VertexColor(tint);
+        }
+
+        internal VertexTexture[] GetTextureCoords()
+        {
+            Vector2 topLeft = new Vector2((float)MathExt.RemapRange(sampleRegion.X, 0, texture.Width, 0, 1), (float)MathExt.RemapRange(sampleRegion.Y, 0, texture.Height, 0, 1));
+            Vector2 topRight = topLeft + new Vector2(texelWidth * sampleRegion.Width, 0);
+            Vector2 bottomRight = topLeft + new Vector2(texelWidth * sampleRegion.Width, texelHeight * sampleRegion.Height);
+            Vector2 bottomLeft = topLeft + new Vector2(0, texelHeight * sampleRegion.Height);
+
+            Vector2[] corners = new Vector2[] { topLeft, bottomLeft, bottomRight, topRight };
+
+            if ((spriteMirroring & SpriteMirroringType.FlipHorizontally) != SpriteMirroringType.None)
+            {
+                Vector2 temp = corners[0];
+                corners[0] = corners[3];
+                corners[3] = temp;
+
+                temp = corners[1];
+                corners[1] = corners[2];
+                corners[2] = temp;
+            }
+
+            if ((spriteMirroring & SpriteMirroringType.FlipVertically) != SpriteMirroringType.None)
+            {
+                Vector2 temp = corners[0];
+                corners[0] = corners[1];
+                corners[1] = temp;
+
+                temp = corners[3];
+                corners[3] = corners[2];
+                corners[2] = temp;
+            }
+
+            return new VertexTexture[]
+            {
+                new VertexTexture(corners[0]),
+                new VertexTexture(corners[1]),
+                new VertexTexture(corners[2]),
+                new VertexTexture(corners[3])
+            };
         }
 
         public virtual void Draw(Camera camera)

@@ -33,7 +33,7 @@ namespace Relatus.Graphics
         {
             this.sharedGeometry = sharedGeometry;
             this.sharedRenderOptions = sharedRenderOptions;
-            
+
             transforms = new VertexTransform[capacity];
             colors = new VertexColor[capacity];
             group = null;
@@ -123,6 +123,7 @@ namespace Relatus.Graphics
                 if (disposing)
                 {
                     transformBuffer.Dispose();
+                    colorBuffer.Dispose();
                 }
 
                 // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
