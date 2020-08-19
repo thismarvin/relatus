@@ -18,12 +18,16 @@ namespace Relatus.Graphics
         private static bool disableRelay;
         private static bool preventFumbledRelay;
 
+        public static SpriteBatcher SpriteBatcher { get; private set; }
+
         static Sketch()
         {
             graphicsDevice = Engine.Graphics.GraphicsDevice;
             spriteBatch = GraphicsManager.SpriteBatch;
 
             shaders = new Queue<Effect>();
+
+            SpriteBatcher = new SpriteBatcher();
         }
 
         /// <summary>

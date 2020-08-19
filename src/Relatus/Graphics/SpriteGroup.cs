@@ -1,11 +1,19 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace Relatus.Graphics
 {
-    public class SpriteGroup : DrawGroup<BetterSprite>, IDisposable
+    internal class SpriteGroup : IDisposable
     {
+        public const uint MaxBatchSize = short.MaxValue / 6;
+
+        public bool InstancingEnabled { get; set; }
+
+        private readonly uint batchSize;
+
         private readonly RenderOptions sharedRenderOptions;
         private readonly Texture2D sharedTexture;
 
@@ -13,8 +21,8 @@ namespace Relatus.Graphics
         private readonly VertexTransform[] transforms;
         private readonly VertexColor[] colors;
         private readonly VertexTexture[] textureCoords;
-        private bool dataChanged;
-        
+        private bool dataModified;
+
         private readonly short[] indices;
         private readonly IndexBuffer indexBuffer;
 
@@ -24,7 +32,9 @@ namespace Relatus.Graphics
         private DynamicVertexBuffer textureCoordBuffer;
         private VertexBufferBinding[] vertexBufferBindings;
 
-        private int totalPrimitives;
+        private uint index;
+        private uint count;
+        private uint totalPrimitives;
 
         private static readonly GraphicsDevice graphicsDevice;
         private static readonly VertexPosition[] sharedGeometry;
@@ -46,18 +56,22 @@ namespace Relatus.Graphics
             };
         }
 
-        public SpriteGroup(RenderOptions sharedRenderOptions, Texture2D sharedTexture, int capacity) : base(capacity)
+        public SpriteGroup(uint batchSize, Texture2D sharedTexture, RenderOptions sharedRenderOptions)
         {
-            this.sharedRenderOptions = sharedRenderOptions;
+            if (batchSize > MaxBatchSize)
+                throw new RelatusException($"SpriteGroup does not support support a batch size greater than {MaxBatchSize}.", new ArgumentOutOfRangeException());
+
+            this.batchSize = batchSize;
             this.sharedTexture = sharedTexture;
+            this.sharedRenderOptions = sharedRenderOptions;
 
-            vertexPositions = new VertexPosition[capacity * 4];
-            transforms = new VertexTransform[capacity * 4];
-            colors = new VertexColor[capacity * 4];
-            textureCoords = new VertexTexture[capacity * 4];
+            vertexPositions = new VertexPosition[batchSize * 4];
+            transforms = new VertexTransform[batchSize * 4];
+            colors = new VertexColor[batchSize * 4];
+            textureCoords = new VertexTexture[batchSize * 4];
 
-            indices = new short[capacity * 6];
-            for (int i = 0; i < capacity; i++)
+            indices = new short[batchSize * 6];
+            for (int i = 0; i < batchSize; i++)
             {
                 int start = 6 * i;
                 int buffer = 4 * i;
@@ -68,78 +82,84 @@ namespace Relatus.Graphics
                 indices[start + 4] = (short)(buffer + 2);
                 indices[start + 5] = (short)(buffer + 3);
             }
-            
+
             indexBuffer = new IndexBuffer(graphicsDevice, typeof(short), indices.Length, BufferUsage.WriteOnly);
             indexBuffer.SetData(indices);
         }
 
-        protected override bool ConditionToAdd(BetterSprite entry)
+        public bool Add(BetterSprite sprite)
         {
-            if (entry == null)
+            if (count >= batchSize)
                 return false;
 
-            return entry.RenderOptions.Equals(sharedRenderOptions) && entry.Texture == sharedTexture;
+            if (!sprite.Texture.Equals(sharedTexture) || !sprite.RenderOptions.Equals(sharedRenderOptions))
+                return false;
+
+            VertexTransform transform = sprite.GetVertexTransform();
+            VertexColor color = sprite.GetVertexColor();
+            VertexTexture[] textureCoords = sprite.GetTextureCoords();
+
+            vertexPositions[index + 0] = sharedGeometry[0];
+            vertexPositions[index + 1] = sharedGeometry[1];
+            vertexPositions[index + 2] = sharedGeometry[2];
+            vertexPositions[index + 3] = sharedGeometry[3];
+
+            transforms[index + 0] = transform;
+            transforms[index + 1] = transform;
+            transforms[index + 2] = transform;
+            transforms[index + 3] = transform;
+
+            colors[index + 0] = color;
+            colors[index + 1] = color;
+            colors[index + 2] = color;
+            colors[index + 3] = color;
+
+            this.textureCoords[index + 0] = textureCoords[0];
+            this.textureCoords[index + 1] = textureCoords[1];
+            this.textureCoords[index + 2] = textureCoords[2];
+            this.textureCoords[index + 3] = textureCoords[3];
+
+            dataModified = true;
+
+            index += 4;
+            count++;
+            totalPrimitives += 2;
+
+            return true;
         }
 
-        public override bool Add(BetterSprite entry)
+        public SpriteGroup AddRange(IEnumerable<BetterSprite> sprites)
         {
-            if (totalPrimitives >= capacity)
-                return false;
-
-            if (ConditionToAdd(entry))
+            foreach (BetterSprite sprite in sprites)
             {
-                VertexTransform transform = entry.GetVertexTransform();
-                VertexColor color = entry.GetVertexColor();
-                VertexTexture[] textureCoords = entry.GetTextureCoords();
-
-                vertexPositions[groupIndex + 0] = sharedGeometry[0]; 
-                vertexPositions[groupIndex + 1] = sharedGeometry[1]; 
-                vertexPositions[groupIndex + 2] = sharedGeometry[2];
-                vertexPositions[groupIndex + 3] = sharedGeometry[3]; 
-
-                transforms[groupIndex + 0] = transform;
-                transforms[groupIndex + 1] = transform;
-                transforms[groupIndex + 2] = transform;
-                transforms[groupIndex + 3] = transform;
-
-                colors[groupIndex + 0] = color;
-                colors[groupIndex + 1] = color;
-                colors[groupIndex + 2] = color;
-                colors[groupIndex + 3] = color;
-
-                this.textureCoords[groupIndex + 0] = textureCoords[0];
-                this.textureCoords[groupIndex + 1] = textureCoords[1];
-                this.textureCoords[groupIndex + 2] = textureCoords[2];
-                this.textureCoords[groupIndex + 3] = textureCoords[3];
-
-                groupIndex += 4;
-                dataChanged = true;
-
-                totalPrimitives++;
-
-                return true;
+                Add(sprite);
             }
 
-            return false;
+            return this;
         }
 
-        private void UpdateBuffer()
+        public SpriteGroup ApplyChanges()
         {
+            if (!dataModified)
+                return this;
+
+            int vertexCount = (int)count * 4;
+
             vertexPositionBuffer?.Dispose();
-            vertexPositionBuffer = new DynamicVertexBuffer(graphicsDevice, typeof(VertexPosition), vertexPositions.Length, BufferUsage.WriteOnly);
-            vertexPositionBuffer.SetData(vertexPositions);
+            vertexPositionBuffer = new DynamicVertexBuffer(graphicsDevice, typeof(VertexPosition), vertexCount, BufferUsage.WriteOnly);
+            vertexPositionBuffer.SetData(vertexPositions, 0, vertexCount);
 
             transformBuffer?.Dispose();
-            transformBuffer = new DynamicVertexBuffer(graphicsDevice, typeof(VertexTransform), transforms.Length, BufferUsage.WriteOnly);
-            transformBuffer.SetData(transforms);
+            transformBuffer = new DynamicVertexBuffer(graphicsDevice, typeof(VertexTransform), vertexCount, BufferUsage.WriteOnly);
+            transformBuffer.SetData(transforms, 0, vertexCount);
 
             colorBuffer?.Dispose();
-            colorBuffer = new DynamicVertexBuffer(graphicsDevice, typeof(VertexColor), colors.Length, BufferUsage.WriteOnly);
-            colorBuffer.SetData(colors);
+            colorBuffer = new DynamicVertexBuffer(graphicsDevice, typeof(VertexColor), vertexCount, BufferUsage.WriteOnly);
+            colorBuffer.SetData(colors, 0, vertexCount);
 
             textureCoordBuffer?.Dispose();
-            textureCoordBuffer = new DynamicVertexBuffer(graphicsDevice, typeof(VertexTexture), textureCoords.Length, BufferUsage.WriteOnly);
-            textureCoordBuffer.SetData(textureCoords);
+            textureCoordBuffer = new DynamicVertexBuffer(graphicsDevice, typeof(VertexTexture), vertexCount, BufferUsage.WriteOnly);
+            textureCoordBuffer.SetData(textureCoords, 0, vertexCount);
 
             vertexBufferBindings = new VertexBufferBinding[]
             {
@@ -148,15 +168,16 @@ namespace Relatus.Graphics
                 new VertexBufferBinding(colorBuffer),
                 new VertexBufferBinding(textureCoordBuffer)
             };
+
+            dataModified = false;
+
+            return this;
         }
 
-        public override void Draw(Camera camera)
+        public void Draw(Camera camera)
         {
-            if (dataChanged)
-            {
-                UpdateBuffer();
-                dataChanged = false;
-            }
+            if (dataModified)
+                throw new RelatusException("The sprite group was modified, but ApplyChanges() was never called.", new MethodExpectedException());
 
             graphicsDevice.RasterizerState = GraphicsManager.RasterizerState;
             graphicsDevice.SamplerStates[0] = sharedRenderOptions.SamplerState;
@@ -173,7 +194,7 @@ namespace Relatus.Graphics
             if (sharedRenderOptions.Effect == null)
             {
                 graphicsDevice.Textures[0] = sharedTexture;
-                graphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, totalPrimitives * 2);
+                graphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, (int)totalPrimitives);
             }
             else
             {
@@ -181,14 +202,13 @@ namespace Relatus.Graphics
                 {
                     pass.Apply();
                     graphicsDevice.Textures[0] = sharedTexture;
-                    graphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, totalPrimitives * 2);
+                    graphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, (int)totalPrimitives);
                 }
             }
         }
 
         #region IDisposable Support
         private bool disposedValue;
-
         protected virtual void Dispose(bool disposing)
         {
             if (!disposedValue)
@@ -199,6 +219,7 @@ namespace Relatus.Graphics
                     transformBuffer.Dispose();
                     colorBuffer.Dispose();
                     textureCoordBuffer.Dispose();
+                    indexBuffer.Dispose();
                 }
 
                 // TODO: free unmanaged resources (unmanaged objects) and override finalizer
@@ -208,7 +229,7 @@ namespace Relatus.Graphics
         }
 
         // // TODO: override finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources
-        // ~SpriteGroup()
+        // ~BetterSpriteGroup()
         // {
         //     // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
         //     Dispose(disposing: false);
