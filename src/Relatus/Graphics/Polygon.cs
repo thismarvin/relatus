@@ -27,12 +27,12 @@ namespace Relatus.Graphics
         public float Width
         {
             get => width;
-            set => SetWidth(value);
+            set => SetDimensions(value, height);
         }
         public float Height
         {
             get => height;
-            set => SetHeight(value);
+            set => SetDimensions(width, value);
         }
         public Color Color
         {
@@ -170,18 +170,9 @@ namespace Relatus.Graphics
             return this;
         }
 
-        public virtual Polygon SetWidth(float width)
+        public virtual Polygon SetDimensions(float width, float height)
         {
             this.width = width;
-
-            modelChanged = true;
-            transformNeedsUpdating = true;
-
-            return this;
-        }
-
-        public virtual Polygon SetHeight(float height)
-        {
             this.height = height;
 
             modelChanged = true;
