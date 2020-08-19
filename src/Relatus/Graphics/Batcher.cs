@@ -10,13 +10,28 @@ namespace Relatus.Graphics
         /// Creates a temporary <see cref="PolygonCollection"/> that batches and draws a given array of polygons.
         /// </summary>
         /// <param name="polygons">The array of polygons that will be batched and drawn together.</param>
-        /// <param name="camera">The camera used to draw the sprites.</param>
+        /// <param name="camera">The camera used to draw the polygons.</param>
         public static void DrawPolygons(Polygon[] polygons, Camera camera)
         {
             using (PolygonCollection polygonCollection = new PolygonCollection())
             {
                 polygonCollection
                     .SetCollection(polygons)
+                    .Draw(camera);
+            }
+        }
+
+        /// <summary>
+        /// Creates a temporary <see cref="SpriteCollection"/> that batches and draws a given array of sprites.
+        /// </summary>
+        /// <param name="sprites">The array of sprites that will be batched and drawn together.</param>
+        /// <param name="camera">The camera used to draw the sprites.</param>
+        public static void DrawSprites(BetterSprite[] sprites, Camera camera)
+        {
+            using (SpriteCollection spriteCollection = new SpriteCollection())
+            {
+                spriteCollection
+                    .SetCollection(sprites)
                     .Draw(camera);
             }
         }
