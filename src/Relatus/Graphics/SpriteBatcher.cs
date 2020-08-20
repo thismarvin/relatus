@@ -1,7 +1,6 @@
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Relatus.Graphics
 {
@@ -10,6 +9,8 @@ namespace Relatus.Graphics
         private readonly List<List<BetterSprite>> sprites;
         private int index;
 
+        private BatchExecution execution;
+        private uint batchSize;
         private Camera camera;
 
         private static readonly GraphicsDevice graphicsDevice;
@@ -22,14 +23,20 @@ namespace Relatus.Graphics
         internal SpriteBatcher()
         {
             sprites = new List<List<BetterSprite>>();
+            execution = BatchExecution.DrawElements;
+            batchSize = SpriteElements.MaxBatchSize;
         }
 
-        public SpriteBatcher Begin()
+        public SpriteBatcher SetBatchExecution(BatchExecution execution)
         {
-            sprites.Clear();
+            this.execution = execution;
 
-            sprites.Add(new List<BetterSprite>((int)SpriteCollection.MaxBatchSize));
-            index = 0;
+            return this;
+        }
+
+        public SpriteBatcher SetBatchSize(uint batchSize)
+        {
+            this.batchSize = batchSize;
 
             return this;
         }
@@ -41,14 +48,24 @@ namespace Relatus.Graphics
             return this;
         }
 
+        public SpriteBatcher Begin()
+        {
+            sprites.Clear();
+
+            sprites.Add(new List<BetterSprite>((int)batchSize));
+            index = 0;
+
+            return this;
+        }
+
         public SpriteBatcher Add(BetterSprite sprite)
         {
             sprites[sprites.Count - 1].Add(sprite);
             index++;
 
-            if (index >= SpriteCollection.MaxBatchSize)
+            if (index >= batchSize)
             {
-                sprites.Add(new List<BetterSprite>((int)SpriteCollection.MaxBatchSize));
+                sprites.Add(new List<BetterSprite>((int)batchSize));
                 index = 0;
             }
 
@@ -67,18 +84,21 @@ namespace Relatus.Graphics
 
         public SpriteBatcher End()
         {
+            if (camera == null)
+                throw new RelatusException("A Camera has not been attached yet. Make sure to call AttachCamera(camera).", new ArgumentNullException());
+
             for (int i = 0; i < sprites.Count; i++)
             {
                 if (i + 1 == sprites.Count)
                 {
-                    using (SpriteCollection spriteCollection = new SpriteCollection((uint)index, sprites[i]))
+                    using (SpriteCollection spriteCollection = new SpriteCollection(execution, (uint)index, sprites[i]))
                     {
                         spriteCollection.Draw(camera);
                     }
                 }
                 else
                 {
-                    using (SpriteCollection spriteCollection = new SpriteCollection(SpriteCollection.MaxBatchSize, sprites[i]))
+                    using (SpriteCollection spriteCollection = new SpriteCollection(execution, batchSize, sprites[i]))
                     {
                         spriteCollection.Draw(camera);
                     }
@@ -86,6 +106,8 @@ namespace Relatus.Graphics
             }
 
             camera = null;
+            execution = BatchExecution.DrawElements;
+            batchSize = SpriteElements.MaxBatchSize;
 
             return this;
         }

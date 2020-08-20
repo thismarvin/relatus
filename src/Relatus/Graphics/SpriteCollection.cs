@@ -5,18 +5,25 @@ namespace Relatus.Graphics
 {
     public class SpriteCollection : IDisposable
     {
-        public const uint MaxBatchSize = SpriteGroup.MaxBatchSize;
+        public const uint MaxSpriteElementsBatchSize = SpriteElements.MaxBatchSize;
 
         private readonly List<SpriteGroup> spriteGroups;
+        private readonly BatchExecution execution;
         private readonly uint batchSize;
 
-        public SpriteCollection(uint batchSize)
+        public SpriteCollection(BatchExecution execution, uint batchSize)
         {
+            this.execution = execution;
+
+            if (this.execution == BatchExecution.DrawElements && batchSize > MaxSpriteElementsBatchSize)
+                throw new RelatusException($"DrawElements does not support support a batch size greater than {MaxSpriteElementsBatchSize}.", new ArgumentOutOfRangeException());
+
             this.batchSize = batchSize;
+
             spriteGroups = new List<SpriteGroup>();
         }
 
-        public SpriteCollection(uint batchSize, IEnumerable<BetterSprite> sprites) : this(batchSize)
+        public SpriteCollection(BatchExecution execution, uint batchSize, IEnumerable<BetterSprite> sprites) : this(execution, batchSize)
         {
             AddRange(sprites);
             ApplyChanges();
@@ -26,7 +33,7 @@ namespace Relatus.Graphics
         {
             if (spriteGroups.Count == 0)
             {
-                spriteGroups.Add(new SpriteGroup(batchSize, sprite.Texture, sprite.RenderOptions));
+                spriteGroups.Add(CreateSpriteGroup(sprite));
                 spriteGroups[spriteGroups.Count - 1].Add(sprite);
 
                 return true;
@@ -35,7 +42,7 @@ namespace Relatus.Graphics
             if (spriteGroups[spriteGroups.Count - 1].Add(sprite))
                 return true;
 
-            spriteGroups.Add(new SpriteGroup(batchSize, sprite.Texture, sprite.RenderOptions));
+            spriteGroups.Add(CreateSpriteGroup(sprite));
             spriteGroups[spriteGroups.Count - 1].Add(sprite);
 
             return false;
@@ -68,6 +75,21 @@ namespace Relatus.Graphics
             return this;
         }
 
+        private SpriteGroup CreateSpriteGroup(BetterSprite sprite)
+        {
+            switch (execution)
+            {
+                case BatchExecution.DrawElements:
+                    return new SpriteElements(batchSize, sprite.Texture, sprite.RenderOptions);
+
+                case BatchExecution.DrawElementsInstanced:
+                    return new SpriteElementsInstanced(batchSize, sprite.Texture, sprite.RenderOptions);
+
+                default:
+                    throw new RelatusException("Unknown collection type.", new ArgumentException());
+            }
+        }
+
         public void Draw(Camera camera)
         {
             for (int i = 0; i < spriteGroups.Count; i++)
@@ -86,7 +108,10 @@ namespace Relatus.Graphics
                 {
                     for (int i = 0; i < spriteGroups.Count; i++)
                     {
-                        spriteGroups[i].Dispose();
+                        if (spriteGroups[i] is IDisposable disposable)
+                        {
+                            disposable.Dispose();
+                        }
                     }
                 }
 
