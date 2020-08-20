@@ -69,7 +69,7 @@ namespace Relatus
         static WindowManager()
         {
             sampleFPS = new Queue<float>();
-            polygonCollection = new PolygonCollection();
+            polygonCollection = new PolygonCollection(BatchExecution.DrawElements, 4);
 
             Engine.Instance.Window.ClientSizeChanged += HandleWindowResize;
 
@@ -226,7 +226,9 @@ namespace Relatus
                 new AABB(PixelWidth * 0.5f, PixelHeight * 0.5f + buffer, buffer, PixelHeight + buffer * 2) { Color = Color.Black }
             };
 
-            polygonCollection.SetCollection(boxing);
+            polygonCollection
+                .AddRange(boxing)
+                .ApplyChanges();
         }
 
         private static void CalculateScale()
