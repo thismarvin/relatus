@@ -253,7 +253,7 @@ namespace Relatus.Graphics
             {
                 colorBuffer?.Dispose();
                 colorBuffer = new DynamicVertexBuffer(graphicsDevice, typeof(VertexColor), 1, BufferUsage.WriteOnly);
-                colorBuffer.SetData(new VertexColor[] { new VertexColor(color) });
+                colorBuffer.SetData(new VertexColor[] { GetVertexColor() });
             }
 
             vertexBufferBindings = new VertexBufferBinding[]
@@ -342,6 +342,11 @@ namespace Relatus.Graphics
             Vector3 scale = new Vector3(width * this.scale.X, height * this.scale.Y, this.scale.Z);
 
             return new VertexTransform(translation, scale, origin, rotation);
+        }
+
+        internal VertexColor GetVertexColor()
+        {
+            return new VertexColor(color);
         }
 
         public virtual void Draw(Camera camera)

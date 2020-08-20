@@ -1,60 +1,31 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Relatus.Graphics
 {
-    public class PolygonCollection : DrawCollection<Polygon>, IDisposable
+    public class PolygonCollection : DrawCollection<Polygon>
     {
-        public PolygonCollection() : base(100000)
+        public PolygonCollection(BatchExecution execution, uint batchSize) : base(execution, batchSize)
         {
         }
 
-        protected override DrawGroup<Polygon> CreateDrawGroup(Polygon currentEntry, int capacity)
+        public PolygonCollection(BatchExecution execution, uint batchSize, IEnumerable<Polygon> entries) : base(execution, batchSize, entries)
         {
-            return new PolygonGroup(currentEntry.Geometry, currentEntry.RenderOptions, capacity);
         }
 
-        #region IDisposable Support
-        private bool disposedValue = false; // To detect redundant calls
-
-        protected virtual void Dispose(bool disposing)
+        protected override DrawGroup<Polygon> CreateDrawGroup(Polygon polygon)
         {
-            if (!disposedValue)
+            switch (execution)
             {
-                if (disposing)
-                {
-                    for (int i = 0; i < groups.Length; i++)
-                    {
-                        if (groups[i] is IDisposable disposable)
-                        {
-                            disposable.Dispose();
-                        }
-                    }
-                }
+                case BatchExecution.DrawElements:
+                    return new PolygonElements(batchSize, polygon.Geometry, polygon.RenderOptions);
 
-                // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
-                // TODO: set large fields to null.
+                case BatchExecution.DrawElementsInstanced:
+                    return new PolygonElementsInstanced(batchSize, polygon.Geometry, polygon.RenderOptions);
 
-                disposedValue = true;
+                default:
+                    throw new RelatusException("Unknown batch execution type.", new ArgumentException());
             }
         }
-
-        // TODO: override a finalizer only if Dispose(bool disposing) above has code to free unmanaged resources.
-        // ~PolygonCollection()
-        // {
-        //   // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
-        //   Dispose(false);
-        // }
-
-        // This code added to correctly implement the disposable pattern.
-        public void Dispose()
-        {
-            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
-            Dispose(true);
-            // TODO: uncomment the following line if the finalizer is overridden above.
-            // GC.SuppressFinalize(this);
-        }
-        #endregion
     }
 }

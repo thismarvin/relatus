@@ -19,6 +19,7 @@ namespace Relatus.Graphics
         private static bool preventFumbledRelay;
 
         public static SpriteBatcher SpriteBatcher { get; private set; }
+        public static GeometryBatcher GeometryBatcher { get; private set; }
 
         static Sketch()
         {
@@ -28,6 +29,7 @@ namespace Relatus.Graphics
             shaders = new Queue<Effect>();
 
             SpriteBatcher = new SpriteBatcher();
+            GeometryBatcher = new GeometryBatcher();
         }
 
         /// <summary>

@@ -4,7 +4,7 @@ using System;
 
 namespace Relatus.Graphics
 {
-    internal class SpriteElements : SpriteGroup, IDisposable
+    internal class SpriteElements : SpriteGroup
     {
         public const uint MaxBatchSize = short.MaxValue / 6;
 
@@ -53,7 +53,7 @@ namespace Relatus.Graphics
         public SpriteElements(uint batchSize, Texture2D sharedTexture, RenderOptions sharedRenderOptions) : base(BatchExecution.DrawElements, batchSize)
         {
             if (BatchSize > MaxBatchSize)
-                throw new RelatusException($"SpriteGroup does not support support a batch size greater than {MaxBatchSize}.", new ArgumentOutOfRangeException());
+                throw new RelatusException($"SpriteElements does not support support a batch size greater than {MaxBatchSize}.", new ArgumentOutOfRangeException());
 
             this.sharedTexture = sharedTexture;
             this.sharedRenderOptions = sharedRenderOptions;
@@ -122,7 +122,7 @@ namespace Relatus.Graphics
 
         }
 
-        public override SpriteGroup ApplyChanges()
+        public override DrawGroup<BetterSprite> ApplyChanges()
         {
             if (!dataModified)
                 return this;
@@ -158,7 +158,7 @@ namespace Relatus.Graphics
             return this;
         }
 
-        public override SpriteGroup Draw(Camera camera)
+        public override DrawGroup<BetterSprite> Draw(Camera camera)
         {
             if (dataModified)
                 throw new RelatusException("The sprite group was modified, but ApplyChanges() was never called.", new MethodExpectedException());
@@ -193,40 +193,13 @@ namespace Relatus.Graphics
             return this;
         }
 
-        #region IDisposable Support
-        private bool disposedValue;
-        protected virtual void Dispose(bool disposing)
+        protected override void OnDispose()
         {
-            if (!disposedValue)
-            {
-                if (disposing)
-                {
-                    vertexPositionBuffer.Dispose();
-                    transformBuffer.Dispose();
-                    colorBuffer.Dispose();
-                    textureCoordBuffer.Dispose();
-                    indexBuffer.Dispose();
-                }
-
-                // TODO: free unmanaged resources (unmanaged objects) and override finalizer
-                // TODO: set large fields to null
-                disposedValue = true;
-            }
+            vertexPositionBuffer.Dispose();
+            transformBuffer.Dispose();
+            colorBuffer.Dispose();
+            textureCoordBuffer.Dispose();
+            indexBuffer.Dispose();
         }
-
-        // // TODO: override finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources
-        // ~BetterSpriteGroup()
-        // {
-        //     // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-        //     Dispose(disposing: false);
-        // }
-
-        public void Dispose()
-        {
-            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-            Dispose(disposing: true);
-            GC.SuppressFinalize(this);
-        }
-        #endregion
     }
 }

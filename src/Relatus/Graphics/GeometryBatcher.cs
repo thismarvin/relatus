@@ -1,71 +1,71 @@
-using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace Relatus.Graphics
 {
-    public class SpriteBatcher : Batcher<BetterSprite>
+    public class GeometryBatcher : Batcher<Polygon>
     {
-        private readonly List<List<BetterSprite>> sprites;
+        private readonly List<List<Polygon>> polygons;
         private int index;
 
         private static readonly GraphicsDevice graphicsDevice;
 
-        static SpriteBatcher()
+        static GeometryBatcher()
         {
             graphicsDevice = Engine.Graphics.GraphicsDevice;
         }
 
-        internal SpriteBatcher()
+        internal GeometryBatcher()
         {
-            sprites = new List<List<BetterSprite>>();
+            polygons = new List<List<Polygon>>();
             execution = BatchExecution.DrawElements;
             batchSize = SpriteElements.MaxBatchSize;
         }
 
-        public override Batcher<BetterSprite> Begin()
+        public override Batcher<Polygon> Begin()
         {
-            sprites.Clear();
+            polygons.Clear();
 
-            sprites.Add(new List<BetterSprite>((int)batchSize));
+            polygons.Add(new List<Polygon>((int)batchSize));
             index = 0;
 
             return this;
         }
 
-        public override Batcher<BetterSprite> Add(BetterSprite sprite)
+        public override Batcher<Polygon> Add(Polygon polygon)
         {
-            sprites[sprites.Count - 1].Add(sprite);
+            polygons[polygons.Count - 1].Add(polygon);
             index++;
 
             if (index >= batchSize)
             {
-                sprites.Add(new List<BetterSprite>((int)batchSize));
+                polygons.Add(new List<Polygon>((int)batchSize));
                 index = 0;
             }
 
             return this;
         }
 
-        public override Batcher<BetterSprite> End()
+        public override Batcher<Polygon> End()
         {
             if (camera == null)
                 throw new RelatusException("A Camera has not been attached yet. Make sure to call AttachCamera(camera).", new ArgumentNullException());
 
-            for (int i = 0; i < sprites.Count; i++)
+            for (int i = 0; i < polygons.Count; i++)
             {
-                if (i + 1 == sprites.Count)
+                if (i + 1 == polygons.Count)
                 {
-                    using (SpriteCollection spriteCollection = new SpriteCollection(execution, (uint)index, sprites[i]))
+                    using (PolygonCollection polygonCollection = new PolygonCollection(execution, (uint)index, polygons[i]))
                     {
-                        spriteCollection.Draw(camera);
+                        polygonCollection.Draw(camera);
                     }
                 }
                 else
                 {
-                    using (SpriteCollection spriteCollection = new SpriteCollection(execution, batchSize, sprites[i]))
+                    using (PolygonCollection polygonCollection = new PolygonCollection(execution, batchSize, polygons[i]))
                     {
-                        spriteCollection.Draw(camera);
+                        polygonCollection.Draw(camera);
                     }
                 }
             }

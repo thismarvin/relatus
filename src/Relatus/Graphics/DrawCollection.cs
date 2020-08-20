@@ -1,44 +1,54 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Relatus.Graphics
 {
-    public abstract class DrawCollection<T>
+    public abstract class DrawCollection<T> : IDisposable
     {
-        private readonly int maximumGroupCapacity;
-        protected DrawGroup<T>[] groups;
+        protected readonly List<DrawGroup<T>> groups;
+        protected readonly BatchExecution execution;
+        protected readonly uint batchSize;
 
-        public DrawCollection(int maximumGroupCapacity)
+        internal DrawCollection(BatchExecution execution, uint batchSize)
         {
-            this.maximumGroupCapacity = maximumGroupCapacity;
-            groups = new DrawGroup<T>[0];
+            this.execution = execution;
+            this.batchSize = batchSize;
+
+            groups = new List<DrawGroup<T>>();
         }
 
-        protected abstract DrawGroup<T> CreateDrawGroup(T currentEntry, int capacity);
-
-        public DrawCollection<T> SetCollection(T[] entries)
+        internal DrawCollection(BatchExecution execution, uint batchSize, IEnumerable<T> entries) : this(execution, batchSize)
         {
-            int totalGroups = (int)Math.Ceiling((float)entries.Length / maximumGroupCapacity);
-            int groupIndex = -1;
-            int remaining = entries.Length;
+            AddRange(entries);
+            ApplyChanges();
+        }
 
-            groups = new DrawGroup<T>[totalGroups];
+        protected abstract DrawGroup<T> CreateDrawGroup(T entry);
 
-            for (int i = 0; i < entries.Length; i++)
+        public bool Add(T entry)
+        {
+            if (groups.Count == 0)
             {
-                if (entries[i] == null)
-                    continue;
+                groups.Add(CreateDrawGroup(entry));
+                groups[groups.Count - 1].Add(entry);
 
-                if (groupIndex == -1 || !groups[groupIndex].Add(entries[i]))
-                {
-                    int capacity = remaining / maximumGroupCapacity > 0 ? maximumGroupCapacity : remaining % maximumGroupCapacity;
-                    remaining -= maximumGroupCapacity;
+                return true;
+            }
 
-                    groupIndex++;
-                    groups[groupIndex] = CreateDrawGroup(entries[i], capacity);
-                    groups[groupIndex].Add(entries[i]);
-                }
+            if (groups[groups.Count - 1].Add(entry))
+                return true;
+
+            groups.Add(CreateDrawGroup(entry));
+            groups[groups.Count - 1].Add(entry);
+
+            return false;
+        }
+
+        public DrawCollection<T> AddRange(IEnumerable<T> entries)
+        {
+            foreach (T entry in entries)
+            {
+                Add(entry);
             }
 
             return this;
@@ -46,9 +56,16 @@ namespace Relatus.Graphics
 
         public DrawCollection<T> Clear()
         {
-            for (int i = 0; i < groups.Length; i++)
+            groups.Clear();
+
+            return this;
+        }
+
+        public DrawCollection<T> ApplyChanges()
+        {
+            for (int i = 0; i < groups.Count; i++)
             {
-                groups[i].Clear();
+                groups[i].ApplyChanges();
             }
 
             return this;
@@ -56,12 +73,48 @@ namespace Relatus.Graphics
 
         public DrawCollection<T> Draw(Camera camera)
         {
-            for (int i = 0; i < groups.Length; i++)
+            for (int i = 0; i < groups.Count; i++)
             {
                 groups[i].Draw(camera);
             }
 
             return this;
         }
+
+        #region IDisposable Support
+        private bool disposedValue;
+
+        protected virtual void OnDispose()
+        {
+
+        }
+
+        private void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    for (int i = 0; i < groups.Count; i++)
+                    {
+                        if (groups[i] is IDisposable disposable)
+                        {
+                            disposable.Dispose();
+                        }
+                    }
+
+                    OnDispose();
+                }
+
+                disposedValue = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
+        }
+        #endregion
     }
 }
