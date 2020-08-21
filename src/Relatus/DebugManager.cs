@@ -65,11 +65,12 @@ namespace Relatus
         // TODO: This is soooo janky!
         internal static Vector2 NextDebugEntryPosition()
         {
+            Vector2 topLeft = new Vector2(-WindowManager.PixelWidth * 0.5f, WindowManager.PixelHeight * 0.5f);
             int padding = 4;
             int textHeight = 8;
             int lineHeight = textHeight + 2;
 
-            return new Vector2(padding, padding + debugEntries.Count * lineHeight);
+            return topLeft + new Vector2(padding, -padding - debugEntries.Count * lineHeight);
         }
 
         private static void UpdateInput()

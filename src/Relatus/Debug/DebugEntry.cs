@@ -1,9 +1,7 @@
 using Microsoft.Xna.Framework;
 using Relatus.Graphics;
 using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Text;
 
 namespace Relatus.Debug
 {
@@ -47,7 +45,9 @@ namespace Relatus.Debug
             Information = new string[] { "" };
 
             Vector2 position = DebugManager.NextDebugEntryPosition();
-            entryText = new Text(position.X, position.Y, "", AssetManager.GetFont("Relatus_Probity"));
+            entryText = new Text("", AssetManager.GetFont("Relatus_Probity"))
+                .SetPosition(position.X, position.Y, 0)
+                .ApplyChanges();
         }
 
         /// <summary>
@@ -88,7 +88,7 @@ namespace Relatus.Debug
         }
 
         #region IDisposable Support
-        private bool disposedValue = false; // To detect redundant calls
+        private bool disposedValue;
 
         protected virtual void Dispose(bool disposing)
         {
@@ -99,27 +99,13 @@ namespace Relatus.Debug
                     entryText.Dispose();
                 }
 
-                // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
-                // TODO: set large fields to null.
-
                 disposedValue = true;
             }
         }
 
-        // TODO: override a finalizer only if Dispose(bool disposing) above has code to free unmanaged resources.
-        // ~DebugEntry()
-        // {
-        //   // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
-        //   Dispose(false);
-        // }
-
-        // This code added to correctly implement the disposable pattern.
         public void Dispose()
         {
-            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
             Dispose(true);
-            // TODO: uncomment the following line if the finalizer is overridden above.
-            // GC.SuppressFinalize(this);
         }
         #endregion
     }
