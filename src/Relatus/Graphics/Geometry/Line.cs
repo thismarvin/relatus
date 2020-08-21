@@ -1,8 +1,6 @@
 using Microsoft.Xna.Framework;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace Relatus.Graphics
 {
@@ -42,6 +40,8 @@ namespace Relatus.Graphics
         private int TotalTriangles { get => TotalVertices - 2; }
         private int TotalIndices { get => TotalTriangles * 3; }
 
+        private PolygonCollection collection;
+
         public Line(float x1, float y1, float x2, float y2)
         {
             points = new Vector2[]
@@ -57,6 +57,8 @@ namespace Relatus.Graphics
             line = new Polygon()
                 .SetBounds(x, y, width, height)
                 .AttachGeometry(CreateShapeData());
+
+            collection = new PolygonCollection(BatchExecution.DrawElements, 1, new Polygon[] { line });
         }
 
         public Line(Vector2[] points)
@@ -68,6 +70,8 @@ namespace Relatus.Graphics
             line = new Polygon()
                 .SetBounds(x, y, width, height)
                 .AttachGeometry(CreateShapeData());
+
+            collection = new PolygonCollection(BatchExecution.DrawElements, 1, new Polygon[] { line });
         }
 
         public void SetPoints(Vector2[] points)
@@ -309,11 +313,13 @@ namespace Relatus.Graphics
             line
                 .SetBounds(x, y, width, height)
                 .AttachGeometry(CreateShapeData());
+
+            collection = new PolygonCollection(BatchExecution.DrawElements, 1, new Polygon[] { line });
         }
 
         public void Draw(Camera camera)
         {
-            line.Draw(camera);
+            collection.Draw(camera);
         }
     }
 }

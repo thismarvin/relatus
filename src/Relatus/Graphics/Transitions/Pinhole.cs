@@ -1,7 +1,4 @@
 using Microsoft.Xna.Framework;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Relatus.Graphics.Transitions
 {
@@ -11,6 +8,8 @@ namespace Relatus.Graphics.Transitions
         private float radius;
         private float lineWidth;
 
+        private readonly PolygonCollection collection;
+
         public Pinhole(TransitionType type) : this(type, 0, 4)
         {
 
@@ -19,14 +18,14 @@ namespace Relatus.Graphics.Transitions
         public Pinhole(TransitionType type, float speed, float acceleration) : base(type, speed, acceleration)
         {
             pinhole = new Circle(0, 0, 1) { Color = Color.Black };
-            pinhole.ApplyChanges();
+
+            collection = new PolygonCollection(BatchExecution.DrawElements, 1, new Polygon[] { pinhole });
         }
 
         protected override void SetupTransition()
         {
             lineWidth = Type == TransitionType.Enter ? radius : 1;
             pinhole.LineWidth = lineWidth;
-            pinhole.ApplyChanges();
         }
 
         protected override void AccommodateToCamera()
@@ -35,7 +34,6 @@ namespace Relatus.Graphics.Transitions
             radius *= 1.2f;
             pinhole.Radius = radius;
             pinhole.SetCenter(Camera.Position.X, Camera.Position.Y);
-            pinhole.ApplyChanges();
         }
 
         protected override void UpdateLogic()
@@ -65,12 +63,11 @@ namespace Relatus.Graphics.Transitions
         protected override void AfterUpdate()
         {
             pinhole.LineWidth = lineWidth;
-            pinhole.ApplyChanges();
         }
 
         protected override void DrawTransition()
         {
-            pinhole.Draw(Camera);
+            collection.Draw(Camera);
         }
 
         protected override void OnDispose()

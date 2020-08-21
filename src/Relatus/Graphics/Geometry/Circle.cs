@@ -14,7 +14,7 @@ namespace Relatus.Graphics
                 if (radius == value)
                     return;
 
-                radius = value;                
+                radius = value;
                 SetBounds(X, Y, radius * 2, radius * 2);
             }
         }
@@ -41,7 +41,6 @@ namespace Relatus.Graphics
 
             SetBounds(x, y, this.radius * 2, this.radius * 2);
             AttachGeometry(GeometryManager.GetShapeData(ShapeType.Circle));
-            ApplyChanges();
         }
     }
 }

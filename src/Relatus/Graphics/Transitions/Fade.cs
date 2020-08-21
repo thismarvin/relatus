@@ -1,7 +1,4 @@
 using Microsoft.Xna.Framework;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Relatus.Graphics.Transitions
 {
@@ -12,6 +9,8 @@ namespace Relatus.Graphics.Transitions
         private Color fadeColor;
         private readonly Quad fade;
 
+        private readonly PolygonCollection collection;
+
         public Fade(TransitionType type) : this(type, 0.01f, 0.01f, Color.Black)
         {
 
@@ -21,7 +20,8 @@ namespace Relatus.Graphics.Transitions
         {
             defaultColor = color;
             fade = new Quad(0, 0, 1, 1) { Color = Color.Black };
-            fade.ApplyChanges();
+
+            collection = new PolygonCollection(BatchExecution.DrawElements, 1, new Polygon[] { fade });
         }
 
         protected override void AccommodateToCamera()
@@ -30,7 +30,6 @@ namespace Relatus.Graphics.Transitions
             fade.Height = Camera.Bounds.Height * 1.4f;
 
             fade.SetCenter(Camera.Position.X, Camera.Position.Y);
-            fade.ApplyChanges();
         }
 
         protected override void SetupTransition()
@@ -39,7 +38,6 @@ namespace Relatus.Graphics.Transitions
             fadeColor = defaultColor * alpha;
 
             fade.Color = fadeColor;
-            fade.ApplyChanges();
         }
 
         protected override void UpdateLogic()
@@ -70,12 +68,11 @@ namespace Relatus.Graphics.Transitions
         {
             fadeColor = defaultColor * alpha;
             fade.Color = fadeColor;
-            fade.ApplyChanges();
         }
 
         protected override void DrawTransition()
         {
-            fade.Draw(Camera);
+            collection.Draw(Camera);
         }
 
         protected override void OnDispose()

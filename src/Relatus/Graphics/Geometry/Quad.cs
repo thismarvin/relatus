@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
-
 namespace Relatus.Graphics
 {
     public class Quad : Polygon
@@ -18,7 +14,6 @@ namespace Relatus.Graphics
         {
             SetBounds(x, y, width, height);
             AttachGeometry(GeometryManager.GetShapeData(ShapeType.Square));
-            ApplyChanges();
         }
 
         public Quad SetLineWidth(float lineWidth)

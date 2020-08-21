@@ -117,36 +117,11 @@ namespace Relatus.Graphics
         private SpriteMirroringType spriteMirroring;
         private RenderOptions renderOptions;
 
-        private bool modelChanged;
-        private bool textureChanged;
-        private bool colorChanged;
-        private DynamicVertexBuffer modelBuffer;
-        private DynamicVertexBuffer textureBuffer;
-        private DynamicVertexBuffer colorBuffer;
-        private VertexBufferBinding[] vertexBufferBindings;
-
-        private static readonly GraphicsDevice graphicsDevice;
-        private static readonly GeometryData geometry;
-        private static readonly Effect spriteShader;
-        private static readonly EffectPass spritePass;
-
-        static BetterSprite()
-        {
-            graphicsDevice = Engine.Graphics.GraphicsDevice;
-            geometry = GeometryManager.GetShapeData(ShapeType.Square);
-            spriteShader = AssetManager.GetEffect("Relatus_RelatusEffect");
-            spritePass = spriteShader.Techniques[2].Passes[0];
-        }
-
         public BetterSprite()
         {
             tint = Color.White;
             scale = Vector3.One;
             renderOptions = new RenderOptions();
-
-            modelChanged = true;
-            textureChanged = true;
-            colorChanged = true;
         }
 
         public static BetterSprite Create()
@@ -160,8 +135,7 @@ namespace Relatus.Graphics
 
             return Create()
                 .SetTexture(spriteAtlas.GetPage(entry.Page))
-                .SetSampleRegion(entry.ImageRegion)
-                .ApplyChanges();
+                .SetSampleRegion(entry.ImageRegion);
         }
 
         public virtual BetterSprite SetTexture(Texture2D texture)
@@ -170,8 +144,6 @@ namespace Relatus.Graphics
 
             texelWidth = 1f / texture.Width;
             texelHeight = 1f / texture.Height;
-
-            textureChanged = true;
 
             return this;
         }
@@ -182,16 +154,12 @@ namespace Relatus.Graphics
             this.y = y;
             this.z = z;
 
-            modelChanged = true;
-
             return this;
         }
 
         public virtual BetterSprite SetTranslation(float x, float y, float z)
         {
             translation = new Vector3(x, y, z);
-
-            modelChanged = true;
 
             return this;
         }
@@ -200,16 +168,12 @@ namespace Relatus.Graphics
         {
             scale = new Vector3(x, y, z);
 
-            modelChanged = true;
-
             return this;
         }
 
         public virtual BetterSprite SetOrigin(float x, float y, float z)
         {
             origin = new Vector3(x, y, z);
-
-            modelChanged = true;
 
             return this;
         }
@@ -218,8 +182,6 @@ namespace Relatus.Graphics
         {
             rotation = new Vector3(roll, pitch, yaw);
 
-            modelChanged = true;
-
             return this;
         }
 
@@ -227,17 +189,12 @@ namespace Relatus.Graphics
         {
             this.tint = tint;
 
-            colorChanged = true;
-
             return this;
         }
 
         public virtual BetterSprite SetSampleRegion(int x, int y, int width, int height)
         {
             sampleRegion = new ImageRegion(x, y, width, height);
-
-            textureChanged = true;
-            modelChanged = true;
 
             return this;
         }
@@ -251,8 +208,6 @@ namespace Relatus.Graphics
         {
             spriteMirroring = mirroringType;
 
-            textureChanged = true;
-
             return this;
         }
 
@@ -263,53 +218,10 @@ namespace Relatus.Graphics
             return this;
         }
 
-        public BetterSprite ApplyChanges()
-        {
-            if (!modelChanged && !colorChanged && !textureChanged)
-                return this;
-
-            if (textureChanged)
-            {
-                textureBuffer?.Dispose();
-                textureBuffer = new DynamicVertexBuffer(graphicsDevice, typeof(VertexTexture), 4, BufferUsage.WriteOnly);
-                textureBuffer.SetData(GetTextureCoords());
-            }
-
-            if (modelChanged)
-            {
-                modelBuffer?.Dispose();
-                modelBuffer = new DynamicVertexBuffer(graphicsDevice, typeof(VertexTransform), 1, BufferUsage.WriteOnly);
-                modelBuffer.SetData(new VertexTransform[] { GetVertexTransform() });
-            }
-
-            if (colorChanged)
-            {
-                colorBuffer?.Dispose();
-                colorBuffer = new DynamicVertexBuffer(graphicsDevice, typeof(VertexColor), 1, BufferUsage.WriteOnly);
-                colorBuffer.SetData(new VertexColor[] { GetVertexColor() });
-            }
-
-            vertexBufferBindings = new VertexBufferBinding[]
-            {
-                new VertexBufferBinding(geometry.VertexBuffer),
-                new VertexBufferBinding(modelBuffer, 0, 1),
-                new VertexBufferBinding(colorBuffer, 0, 1),
-                new VertexBufferBinding(textureBuffer),
-            };
-
-            modelChanged = false;
-            textureChanged = false;
-            colorChanged = false;
-
-            return this;
-        }
-
         public BetterSprite SetCenter(float x, float y)
         {
             this.x = x - Width * 0.5f;
             this.y = y + Height * 0.5f;
-
-            modelChanged = true;
 
             return this;
         }
@@ -365,39 +277,6 @@ namespace Relatus.Graphics
                 new VertexTexture(corners[2]),
                 new VertexTexture(corners[3])
             };
-        }
-
-        public virtual void Draw(Camera camera)
-        {
-            if (modelChanged || colorChanged || textureChanged)
-                throw new RelatusException("The sprite was modified, but ApplyChanges() was never called.", new MethodExpectedException());
-
-            graphicsDevice.RasterizerState = GraphicsManager.RasterizerState;
-            graphicsDevice.SamplerStates[0] = renderOptions.SamplerState;
-            graphicsDevice.BlendState = renderOptions.BlendState;
-            graphicsDevice.DepthStencilState = renderOptions.DepthStencilState;
-            graphicsDevice.SetVertexBuffers(vertexBufferBindings);
-            graphicsDevice.Indices = geometry.IndexBuffer;
-
-            spriteShader.Parameters["WVP"].SetValue(camera.WVP);
-            spriteShader.Parameters["SpriteTexture"].SetValue(texture);
-
-            spritePass.Apply();
-
-            if (renderOptions.Effect == null)
-            {
-                graphicsDevice.Textures[0] = texture;
-                graphicsDevice.DrawInstancedPrimitives(PrimitiveType.TriangleList, 0, 0, geometry.TotalTriangles, 1);
-            }
-            else
-            {
-                foreach (EffectPass pass in renderOptions.Effect.CurrentTechnique.Passes)
-                {
-                    pass.Apply();
-                    graphicsDevice.Textures[0] = texture;
-                    graphicsDevice.DrawInstancedPrimitives(PrimitiveType.TriangleList, 0, 0, geometry.TotalTriangles, 1);
-                }
-            }
         }
     }
 }
