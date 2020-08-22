@@ -5,7 +5,6 @@ using Relatus.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace Relatus
 {
@@ -55,7 +54,7 @@ namespace Relatus
 
         private static readonly PolygonCollection polygonCollection;
         private static readonly Queue<float> sampleFPS;
-        private static AABB[] boxing;
+        private static Polygon[] boxing;
         private static int defaultWindowWidth;
         private static int defaultWindowHeight;
         private static bool manipulatingScreen;
@@ -216,14 +215,14 @@ namespace Relatus
         {
             int buffer = 1000;
 
-            boxing = new AABB[]
+            boxing = new Polygon[]
             {
                 // Letter boxing.
-                new AABB(-PixelWidth * 0.5f - buffer, PixelHeight * 0.5f + buffer, PixelWidth + buffer * 2, buffer) { Color = Color.Black },
-                new AABB(-PixelWidth * 0.5f - buffer, -PixelHeight * 0.5f, PixelWidth + buffer * 2, buffer) { Color = Color.Black },
+                new Quad(-PixelWidth * 0.5f - buffer, PixelHeight * 0.5f + buffer, PixelWidth + buffer * 2, buffer) { Color = Color.Black },
+                new Quad(-PixelWidth * 0.5f - buffer, -PixelHeight * 0.5f, PixelWidth + buffer * 2, buffer) { Color = Color.Black },
                 // Pillar boxing.
-                new AABB(-PixelWidth * 0.5f - buffer, PixelHeight * 0.5f + buffer, buffer, PixelHeight + buffer * 2) { Color = Color.Black },
-                new AABB(PixelWidth * 0.5f, PixelHeight * 0.5f + buffer, buffer, PixelHeight + buffer * 2) { Color = Color.Black }
+                new Quad(-PixelWidth * 0.5f - buffer, PixelHeight * 0.5f + buffer, buffer, PixelHeight + buffer * 2) { Color = Color.Black },
+                new Quad(PixelWidth * 0.5f, PixelHeight * 0.5f + buffer, buffer, PixelHeight + buffer * 2) { Color = Color.Black }
             };
 
             polygonCollection
