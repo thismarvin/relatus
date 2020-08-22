@@ -1,13 +1,14 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Relatus.Graphics
 {
     public static class Sketch
     {
+        public static SpriteBatcher SpriteBatcher { get; private set; }
+        public static GeometryBatcher GeometryBatcher { get; private set; }
+
         private static readonly GraphicsDevice graphicsDevice;
         private static readonly SpriteBatch spriteBatch;
 
@@ -17,9 +18,6 @@ namespace Relatus.Graphics
         private static Color clearColor;
         private static bool disableRelay;
         private static bool preventFumbledRelay;
-
-        public static SpriteBatcher SpriteBatcher { get; private set; }
-        public static GeometryBatcher GeometryBatcher { get; private set; }
 
         static Sketch()
         {
