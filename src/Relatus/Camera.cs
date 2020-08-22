@@ -1,7 +1,5 @@
 using Microsoft.Xna.Framework;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Relatus
 {
@@ -21,37 +19,25 @@ namespace Relatus
         public Vector3 Position
         {
             get => position;
-            set
-            {
-                SetPosition(value.X, value.Y, value.Z);
-            }
+            set => SetPosition(value.X, value.Y, value.Z);
         }
 
         public Vector3 Target
         {
             get => target;
-            set
-            {
-                SetTarget(value.X, value.Y, value.Z);
-            }
+            set => SetTarget(value.X, value.Y, value.Z);
         }
 
         public Vector3 Up
         {
             get => up;
-            set
-            {
-                SetUp(value.X, value.Y, value.Z);
-            }
+            set => SetUp(value.X, value.Y, value.Z);
         }
 
         public Matrix World
         {
             get => world;
-            set
-            {
-                SetWorld(value);
-            }
+            set => SetWorld(value);
         }
 
         private Vector3 target;
