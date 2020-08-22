@@ -1,3 +1,5 @@
+using Microsoft.Xna.Framework;
+
 namespace Relatus.Graphics
 {
     public class Quad : Polygon
@@ -10,13 +12,29 @@ namespace Relatus.Graphics
 
         private float lineWidth;
 
-        public Quad(float x, float y, float width, float height)
+        private readonly static GeometryData geometry;
+
+        static Quad()
         {
-            SetBounds(x, y, width, height);
-            AttachGeometry(GeometryManager.GetShapeData(ShapeType.Square));
+            geometry = GeometryManager.GetShapeData(ShapeType.Square);
         }
 
-        public Quad SetLineWidth(float lineWidth)
+        public Quad(float x, float y, float width, float height)
+        {
+            SetPosition(x, y, 0);
+            SetDimensions(width, height);
+            AttachGeometry(geometry);
+        }
+
+        public static Quad Create(float x, float y, float width, float height, Color color)
+        {
+            Quad result = new Quad(x, y, width, height);
+            result.SetColor(color);
+
+            return result;
+        }
+
+        public Polygon SetLineWidth(float lineWidth)
         {
             if (this.lineWidth == lineWidth)
                 return this;
