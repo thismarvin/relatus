@@ -1,6 +1,6 @@
 using Microsoft.Xna.Framework;
 
-namespace Relatus.Graphics.Transitions
+namespace Relatus.Graphics.Bundled
 {
     public class Pinhole : Transition
     {
