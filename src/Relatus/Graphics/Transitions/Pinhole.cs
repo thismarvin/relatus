@@ -8,8 +8,6 @@ namespace Relatus.Graphics.Transitions
         private float radius;
         private float lineWidth;
 
-        private readonly PolygonCollection collection;
-
         public Pinhole(TransitionType type) : this(type, 0, 4)
         {
 
@@ -18,8 +16,6 @@ namespace Relatus.Graphics.Transitions
         public Pinhole(TransitionType type, float speed, float acceleration) : base(type, speed, acceleration)
         {
             pinhole = new Circle(0, 0, 1) { Color = Color.Black };
-
-            collection = new PolygonCollection(BatchExecution.DrawElements, 1, new Polygon[] { pinhole });
         }
 
         protected override void SetupTransition()
@@ -67,7 +63,12 @@ namespace Relatus.Graphics.Transitions
 
         protected override void DrawTransition()
         {
-            collection.Draw(Camera);
+            Sketch.GeometryBatcher
+                .SetBatchSize(1)
+                .AttachCamera(Camera)
+                .Begin()
+                    .Add(pinhole)
+                .End();
         }
 
         protected override void OnDispose()

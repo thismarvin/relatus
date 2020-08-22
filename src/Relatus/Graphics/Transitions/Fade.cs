@@ -9,8 +9,6 @@ namespace Relatus.Graphics.Transitions
         private Color fadeColor;
         private readonly Quad fade;
 
-        private readonly PolygonCollection collection;
-
         public Fade(TransitionType type) : this(type, 0.01f, 0.01f, Color.Black)
         {
 
@@ -20,8 +18,6 @@ namespace Relatus.Graphics.Transitions
         {
             defaultColor = color;
             fade = new Quad(0, 0, 1, 1) { Color = Color.Black };
-
-            collection = new PolygonCollection(BatchExecution.DrawElements, 1, new Polygon[] { fade });
         }
 
         protected override void AccommodateToCamera()
@@ -72,7 +68,12 @@ namespace Relatus.Graphics.Transitions
 
         protected override void DrawTransition()
         {
-            collection.Draw(Camera);
+            Sketch.GeometryBatcher
+                .SetBatchSize(1)
+                .AttachCamera(Camera)
+                .Begin()
+                    .Add(fade)
+                .End();
         }
 
         protected override void OnDispose()
