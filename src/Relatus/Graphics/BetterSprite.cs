@@ -1,9 +1,6 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Relatus.Utilities;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Relatus.Graphics
 {
@@ -28,35 +25,25 @@ namespace Relatus.Graphics
             get => texture;
             set => SetTexture(value);
         }
-        public float X
+        public Vector3 Position
         {
-            get => x;
-            set => SetPosition(value, y, z);
-        }
-        public float Y
-        {
-            get => y;
-            set => SetPosition(x, value, z);
-        }
-        public float Z
-        {
-            get => z;
-            set => SetPosition(x, y, value);
+            get => position;
+            set => SetPosition(value);
         }
         public Vector3 Translation
         {
             get => translation;
-            set => SetTranslation(value.X, value.Y, value.Z);
+            set => SetTranslation(value);
         }
         public Vector3 Scale
         {
             get => scale;
-            set => SetScale(value.X, value.Y, value.Z);
+            set => SetScale(value);
         }
         public Vector3 Origin
         {
             get => origin;
-            set => SetOrigin(value.X, value.Y, value.Z);
+            set => SetOrigin(value);
         }
         public Vector3 Rotation
         {
@@ -88,26 +75,35 @@ namespace Relatus.Graphics
         public int Width => SampleRegion.Width;
         public int Height => SampleRegion.Height;
 
-        public Vector3 Position
-        {
-            get => new Vector3(x, y, z);
-            set => SetPosition(value.X, value.Y, value.Z);
-        }
-
-        // I just want to note that although this is a Vector3, it is really treated like a Vector2.
         public Vector3 Center
         {
-            get => new Vector3(x + Width * 0.5f, y - Height * 0.5f, z);
+            get => new Vector3(position.X + Width * 0.5f, position.Y - Height * 0.5f, position.Z);
             set => SetCenter(value.X, value.Y);
+        }
+        public RectangleF Bounds
+        {
+            get => new RectangleF(position.X, position.Y, Width, Height);
+        }
+        public float X
+        {
+            get => position.X;
+            set => SetPosition(value, position.Y, position.Z);
+        }
+        public float Y
+        {
+            get => position.Y;
+            set => SetPosition(position.X, value, position.Z);
+        }
+        public float Z
+        {
+            get => position.Z;
+            set => SetPosition(position.X, position.Y, value);
         }
 
         private Texture2D texture;
         private float texelWidth;
         private float texelHeight;
-
-        private float x;
-        private float y;
-        private float z;
+        private Vector3 position;
         private Vector3 translation;
         private Vector3 scale;
         private Vector3 origin;
@@ -148,34 +144,53 @@ namespace Relatus.Graphics
             return this;
         }
 
-        public virtual BetterSprite SetPosition(float x, float y, float z)
+
+        public virtual BetterSprite SetPosition(Vector3 position)
         {
-            this.x = x;
-            this.y = y;
-            this.z = z;
+            this.position = position;
 
             return this;
         }
 
-        public virtual BetterSprite SetTranslation(float x, float y, float z)
+        public BetterSprite SetPosition(float x, float y, float z)
         {
-            translation = new Vector3(x, y, z);
+            return SetPosition(new Vector3(x, y, z));
+        }
+
+        public virtual BetterSprite SetTranslation(Vector3 translation)
+        {
+            this.translation = translation;
 
             return this;
         }
 
-        public virtual BetterSprite SetScale(float x, float y, float z)
+        public BetterSprite SetTranslation(float x, float y, float z)
         {
-            scale = new Vector3(x, y, z);
+            return SetTranslation(new Vector3(x, y, z));
+        }
+
+        public virtual BetterSprite SetScale(Vector3 scale)
+        {
+            this.scale = scale;
 
             return this;
         }
 
-        public virtual BetterSprite SetOrigin(float x, float y, float z)
+        public BetterSprite SetScale(float x, float y, float z)
         {
-            origin = new Vector3(x, y, z);
+            return SetScale(new Vector3(x, y, z));
+        }
+
+        public virtual BetterSprite SetOrigin(Vector3 origin)
+        {
+            this.origin = origin;
 
             return this;
+        }
+
+        public BetterSprite SetOrigin(float x, float y, float z)
+        {
+            return SetOrigin(new Vector3(x, y, z));
         }
 
         public virtual BetterSprite SetRotation(float roll, float pitch, float yaw)
@@ -192,16 +207,21 @@ namespace Relatus.Graphics
             return this;
         }
 
-        public virtual BetterSprite SetSampleRegion(int x, int y, int width, int height)
+        public BetterSprite SetTint(int r, int g, int b, float a = 1)
         {
-            sampleRegion = new ImageRegion(x, y, width, height);
+            return SetTint(new Color(r, g, b) * a);
+        }
+
+        public virtual BetterSprite SetSampleRegion(ImageRegion sampleRegion)
+        {
+            this.sampleRegion = sampleRegion;
 
             return this;
         }
 
-        public virtual BetterSprite SetSampleRegion(ImageRegion region)
+        public BetterSprite SetSampleRegion(int x, int y, int width, int height)
         {
-            return SetSampleRegion(region.X, region.Y, region.Width, region.Height);
+            return SetSampleRegion(new ImageRegion(x, y, width, height));
         }
 
         public virtual BetterSprite SetSpriteMirroring(SpriteMirroringType mirroringType)
@@ -220,18 +240,16 @@ namespace Relatus.Graphics
 
         public BetterSprite SetCenter(float x, float y)
         {
-            this.x = x - Width * 0.5f;
-            this.y = y + Height * 0.5f;
+            position = new Vector3(x - Width * 0.5f, y + Height * 0.5f, position.Z);
 
             return this;
         }
 
         internal VertexTransform GetVertexTransform()
         {
-            Vector3 translation = new Vector3(x + this.translation.X, y + this.translation.Y, z + this.translation.Z);
             Vector3 scale = new Vector3(Width * this.scale.X, Height * this.scale.Y, this.scale.Z);
 
-            return new VertexTransform(translation, scale, origin, rotation);
+            return new VertexTransform(position + translation, scale, origin, rotation);
         }
 
         internal VertexColor GetVertexColor()

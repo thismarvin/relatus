@@ -1,29 +1,11 @@
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Relatus.Graphics
 {
     public class Polygon : IDisposable
     {
         #region Properties
-        public float X
-        {
-            get => x;
-            set => SetPosition(value, y, z);
-        }
-        public float Y
-        {
-            get => y;
-            set => SetPosition(x, value, z);
-        }
-        public float Z
-        {
-            get => z;
-            set => SetPosition(x, y, value);
-        }
         public float Width
         {
             get => width;
@@ -33,6 +15,11 @@ namespace Relatus.Graphics
         {
             get => height;
             set => SetDimensions(width, value);
+        }
+        public Vector3 Position
+        {
+            get => position;
+            set => SetPosition(value);
         }
         public Color Color
         {
@@ -47,17 +34,17 @@ namespace Relatus.Graphics
         public Vector3 Origin
         {
             get => origin;
-            set => SetOrigin(value.X, value.Y, value.Z);
+            set => SetOrigin(value);
         }
         public Vector3 Translation
         {
             get => translation;
-            set => SetTranslation(value.X, value.Y, value.Z);
+            set => SetTranslation(value);
         }
         public Vector3 Scale
         {
             get => scale;
-            set => SetScale(value.X, value.Y, value.Z);
+            set => SetScale(value);
         }
         public GeometryData Geometry
         {
@@ -71,35 +58,39 @@ namespace Relatus.Graphics
         }
         #endregion
 
-        public Vector3 Position
-        {
-            get => new Vector3(x, y, z);
-            set => SetPosition(value.X, value.Y, value.Z);
-        }
-
-        // I just want to note that although this is a Vector3, it is really treated like a Vector2.
         public Vector3 Center
         {
-            get => new Vector3(x + width * 0.5f, y - height * 0.5f, z);
+            get => new Vector3(position.X + width * 0.5f, position.Y - height * 0.5f, position.Z);
             set => SetCenter(value.X, value.Y);
         }
-
         public RectangleF Bounds
         {
-            get => new RectangleF(x, y, width, height);
-            set => SetBounds(value.X, value.Y, value.Width, value.Height);
+            get => new RectangleF(position.X, position.Y, width, height);
+        }
+        public float X
+        {
+            get => position.X;
+            set => SetPosition(value, position.Y, position.Z);
+        }
+        public float Y
+        {
+            get => position.Y;
+            set => SetPosition(position.X, value, position.Z);
+        }
+        public float Z
+        {
+            get => position.Z;
+            set => SetPosition(position.X, position.Y, value);
         }
 
-        private float x;
-        private float y;
-        private float z;
         private float width;
         private float height;
-        private Color color;
+        private Vector3 position;
         private Vector3 rotation;
         private Vector3 origin;
         private Vector3 translation;
         private Vector3 scale;
+        private Color color;
         private GeometryData geometry;
         private RenderOptions renderOptions;
 
@@ -136,15 +127,18 @@ namespace Relatus.Graphics
             return this;
         }
 
-        public virtual Polygon SetPosition(float x, float y, float z)
+        public virtual Polygon SetPosition(Vector3 position)
         {
-            this.x = x;
-            this.y = y;
-            this.z = z;
+            this.position = position;
 
             transformNeedsUpdating = true;
 
             return this;
+        }
+
+        public Polygon SetPosition(float x, float y, float z)
+        {
+            return SetPosition(new Vector3(x, y, z));
         }
 
         public virtual Polygon SetDimensions(float width, float height)
@@ -164,31 +158,53 @@ namespace Relatus.Graphics
             return this;
         }
 
-        public virtual Polygon SetTranslation(float x, float y, float z)
+        public Polygon SetColor(int r, int g, int b, float a = 1)
         {
-            translation = new Vector3(x, y, z);
+            this.color = new Color(r, g, b) * a;
+
+            return this;
+        }
+
+        public virtual Polygon SetTranslation(Vector3 translation)
+        {
+            this.translation = translation;
 
             transformNeedsUpdating = true;
 
             return this;
         }
 
-        public virtual Polygon SetScale(float x, float y, float z)
+        public Polygon SetTranslation(float x, float y, float z)
         {
-            scale = new Vector3(x, y, z);
+            return SetTranslation(new Vector3(x, y, z));
+        }
+
+        public virtual Polygon SetScale(Vector3 scale)
+        {
+            this.scale = scale;
 
             transformNeedsUpdating = true;
 
             return this;
         }
 
-        public virtual Polygon SetOrigin(float x, float y, float z)
+        public Polygon SetScale(float x, float y, float z)
         {
-            origin = new Vector3(x, y, z);
+            return SetScale(new Vector3(x, y, z));
+        }
+
+        public virtual Polygon SetOrigin(Vector3 origin)
+        {
+            this.origin = origin;
 
             transformNeedsUpdating = true;
 
             return this;
+        }
+
+        public Polygon SetOrigin(float x, float y, float z)
+        {
+            return SetOrigin(new Vector3(x, y, z));
         }
 
         public virtual Polygon SetRotation(float roll, float pitch, float yaw)
@@ -209,20 +225,7 @@ namespace Relatus.Graphics
 
         public virtual Polygon SetCenter(float x, float y)
         {
-            this.x = x - width * 0.5f;
-            this.y = y + height * 0.5f;
-
-            transformNeedsUpdating = true;
-
-            return this;
-        }
-
-        public virtual Polygon SetBounds(float x, float y, float width, float height)
-        {
-            this.x = x;
-            this.y = y;
-            this.width = width;
-            this.height = height;
+            position = new Vector3(x - width * 0.5f, y + height * 0.5f, position.Z);
 
             transformNeedsUpdating = true;
 
@@ -273,10 +276,9 @@ namespace Relatus.Graphics
 
         internal VertexTransform GetVertexTransform()
         {
-            Vector3 translation = new Vector3(x + this.translation.X, y + this.translation.Y, z + this.translation.Z);
             Vector3 scale = new Vector3(width * this.scale.X, height * this.scale.Y, this.scale.Z);
 
-            return new VertexTransform(translation, scale, origin, rotation);
+            return new VertexTransform(position + translation, scale, origin, rotation);
         }
 
         internal VertexColor GetVertexColor()

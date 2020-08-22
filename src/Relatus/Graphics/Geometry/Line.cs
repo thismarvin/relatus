@@ -40,7 +40,7 @@ namespace Relatus.Graphics
         private int TotalTriangles { get => TotalVertices - 2; }
         private int TotalIndices { get => TotalTriangles * 3; }
 
-        private PolygonCollection collection;
+        private readonly PolygonCollection collection;
 
         public Line(float x1, float y1, float x2, float y2)
         {
@@ -55,7 +55,8 @@ namespace Relatus.Graphics
             ProcessPoints();
 
             line = new Polygon()
-                .SetBounds(x, y, width, height)
+                .SetPosition(x, y, 0)
+                .SetDimensions(width, height)
                 .AttachGeometry(CreateShapeData());
 
             collection = new PolygonCollection(BatchExecution.DrawElements, 1, new Polygon[] { line });
@@ -68,7 +69,8 @@ namespace Relatus.Graphics
             ProcessPoints();
 
             line = new Polygon()
-                .SetBounds(x, y, width, height)
+                .SetPosition(x, y, 0)
+                .SetDimensions(width, height)
                 .AttachGeometry(CreateShapeData());
 
             collection = new PolygonCollection(BatchExecution.DrawElements, 1, new Polygon[] { line });
@@ -311,10 +313,13 @@ namespace Relatus.Graphics
             ProcessPoints();
 
             line
-                .SetBounds(x, y, width, height)
+                .SetPosition(x, y, 0)
+                .SetDimensions(width, height)
                 .AttachGeometry(CreateShapeData());
 
-            collection = new PolygonCollection(BatchExecution.DrawElements, 1, new Polygon[] { line });
+            collection.Clear();
+            collection.Add(line);
+            collection.ApplyChanges();
         }
 
         public void Draw(Camera camera)
