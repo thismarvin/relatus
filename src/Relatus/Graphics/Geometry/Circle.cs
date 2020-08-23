@@ -26,6 +26,11 @@ namespace Relatus.Graphics
             geometry = GeometryManager.GetShapeData(ShapeType.Circle);
         }
 
+        public Circle()
+        {
+            AttachGeometry(geometry);
+        }
+
         public Circle(float x, float y, float radius)
         {
             this.radius = radius;
@@ -39,6 +44,15 @@ namespace Relatus.Graphics
         {
             Circle result = new Circle(x, y, radius);
             result.SetColor(color);
+
+            return result;
+        }
+
+        public static Circle Create(float x, float y, float radius, float lineWidth, Color color)
+        {
+            Circle result = new Circle(x, y, radius);
+            result.SetColor(color);
+            result.SetLineWidth(lineWidth);
 
             return result;
         }
@@ -60,7 +74,7 @@ namespace Relatus.Graphics
                 return this;
 
             this.lineWidth = lineWidth;
-            AttachGeometry(GeometryManager.CreateHollowCircle(radius, lineWidth));
+            AttachGeometry(GeometryManager.CreateHollowCircle(radius, this.lineWidth));
 
             return this;
         }
