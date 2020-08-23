@@ -129,9 +129,10 @@ namespace Relatus.Graphics
         {
             SpriteAtlasEntry entry = spriteAtlas.GetEntry(name);
 
-            return Create()
-                .SetTexture(spriteAtlas.GetPage(entry.Page))
-                .SetSampleRegion(entry.ImageRegion);
+            return
+                new BetterSprite()
+                    .SetTexture(spriteAtlas.GetPage(entry.Page))
+                    .SetSampleRegion(entry.ImageRegion);
         }
 
         public virtual BetterSprite SetTexture(Texture2D texture)
@@ -140,6 +141,11 @@ namespace Relatus.Graphics
 
             texelWidth = 1f / texture.Width;
             texelHeight = 1f / texture.Height;
+
+            if (sampleRegion.X == 0 && sampleRegion.Y == 0 && sampleRegion.Width == 0 && sampleRegion.Height == 0)
+            {
+                sampleRegion = new ImageRegion(0, 0, texture.Width, texture.Height);
+            }
 
             return this;
         }
