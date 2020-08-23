@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Relatus.Graphics
@@ -76,16 +75,6 @@ namespace Relatus.Graphics
             batchSize = SpriteElements.MaxBatchSize;
 
             return this;
-        }
-
-        public Batcher<Polygon> DrawRectangle(float x, float y, float width, float height, Color color)
-        {
-            return Add(Quad.Create(x, y, width, height, color));
-        }
-
-        public Batcher<Polygon> DrawCircle(float x, float y, float radius, Color color)
-        {
-            return Add(Circle.Create(x, y, radius, color));
         }
     }
 }
