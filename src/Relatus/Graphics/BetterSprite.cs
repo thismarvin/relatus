@@ -199,11 +199,16 @@ namespace Relatus.Graphics
             return SetOrigin(new Vector3(x, y, z));
         }
 
-        public virtual BetterSprite SetRotation(float roll, float pitch, float yaw)
+        public virtual BetterSprite SetRotation(Vector3 rotation)
         {
-            rotation = new Vector3(roll, pitch, yaw);
+            this.rotation = rotation;
 
             return this;
+        }
+
+        public BetterSprite SetRotation(float roll, float pitch, float yaw)
+        {
+            return SetRotation(new Vector3(roll, pitch, yaw));
         }
 
         public virtual BetterSprite SetTint(Color tint)
