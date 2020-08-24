@@ -1,9 +1,7 @@
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
-using Relatus.Debug;
 using System;
-using System.Collections.Generic;
-using System.Text;
+using Microsoft.Xna.Framework.Input;
+using Relatus.Graphics;
+using Relatus.Utilities;
 
 namespace Relatus
 {
@@ -16,61 +14,25 @@ namespace Relatus
         public static bool Debugging { get; set; }
         public static bool ShowWireFrame { get; set; }
 
-        private static readonly ResourceHandler<DebugEntry> debugEntries;
-
-        private static readonly DebugEntry fps;
-        private static readonly DebugEntry scene;
+        private static Camera camera;
+        private static BMFont font;
+        private static BMFontShader fontShader;
 
         static DebugManager()
         {
-            debugEntries = new ResourceHandler<DebugEntry>();
+            camera = Camera.CreateOrthographic(WindowManager.ScaledWidth, WindowManager.ScaledHeight, 0.5f, 16)
+                .SetPosition(WindowManager.PixelWidth * 0.5f, WindowManager.PixelHeight * 0.5f, 1)
+                .SetTarget(WindowManager.PixelWidth * 0.5f, WindowManager.PixelHeight * 0.5f, 0);
 
-            fps = new DebugEntry("Relatus_FPS", "{0} FPS");
-            RegisterDebugEntry(fps);
+            WindowManager.WindowResize += HandleResize;
 
-            scene = new DebugEntry("Relatus_Scene", "SCENE: {0}");
-            RegisterDebugEntry(scene);
+            font = AssetManager.GetFont("Relatus_Probity");
+            fontShader = new BMFontShader();
         }
 
-        #region Handle DebugEntries
-        /// <summary>
-        /// Register a <see cref="DebugEntry"/> to be managed by Relatus.
-        /// </summary>
-        /// <param name="debugEntry">The debug entry you want to register.</param>
-        public static void RegisterDebugEntry(DebugEntry debugEntry)
+        private static void HandleResize(object sender, EventArgs args)
         {
-            debugEntries.Register(debugEntry.Name, debugEntry);
-        }
-
-        /// <summary>
-        /// Get a <see cref="DebugEntry"/> that was previously registered.
-        /// </summary>
-        /// <param name="name">The name given to the debug entry that was previously registered.</param>
-        /// <returns>The registered debug entry with the given name.</returns>
-        public static DebugEntry GetDebugEntry(string name)
-        {
-            return debugEntries.Get(name);
-        }
-
-        /// <summary>
-        /// Remove a registered <see cref="DebugEntry"/>.
-        /// </summary>
-        /// <param name="name">The name given to the debug entry that was previously registered.</param>
-        public static void RemoveDebugEntry(string name)
-        {
-            debugEntries.Remove(name);
-        }
-        #endregion
-
-        // TODO: This is soooo janky!
-        internal static Vector2 NextDebugEntryPosition()
-        {
-            Vector2 topLeft = new Vector2(-WindowManager.PixelWidth * 0.5f, WindowManager.PixelHeight * 0.5f);
-            int padding = 4;
-            int textHeight = 8;
-            int lineHeight = textHeight + 2;
-
-            return topLeft + new Vector2(padding, -padding - debugEntries.Count * lineHeight);
+            camera.SetDimensions(WindowManager.ScaledWidth, WindowManager.ScaledHeight);
         }
 
         private static void UpdateInput()
@@ -89,32 +51,27 @@ namespace Relatus
             }
         }
 
-        private static void UpdateInfo()
+        internal static void UnloadContent()
         {
-            fps.SetInformation(Math.Round(WindowManager.FPS));
-            scene.SetInformation(SceneManager.CurrentScene.Name);
-        }
-
-        private static void DrawDebugEntries()
-        {
-            if (!Debugging)
-                return;
-
-            foreach (DebugEntry debugEntry in debugEntries)
-            {
-                debugEntry.Draw(CameraManager.TopLeftAligned);
-            }
+            fontShader.Dispose();
         }
 
         internal static void Update()
         {
             UpdateInput();
-            UpdateInfo();
         }
 
         internal static void Draw()
         {
-            DrawDebugEntries();
+            if (!Debugging)
+                return;
+
+            Sketch.SpriteBatcher
+                .AttachCamera(camera)
+                .SetBatchSize(1)
+                .Begin()
+                    .AddRange(ImText.Create(4, WindowManager.PixelHeight - 4, $"{Math.Round(WindowManager.FPS)} FPS", font, fontShader))
+                .End();
         }
     }
 }
