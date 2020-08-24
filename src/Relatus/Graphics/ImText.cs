@@ -5,13 +5,16 @@ namespace Relatus.Graphics
 {
     public static class ImText
     {
-        public static BetterSprite[] Create(float x, float y, string text, BMFont font)
+        public static BetterSprite[] Create(float x, float y, string text, BMFont font, BMFontShader shader)
+        {
+            return Create(new Vector3(x, y, 0), text, font, shader);
+        }
+
+        private static BetterSprite[] Create(Vector3 position, string text, BMFont font, BMFontShader shader)
         {
             BetterSprite[] sprites = new BetterSprite[text.Length];
-            // ! This needs to be disposed somehow...
-            BMFontShader shader = new BMFontShader(Color.White, Color.Black, Color.Transparent);
 
-            float xOffset = x;
+            float xOffset = position.X;
 
             for (int i = 0; i < text.Length; i++)
             {
@@ -25,7 +28,7 @@ namespace Relatus.Graphics
                     {
                         Effect = shader.Effect
                     })
-                    .SetPosition(xOffset + characterData.XOffset, y - characterData.YOffset, 0);
+                .SetPosition(xOffset + characterData.XOffset, position.Y - characterData.YOffset, position.Z);
 
                 xOffset += characterData.XAdvance;
             }
