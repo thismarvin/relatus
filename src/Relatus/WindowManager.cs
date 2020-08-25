@@ -238,7 +238,7 @@ namespace Relatus
             {
                 Scale = (float)WindowHeight / PixelHeight;
 
-                // Check if letterboxing is required.
+                // Check if pillar boxing is required.
                 if (PixelWidth * Scale > WindowWidth)
                 {
                     Scale = (float)WindowWidth / PixelWidth;
