@@ -16,7 +16,6 @@ namespace Relatus
     public static class SketchManager
     {
         private static readonly GraphicsDevice graphicsDevice;
-        private static readonly SpriteBatch spriteBatch;
         private static readonly List<BetterSprite> renderTargets;
         private static readonly List<StageType> completedStages;
         private static Effect postProcessing;
@@ -24,7 +23,6 @@ namespace Relatus
         static SketchManager()
         {
             graphicsDevice = Engine.Graphics.GraphicsDevice;
-            spriteBatch = GraphicsManager.SpriteBatch;
             renderTargets = new List<BetterSprite>();
             completedStages = new List<StageType>();
         }
@@ -75,8 +73,6 @@ namespace Relatus
 
         internal static void AddSketch(BetterSprite renderTarget)
         {
-            renderTarget.SetPosition(-WindowManager.WindowWidth * 0.5f + WindowManager.PillarBox * WindowManager.Scale, WindowManager.WindowHeight * 0.5f - WindowManager.LetterBox * WindowManager.Scale, 0);
-
             renderTargets.Add(renderTarget);
 
             // A Sketch has been completed successfully; reset the stage queue.
@@ -85,7 +81,12 @@ namespace Relatus
 
         internal static void Draw()
         {
-            Camera camera = Camera.CreateOrthographic(WindowManager.WindowWidth, WindowManager.WindowHeight, 0.5f, 2);
+            float x = WindowManager.WindowWidth * 0.5f - WindowManager.PillarBox * WindowManager.Scale;
+            float y = -WindowManager.WindowHeight * 0.5f + WindowManager.LetterBox * WindowManager.Scale;
+
+            Camera camera = Camera.CreateOrthographic(WindowManager.WindowWidth, WindowManager.WindowHeight, 0.5f, 2)
+                .SetPosition(x, y, 1)
+                .SetTarget(x, y, 0);
 
             // Draw all the saved RenderTargets.
             Sketch.SpriteBatcher

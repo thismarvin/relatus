@@ -71,10 +71,13 @@ namespace Relatus.Graphics
                 RenderTarget2D previous = idle.Pop();
                 graphicsDevice.SetRenderTarget(previous);
 
+                float x = current.Width * 0.5f;
+                float y = -current.Height * 0.5f;
+
                 Camera camera =
                     Camera.CreateOrthographic(current.Width, current.Height, 0.5f, 2)
-                        .SetPosition(current.Width * 0.5f, -current.Height * 0.5f, 1)
-                        .SetTarget(current.Width * 0.5f, -current.Height * 0.5f, 0);
+                        .SetPosition(x, y, 1)
+                        .SetTarget(x, y, 0);
 
                 Sketch.SpriteBatcher
                     .AttachCamera(camera)
