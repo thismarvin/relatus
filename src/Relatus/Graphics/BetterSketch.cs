@@ -1,14 +1,16 @@
-using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System;
+using System.Collections.Generic;
 
 namespace Relatus.Graphics
 {
     public static class BetterSketch
     {
-        private static GraphicsDevice graphicsDevice;
+        private static readonly GraphicsDevice graphicsDevice;
+        private static readonly Stack<RenderTarget2D> idle;
+        private static readonly List<RenderTarget2D> expired;
 
-        private static RenderTarget2D previous;
         private static RenderTarget2D current;
 
         private static Color clearColor;
@@ -18,6 +20,9 @@ namespace Relatus.Graphics
         static BetterSketch()
         {
             graphicsDevice = Engine.Graphics.GraphicsDevice;
+
+            idle = new Stack<RenderTarget2D>();
+            expired = new List<RenderTarget2D>();
 
             clearColor = Color.Transparent;
             width = WindowManager.WindowWidth;
@@ -39,7 +44,11 @@ namespace Relatus.Graphics
         {
             if (current != null)
             {
-                previous = current;
+                idle.Push(current);
+
+                // Any nested layers should have the same dimensions as the parent layer.
+                width = current.Width;
+                height = current.Height;
             }
 
             current = new RenderTarget2D(graphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None, 0, RenderTargetUsage.PreserveContents);
@@ -47,21 +56,25 @@ namespace Relatus.Graphics
             graphicsDevice.SetRenderTarget(current);
             graphicsDevice.Clear(clearColor);
 
+            // Reset properties to default.
             clearColor = Color.Transparent;
+            width = (int)Math.Round(WindowManager.PixelWidth * WindowManager.Scale);
+            height = (int)Math.Round(WindowManager.PixelHeight * WindowManager.Scale);
         }
 
         public static void End()
         {
             graphicsDevice.SetRenderTarget(null);
 
-            if (previous != null)
+            if (idle.Count > 0)
             {
+                RenderTarget2D previous = idle.Pop();
                 graphicsDevice.SetRenderTarget(previous);
 
                 Camera camera =
-                    Camera.CreateOrthographic(width, height, 0.5f, 2)
-                        .SetPosition(width * 0.5f, -height * 0.5f, 1)
-                        .SetTarget(width * 0.5f, -height * 0.5f, 0);
+                    Camera.CreateOrthographic(current.Width, current.Height, 0.5f, 2)
+                        .SetPosition(current.Width * 0.5f, -current.Height * 0.5f, 1)
+                        .SetTarget(current.Width * 0.5f, -current.Height * 0.5f, 0);
 
                 Sketch.SpriteBatcher
                     .AttachCamera(camera)
@@ -73,12 +86,12 @@ namespace Relatus.Graphics
                         })
                     .End();
 
+                expired.Add(current);
                 current = previous;
-                previous = null;
             }
             else
             {
-                float scale = 0;
+                float scale;
                 if (current.Width > current.Height)
                 {
                     scale = (float)WindowManager.WindowHeight / current.Height;
@@ -102,13 +115,18 @@ namespace Relatus.Graphics
 
                 SketchManager.AddSketch(new BetterSprite() { Texture = current, Scale = new Vector3(scale, scale, 1) });
 
-                //current.Dispose();
-                //previous.Dispose();
+                expired.Add(current);
                 current = null;
-
-                width = (int)Math.Round(WindowManager.PixelWidth * WindowManager.Scale);
-                height = (int)Math.Round(WindowManager.PixelHeight * WindowManager.Scale);
             }
+        }
+
+        internal static void Clean()
+        {
+            for (int i = 0; i < expired.Count; i++)
+            {
+                expired[i].Dispose();
+            }
+            expired.Clear();
         }
     }
 }

@@ -78,7 +78,7 @@ namespace Relatus
             renderTarget.SetPosition(-WindowManager.WindowWidth * 0.5f + WindowManager.PillarBox * WindowManager.Scale, WindowManager.WindowHeight * 0.5f - WindowManager.LetterBox * WindowManager.Scale, 0);
 
             renderTargets.Add(renderTarget);
-            //
+
             // A Sketch has been completed successfully; reset the stage queue.
             completedStages.Clear();
         }
@@ -95,11 +95,7 @@ namespace Relatus
                     .AddRange(renderTargets)
                 .End();
 
-            // Dispose of all RenderTargets.
-            for (int i = 0; i < renderTargets.Count; i++)
-            {
-                renderTargets[i].Texture.Dispose();
-            }
+            BetterSketch.Clean();
             renderTargets.Clear();
         }
     }
