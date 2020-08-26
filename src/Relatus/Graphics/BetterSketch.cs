@@ -210,5 +210,15 @@ namespace Relatus.Graphics
                 collection.Draw(camera);
             }
         }
+
+        public static void DrawLineSegment(float x1, float y1, float x2, float y2, float lineWidth, Camera camera)
+        {
+            DrawPolygon(ImLineSegment.Create(x1, y1, x2, y2, lineWidth), camera);
+        }
+
+        public static void DrawLineGraph(Vector2[] points, float lineWidth, Camera camera)
+        {
+            DrawPolygon(ImLineSegment.Create(points, lineWidth), camera);
+        }
     }
 }
