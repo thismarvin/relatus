@@ -22,6 +22,8 @@ namespace Relatus
 
         private static readonly List<StageType> completedStages;
 
+        private static BatchExecution batchExecution;
+
         static SketchManager()
         {
             graphicsDevice = Engine.Graphics.GraphicsDevice;
@@ -30,6 +32,13 @@ namespace Relatus
             decommissioned = new List<RenderTarget2D>();
 
             completedStages = new List<StageType>();
+
+            batchExecution = BatchExecution.DrawElements;
+        }
+
+        public static void SetBatchExecution(BatchExecution execution)
+        {
+            batchExecution = execution;
         }
 
         ///// <summary>
@@ -101,12 +110,12 @@ namespace Relatus
             if (effects.Count == 0)
             {
                 // Draw all the saved RenderTargets.
-                using (SpriteCollection collection = new SpriteCollection(BatchExecution.DrawElements, (uint)layers.Count))
-                {
-                    collection.AddRange(layers);
-                    collection.ApplyChanges();
-                    collection.Draw(camera);
-                }
+                Sketch.SpriteBatcher
+                    .AttachCamera(camera)
+                    .SetBatchExecution(batchExecution)
+                    .Begin()
+                        .AddRange(layers)
+                    .End();
             }
             else
             {
@@ -116,24 +125,19 @@ namespace Relatus
                 graphicsDevice.SetRenderTarget(flatten);
                 graphicsDevice.Clear(Color.Transparent);
 
-                using (SpriteCollection collection = new SpriteCollection(BatchExecution.DrawElements, (uint)layers.Count))
-                {
-                    collection.AddRange(layers);
-                    collection.ApplyChanges();
-                    collection.Draw(camera);
-                }
+                Sketch.SpriteBatcher
+                    .AttachCamera(camera)
+                    .SetBatchExecution(batchExecution)
+                    .Begin()
+                        .AddRange(layers)
+                    .End();
 
                 graphicsDevice.SetRenderTarget(null);
 
                 // Now that we have a single texture to work with we can apply all of the effects to said texture.
                 BetterSprite sprite = CreateSprite(flatten, effects);
 
-                using (SpriteCollection collection = new SpriteCollection(BatchExecution.DrawElements, 1))
-                {
-                    collection.Add(sprite);
-                    collection.ApplyChanges();
-                    collection.Draw(camera);
-                }
+                BetterSketch.DrawSprite(sprite, camera);
 
                 flatten.Dispose();
             }
@@ -190,21 +194,16 @@ namespace Relatus
 
             for (int i = 0; i < totalEffects; i++)
             {
-                using (SpriteCollection collection = new SpriteCollection(BatchExecution.DrawElements, 1))
+                BetterSprite sprite = new BetterSprite()
                 {
-                    BetterSprite layer = new BetterSprite()
+                    Texture = i == 0 ? texture : accumulation,
+                    RenderOptions = new RenderOptions()
                     {
-                        Texture = i == 0 ? texture : accumulation,
-                        RenderOptions = new RenderOptions()
-                        {
-                            Effect = effects.Dequeue()
-                        }
-                    };
+                        Effect = effects.Dequeue()
+                    }
+                };
 
-                    collection.Add(layer);
-                    collection.ApplyChanges();
-                    collection.Draw(camera);
-                }
+                BetterSketch.DrawSprite(sprite, camera);
             }
 
             graphicsDevice.SetRenderTarget(null);
