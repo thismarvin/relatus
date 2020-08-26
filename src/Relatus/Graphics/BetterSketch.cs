@@ -12,6 +12,8 @@ namespace Relatus.Graphics
         private static readonly Stack<RenderTarget2D> idle;
 
         private static RenderTarget2D current;
+        private static Texture2D intercept;
+        private static bool disableRelay;
 
         private static Color clearColor;
         private static int width;
@@ -68,13 +70,19 @@ namespace Relatus.Graphics
             effects.Peek().Enqueue(effect);
         }
 
+        public static void DisableRelay()
+        {
+            disableRelay = true;
+        }
+
         public static void End()
         {
             graphicsDevice.SetRenderTarget(null);
 
-            // If there are any nested layers then we have to do additional logic before we can submit anything.
             if (idle.Count > 0)
             {
+                /// If there are any nested layers then we have to do additional logic before we can submit anything.
+
                 // Apply all of this layer's effects. (Note that CreateSprite must be called while the current RenderTarget is null).
                 BetterSprite sprite = CreateSprite(current, effects.Pop());
 
@@ -106,40 +114,49 @@ namespace Relatus.Graphics
                 // Everything has been taken care of, so we can set the current layer back to the parent layer.
                 current = previous;
             }
-            // At this point we should be safe to start the submition process.
             else
             {
+                /// At this point we should be safe to start the submition process.
+
                 // Apply all of this layer's effects. (Note that CreateSprite must be called while the current RenderTarget is null).
                 BetterSprite layer = CreateSprite(current, effects.Pop());
 
-                // Before we submit the finished product, we must first figure out what the layer must be scaled by to fit the entire screen.
-                float scale;
-                if (current.Width > current.Height)
+                if (disableRelay)
                 {
-                    scale = (float)WindowManager.WindowHeight / current.Height;
-
-                    // Check if letterboxing is required.
-                    if (current.Width * scale > WindowManager.WindowWidth)
-                    {
-                        scale = (float)WindowManager.WindowWidth / current.Width;
-                    }
+                    // If the user has disabled the relay to the SketchManager, then set the intercept to the current layer's sprite's texture.
+                    intercept = layer.Texture;
                 }
                 else
                 {
-                    scale = (float)WindowManager.WindowWidth / current.Width;
-
-                    // Check if letterboxing is required.
-                    if (current.Height * scale > WindowManager.WindowHeight)
+                    // Before we submit the finished product, we must first figure out what the layer must be scaled by to fit the entire screen.
+                    float scale;
+                    if (current.Width > current.Height)
                     {
                         scale = (float)WindowManager.WindowHeight / current.Height;
+
+                        // Check if letterboxing is required.
+                        if (current.Width * scale > WindowManager.WindowWidth)
+                        {
+                            scale = (float)WindowManager.WindowWidth / current.Width;
+                        }
                     }
+                    else
+                    {
+                        scale = (float)WindowManager.WindowWidth / current.Width;
+
+                        // Check if letterboxing is required.
+                        if (current.Height * scale > WindowManager.WindowHeight)
+                        {
+                            scale = (float)WindowManager.WindowHeight / current.Height;
+                        }
+                    }
+
+                    // Apply the scale to the sprite.
+                    layer.Scale = new Vector3(scale, scale, 1);
+
+                    // Everything should be setup, so we can finally submit the layer to the SketchManager.
+                    SketchManager.AddSketch(layer);
                 }
-
-                // Apply the scale to the sprite.
-                layer.Scale = new Vector3(scale, scale, 1);
-
-                // Everything should be setup, so we can finally submit the layer to the SketchManager.
-                SketchManager.AddSketch(layer);
 
                 // We cannot dispose of the current layer just yet. Instead we are going to have to add it to a list, and deal with it later.
                 SketchManager.Decomission(current);
@@ -147,6 +164,13 @@ namespace Relatus.Graphics
                 // Make sure to set the current layer to null in order to prevent any unwanted nesting!
                 current = null;
             }
+        }
+
+        public static Texture2D InterceptRelay()
+        {
+            disableRelay = false;
+
+            return intercept;
         }
 
         private static BetterSprite CreateSprite(RenderTarget2D renderTarget, Queue<Effect> effects)
