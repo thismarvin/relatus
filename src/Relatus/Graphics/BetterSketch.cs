@@ -8,6 +8,7 @@ namespace Relatus.Graphics
     public static class BetterSketch
     {
         private static readonly GraphicsDevice graphicsDevice;
+        private static readonly Stack<Queue<Effect>> effects;
         private static readonly Stack<RenderTarget2D> idle;
         private static readonly List<RenderTarget2D> expired;
 
@@ -21,6 +22,7 @@ namespace Relatus.Graphics
         {
             graphicsDevice = Engine.Graphics.GraphicsDevice;
 
+            effects = new Stack<Queue<Effect>>();
             idle = new Stack<RenderTarget2D>();
             expired = new List<RenderTarget2D>();
 
@@ -40,6 +42,12 @@ namespace Relatus.Graphics
             BetterSketch.height = height;
         }
 
+        public static void AttachEffect(Effect effect)
+        {
+            effects.Peek().Enqueue(effect);
+
+        }
+
         public static void Begin()
         {
             if (current != null)
@@ -51,6 +59,7 @@ namespace Relatus.Graphics
                 height = current.Height;
             }
 
+            effects.Push(new Queue<Effect>());
             current = new RenderTarget2D(graphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None, 0, RenderTargetUsage.PreserveContents);
 
             graphicsDevice.SetRenderTarget(current);
@@ -79,15 +88,27 @@ namespace Relatus.Graphics
                         .SetPosition(x, y, 1)
                         .SetTarget(x, y, 0);
 
+                BetterSprite layer = new BetterSprite()
+                {
+                    Texture = current
+                };
+
+                Queue<Effect> efs = effects.Pop();
+                while (efs.Count > 0)
+                {
+                    layer.RenderOptions = new RenderOptions()
+                    {
+                        Effect = efs.Dequeue()
+                    };
+                }
+
                 Sketch.SpriteBatcher
                     .AttachCamera(camera)
                     .SetBatchSize(1)
                     .Begin()
-                        .Add(new BetterSprite()
-                        {
-                            Texture = current
-                        })
+                        .Add(layer)
                     .End();
+
 
                 expired.Add(current);
                 current = previous;
@@ -116,7 +137,26 @@ namespace Relatus.Graphics
                     }
                 }
 
-                SketchManager.AddSketch(new BetterSprite() { Texture = current, Scale = new Vector3(scale, scale, 1) });
+                //BetterSprite layer = new BetterSprite()
+                //{
+                //Texture = current,
+                //Scale = new Vector3(scale, scale, 1),
+                //};
+
+                //Queue<Effect> ef = effects.Pop();
+
+                //while (ef.Count > 0)
+                //{
+                //layer.RenderOptions = new RenderOptions()
+                //{
+                //Effect = ef.Dequeue()
+                //};
+                //}
+
+                BetterSprite layer = CreateSprite(current, effects.Pop());
+                layer.Scale = new Vector3(scale, scale, 1);
+
+                SketchManager.AddSketch(layer);
 
                 expired.Add(current);
                 current = null;
@@ -130,6 +170,92 @@ namespace Relatus.Graphics
                 expired[i].Dispose();
             }
             expired.Clear();
+        }
+
+        private static BetterSprite CreateSprite(RenderTarget2D renderTarget, Queue<Effect> effects)
+        {
+            if (effects.Count == 0)
+            {
+                return new BetterSprite()
+                {
+                    Texture = renderTarget
+                };
+            }
+
+            if (effects.Count == 1)
+            {
+                return new BetterSprite()
+                {
+                    Texture = renderTarget,
+                    RenderOptions = new RenderOptions()
+                    {
+                        Effect = effects.Dequeue()
+                    }
+                };
+            }
+
+            float x = renderTarget.Width * 0.5f;
+            float y = -renderTarget.Height * 0.5f;
+
+            Camera camera =
+                Camera.CreateOrthographic(renderTarget.Width, renderTarget.Height, 0.5f, 2)
+                .SetPosition(x, y, 1)
+                .SetTarget(x, y, 0);
+
+            RenderTarget2D[] renderTargets = new RenderTarget2D[effects.Count];
+
+            for (int i = 0; i < renderTargets.Length; i++)
+            {
+                renderTargets[i] = new RenderTarget2D(graphicsDevice, renderTarget.Width, renderTarget.Height);
+
+                graphicsDevice.SetRenderTarget(renderTargets[i]);
+
+                using (SpriteCollection collection = new SpriteCollection(BatchExecution.DrawElements, 1))
+                {
+                    BetterSprite layer = new BetterSprite()
+                    {
+                        Texture = i == 0 ? renderTarget : renderTargets[i - 1],
+                        RenderOptions = new RenderOptions()
+                        {
+                            Effect = effects.Dequeue()
+                        }
+                    };
+
+                    collection.Add(layer);
+                    collection.ApplyChanges();
+                    collection.Draw(camera);
+                }
+            }
+
+            RenderTarget2D accumulation = new RenderTarget2D(graphicsDevice, renderTarget.Width, renderTarget.Height);
+
+            graphicsDevice.SetRenderTarget(accumulation);
+
+            using (SpriteCollection collection = new SpriteCollection(BatchExecution.DrawElements, 1))
+            {
+                BetterSprite layer = new BetterSprite()
+                {
+                    Texture = renderTargets[renderTargets.Length - 1],
+                };
+
+                collection.Add(layer);
+                collection.ApplyChanges();
+                collection.Draw(camera);
+            }
+
+            for (int i = 0; i < renderTargets.Length; i++)
+            {
+                renderTargets[i].Dispose();
+            }
+
+            expired.Add(accumulation);
+
+            graphicsDevice.SetRenderTarget(null);
+
+            return new BetterSprite()
+            {
+                Texture = accumulation
+            };
         }
     }
 }
