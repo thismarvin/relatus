@@ -10,7 +10,6 @@ namespace Relatus.Graphics
         private static readonly GraphicsDevice graphicsDevice;
         private static readonly Stack<Queue<Effect>> effects;
         private static readonly Stack<RenderTarget2D> idle;
-        private static readonly List<RenderTarget2D> expired;
 
         private static RenderTarget2D current;
 
@@ -24,7 +23,6 @@ namespace Relatus.Graphics
 
             effects = new Stack<Queue<Effect>>();
             idle = new Stack<RenderTarget2D>();
-            expired = new List<RenderTarget2D>();
 
             clearColor = Color.Transparent;
             width = WindowManager.WindowWidth;
@@ -49,8 +47,8 @@ namespace Relatus.Graphics
                 idle.Push(current);
 
                 // The dimensions of any nested layer should not exceed the dimensions of the parent layer, but it is okay for the dimensions to be smaller.
-                width = (int)Math.Min(current.Width, width);
-                height = (int)Math.Min(current.Height, height);
+                width = Math.Min(current.Width, width);
+                height = Math.Min(current.Height, height);
             }
 
             effects.Push(new Queue<Effect>());
@@ -103,7 +101,7 @@ namespace Relatus.Graphics
                 }
 
                 // We cannot dispose of the current layer just yet. Instead we are going to have to add it to a list, and deal with it later.
-                expired.Add(current);
+                SketchManager.Decomission(current);
 
                 // Everything has been taken care of, so we can set the current layer back to the parent layer.
                 current = previous;
@@ -144,21 +142,11 @@ namespace Relatus.Graphics
                 SketchManager.AddSketch(layer);
 
                 // We cannot dispose of the current layer just yet. Instead we are going to have to add it to a list, and deal with it later.
-                expired.Add(current);
+                SketchManager.Decomission(current);
 
                 // Make sure to set the current layer to null in order to prevent any unwanted nesting!
                 current = null;
             }
-        }
-
-        internal static void Clean()
-        {
-            // At this point all of the layers have finally been drawn, so we can dispose of them now.
-            for (int i = 0; i < expired.Count; i++)
-            {
-                expired[i].Dispose();
-            }
-            expired.Clear();
         }
 
         private static BetterSprite CreateSprite(RenderTarget2D renderTarget, Queue<Effect> effects)
@@ -223,7 +211,8 @@ namespace Relatus.Graphics
 
             graphicsDevice.SetRenderTarget(null);
 
-            expired.Add(accumulation);
+            // We cannot dispose of the accumulation just yet. Instead we are going to have to add it to a list, and deal with it later.
+            SketchManager.Decomission(accumulation);
 
             // Now that all the effects were applied, just return a sprite with the accumulation as the texture.
             return new BetterSprite()
