@@ -74,14 +74,19 @@ namespace Relatus.Graphics
         {
             graphicsDevice.SetRenderTarget(null);
 
+            // If there are any nested layers then we have to do additional logic before we can submit anything.
             if (idle.Count > 0)
             {
+                // Apply all of this layer's effects. (Note that CreateSprite must be called while the current RenderTarget is null).
                 BetterSprite sprite = CreateSprite(current, effects.Pop());
 
+                // Get the current layer's parent.
                 RenderTarget2D previous = idle.Pop();
 
+                // Set the current RenderTarget back to the parent layer.
                 graphicsDevice.SetRenderTarget(previous);
 
+                // Draw the current layer on top of its parent layer.
                 using (SpriteCollection collection = new SpriteCollection(BatchExecution.DrawElements, 1))
                 {
                     float x = current.Width * 0.5f;
@@ -97,12 +102,19 @@ namespace Relatus.Graphics
                     collection.Draw(camera);
                 }
 
+                // We cannot dispose of the current layer just yet. Instead we are going to have to add it to a list, and deal with it later.
                 expired.Add(current);
 
+                // Everything has been taken care of, so we can set the current layer back to the parent layer.
                 current = previous;
             }
+            // At this point we should be safe to start the submition process.
             else
             {
+                // Apply all of this layer's effects. (Note that CreateSprite must be called while the current RenderTarget is null).
+                BetterSprite layer = CreateSprite(current, effects.Pop());
+
+                // Before we submit the finished product, we must first figure out what the layer must be scaled by to fit the entire screen.
                 float scale;
                 if (current.Width > current.Height)
                 {
@@ -125,18 +137,23 @@ namespace Relatus.Graphics
                     }
                 }
 
-                BetterSprite layer = CreateSprite(current, effects.Pop());
+                // Apply the scale to the sprite.
                 layer.Scale = new Vector3(scale, scale, 1);
 
+                // Everything should be setup, so we can finally submit the layer to the SketchManager.
                 SketchManager.AddSketch(layer);
 
+                // We cannot dispose of the current layer just yet. Instead we are going to have to add it to a list, and deal with it later.
                 expired.Add(current);
+
+                // Make sure to set the current layer to null in order to prevent any unwanted nesting!
                 current = null;
             }
         }
 
         internal static void Clean()
         {
+            // At this point all of the layers have finally been drawn, so we can dispose of them now.
             for (int i = 0; i < expired.Count; i++)
             {
                 expired[i].Dispose();
@@ -146,6 +163,7 @@ namespace Relatus.Graphics
 
         private static BetterSprite CreateSprite(RenderTarget2D renderTarget, Queue<Effect> effects)
         {
+            // If there are no effects then return a sprite with the renderTarget as the texture.
             if (effects.Count == 0)
             {
                 return new BetterSprite()
@@ -154,6 +172,7 @@ namespace Relatus.Graphics
                 };
             }
 
+            // There is only one effect, so we can just return a sprite with the renderTarget as the texture and then simply attach the effect to the sprite's render options.
             if (effects.Count == 1)
             {
                 return new BetterSprite()
@@ -165,6 +184,8 @@ namespace Relatus.Graphics
                     }
                 };
             }
+
+            // There is more than one effect, so we are going to have to draw the renderTarget multiple times in order to apply every effect.
 
             float x = renderTarget.Width * 0.5f;
             float y = -renderTarget.Height * 0.5f;
@@ -200,10 +221,11 @@ namespace Relatus.Graphics
                 }
             }
 
-            expired.Add(accumulation);
-
             graphicsDevice.SetRenderTarget(null);
 
+            expired.Add(accumulation);
+
+            // Now that all the effects were applied, just return a sprite with the accumulation as the texture.
             return new BetterSprite()
             {
                 Texture = accumulation
