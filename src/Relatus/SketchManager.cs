@@ -110,9 +110,11 @@ namespace Relatus
             }
             else
             {
-                RenderTarget2D squash = new RenderTarget2D(graphicsDevice, WindowManager.WindowWidth, WindowManager.WindowHeight);
+                // We need flatten all the layers into a single layer.
+                RenderTarget2D flatten = new RenderTarget2D(graphicsDevice, WindowManager.WindowWidth, WindowManager.WindowHeight);
 
-                graphicsDevice.SetRenderTarget(squash);
+                graphicsDevice.SetRenderTarget(flatten);
+                graphicsDevice.Clear(Color.Transparent);
 
                 using (SpriteCollection collection = new SpriteCollection(BatchExecution.DrawElements, (uint)layers.Count))
                 {
@@ -123,7 +125,8 @@ namespace Relatus
 
                 graphicsDevice.SetRenderTarget(null);
 
-                BetterSprite sprite = CreateSprite(squash, effects);
+                // Now that we have a single texture to work with we can apply all of the effects to said texture.
+                BetterSprite sprite = CreateSprite(flatten, effects);
 
                 using (SpriteCollection collection = new SpriteCollection(BatchExecution.DrawElements, 1))
                 {
@@ -132,7 +135,7 @@ namespace Relatus
                     collection.Draw(camera);
                 }
 
-                squash.Dispose();
+                flatten.Dispose();
             }
 
             // Clean up.
@@ -144,23 +147,23 @@ namespace Relatus
             layers.Clear();
         }
 
-        private static BetterSprite CreateSprite(Texture2D renderTarget, Queue<Effect> effects)
+        internal static BetterSprite CreateSprite(Texture2D texture, Queue<Effect> effects)
         {
-            // If there are no effects then return a sprite with the renderTarget as the texture.
+            // If there are no effects then return a new sprite with the texture attached.
             if (effects.Count == 0)
             {
                 return new BetterSprite()
                 {
-                    Texture = renderTarget
+                    Texture = texture
                 };
             }
 
-            // There is only one effect, so we can just return a sprite with the renderTarget as the texture and then simply attach the effect to the sprite's render options.
+            // There is only one effect, so we can just return a sprite with the texture attached and then simply attach the effect to the sprite's render options.
             if (effects.Count == 1)
             {
                 return new BetterSprite()
                 {
-                    Texture = renderTarget,
+                    Texture = texture,
                     RenderOptions = new RenderOptions()
                     {
                         Effect = effects.Dequeue()
@@ -168,17 +171,17 @@ namespace Relatus
                 };
             }
 
-            // There is more than one effect, so we are going to have to draw the renderTarget multiple times in order to apply every effect.
+            // There is more than one effect. We are going to have to create a new RenderTarget2D, and then draw the texture multiple times on said render target in order to apply every effect.
 
-            float x = renderTarget.Width * 0.5f;
-            float y = -renderTarget.Height * 0.5f;
+            float x = texture.Width * 0.5f;
+            float y = -texture.Height * 0.5f;
 
             Camera camera =
-                Camera.CreateOrthographic(renderTarget.Width, renderTarget.Height, 0.5f, 2)
+                Camera.CreateOrthographic(texture.Width, texture.Height, 0.5f, 2)
                 .SetPosition(x, y, 1)
                 .SetTarget(x, y, 0);
 
-            RenderTarget2D accumulation = new RenderTarget2D(graphicsDevice, renderTarget.Width, renderTarget.Height);
+            RenderTarget2D accumulation = new RenderTarget2D(graphicsDevice, texture.Width, texture.Height);
 
             graphicsDevice.SetRenderTarget(accumulation);
             graphicsDevice.Clear(Color.Transparent);
@@ -191,7 +194,7 @@ namespace Relatus
                 {
                     BetterSprite layer = new BetterSprite()
                     {
-                        Texture = i == 0 ? renderTarget : accumulation,
+                        Texture = i == 0 ? texture : accumulation,
                         RenderOptions = new RenderOptions()
                         {
                             Effect = effects.Dequeue()

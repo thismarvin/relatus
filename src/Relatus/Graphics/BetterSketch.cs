@@ -84,7 +84,7 @@ namespace Relatus.Graphics
                 /// If there are any nested layers then we have to do additional logic before we can submit anything.
 
                 // Apply all of this layer's effects. (Note that CreateSprite must be called while the current RenderTarget is null).
-                BetterSprite sprite = CreateSprite(current, effects.Pop());
+                BetterSprite sprite = SketchManager.CreateSprite(current, effects.Pop());
 
                 // Get the current layer's parent.
                 RenderTarget2D previous = idle.Pop();
@@ -119,7 +119,7 @@ namespace Relatus.Graphics
                 /// At this point we should be safe to start the submition process.
 
                 // Apply all of this layer's effects. (Note that CreateSprite must be called while the current RenderTarget is null).
-                BetterSprite layer = CreateSprite(current, effects.Pop());
+                BetterSprite layer = SketchManager.CreateSprite(current, effects.Pop());
 
                 if (disableRelay)
                 {
@@ -171,78 +171,6 @@ namespace Relatus.Graphics
             disableRelay = false;
 
             return intercept;
-        }
-
-        private static BetterSprite CreateSprite(RenderTarget2D renderTarget, Queue<Effect> effects)
-        {
-            // If there are no effects then return a sprite with the renderTarget as the texture.
-            if (effects.Count == 0)
-            {
-                return new BetterSprite()
-                {
-                    Texture = renderTarget
-                };
-            }
-
-            // There is only one effect, so we can just return a sprite with the renderTarget as the texture and then simply attach the effect to the sprite's render options.
-            if (effects.Count == 1)
-            {
-                return new BetterSprite()
-                {
-                    Texture = renderTarget,
-                    RenderOptions = new RenderOptions()
-                    {
-                        Effect = effects.Dequeue()
-                    }
-                };
-            }
-
-            // There is more than one effect, so we are going to have to draw the renderTarget multiple times in order to apply every effect.
-
-            float x = renderTarget.Width * 0.5f;
-            float y = -renderTarget.Height * 0.5f;
-
-            Camera camera =
-                Camera.CreateOrthographic(renderTarget.Width, renderTarget.Height, 0.5f, 2)
-                .SetPosition(x, y, 1)
-                .SetTarget(x, y, 0);
-
-            RenderTarget2D accumulation = new RenderTarget2D(graphicsDevice, renderTarget.Width, renderTarget.Height);
-
-            graphicsDevice.SetRenderTarget(accumulation);
-            graphicsDevice.Clear(Color.Transparent);
-
-            int totalEffects = effects.Count;
-
-            for (int i = 0; i < totalEffects; i++)
-            {
-                using (SpriteCollection collection = new SpriteCollection(BatchExecution.DrawElements, 1))
-                {
-                    BetterSprite layer = new BetterSprite()
-                    {
-                        Texture = i == 0 ? renderTarget : accumulation,
-                        RenderOptions = new RenderOptions()
-                        {
-                            Effect = effects.Dequeue()
-                        }
-                    };
-
-                    collection.Add(layer);
-                    collection.ApplyChanges();
-                    collection.Draw(camera);
-                }
-            }
-
-            graphicsDevice.SetRenderTarget(null);
-
-            // We cannot dispose of the accumulation just yet. Instead we are going to have to add it to a list, and deal with it later.
-            SketchManager.Decomission(accumulation);
-
-            // Now that all the effects were applied, just return a sprite with the accumulation as the texture.
-            return new BetterSprite()
-            {
-                Texture = accumulation
-            };
         }
     }
 }
