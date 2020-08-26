@@ -1,5 +1,6 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Relatus.Utilities;
 using System;
 using System.Collections.Generic;
 
@@ -171,6 +172,43 @@ namespace Relatus.Graphics
             disableRelay = false;
 
             return intercept;
+        }
+
+        public static void DrawSprite(BetterSprite sprite, Camera camera)
+        {
+            SpriteElements spriteGroup = new SpriteElements(1, sprite.Texture, sprite.RenderOptions);
+            spriteGroup.Add(sprite);
+            spriteGroup.ApplyChanges();
+            spriteGroup.Draw(camera);
+        }
+
+        public static void DrawSpriteCollection(BatchExecution batchExecution, uint batchSize, IEnumerable<BetterSprite> sprites, Camera camera)
+        {
+            using (SpriteCollection collection = new SpriteCollection(batchExecution, batchSize, sprites))
+            {
+                collection.Draw(camera);
+            }
+        }
+
+        public static void DrawText(float x, float y, string text, BMFont font, BMFontShader fontShader, Camera camera)
+        {
+            DrawSpriteCollection(BatchExecution.DrawElements, 1, ImText.Create(x, y, text, font, fontShader), camera);
+        }
+
+        public static void DrawPolygon(Polygon polygon, Camera camera)
+        {
+            PolygonElements polygonGroup = new PolygonElements(1, polygon.Geometry, polygon.RenderOptions);
+            polygonGroup.Add(polygon);
+            polygonGroup.ApplyChanges();
+            polygonGroup.Draw(camera);
+        }
+
+        public static void DrawPolygonCollection(BatchExecution batchExecution, uint batchSize, IEnumerable<Polygon> polygons, Camera camera)
+        {
+            using (PolygonCollection collection = new PolygonCollection(batchExecution, batchSize, polygons))
+            {
+                collection.Draw(camera);
+            }
         }
     }
 }
