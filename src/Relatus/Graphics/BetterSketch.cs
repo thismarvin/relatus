@@ -48,9 +48,9 @@ namespace Relatus.Graphics
             {
                 idle.Push(current);
 
-                // Any nested layers should have the same dimensions as the parent layer.
-                width = current.Width;
-                height = current.Height;
+                // The dimensions of any nested layer should not exceed the dimensions of the parent layer, but it is okay for the dimensions to be smaller.
+                width = (int)Math.Min(current.Width, width);
+                height = (int)Math.Min(current.Height, height);
             }
 
             effects.Push(new Queue<Effect>());
@@ -76,6 +76,8 @@ namespace Relatus.Graphics
 
             if (idle.Count > 0)
             {
+                BetterSprite sprite = CreateSprite(current, effects.Pop());
+
                 RenderTarget2D previous = idle.Pop();
 
                 graphicsDevice.SetRenderTarget(previous);
@@ -89,8 +91,6 @@ namespace Relatus.Graphics
                         Camera.CreateOrthographic(current.Width, current.Height, 0.5f, 2)
                         .SetPosition(x, y, 1)
                         .SetTarget(x, y, 0);
-
-                    BetterSprite sprite = CreateSprite(current, effects.Pop());
 
                     collection.Add(sprite);
                     collection.ApplyChanges();
