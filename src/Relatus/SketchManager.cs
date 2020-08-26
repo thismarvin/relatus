@@ -1,3 +1,4 @@
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Relatus.Graphics;
 using System.Collections.Generic;
@@ -16,27 +17,29 @@ namespace Relatus
     {
         private static readonly GraphicsDevice graphicsDevice;
         private static readonly List<BetterSprite> layers;
-        private static readonly List<StageType> completedStages;
+        private static readonly Queue<Effect> effects;
         private static readonly List<RenderTarget2D> decommissioned;
 
-        //private static Effect postProcessing;
+        private static readonly List<StageType> completedStages;
 
         static SketchManager()
         {
             graphicsDevice = Engine.Graphics.GraphicsDevice;
             layers = new List<BetterSprite>();
-            completedStages = new List<StageType>();
+            effects = new Queue<Effect>();
             decommissioned = new List<RenderTarget2D>();
+
+            completedStages = new List<StageType>();
         }
 
         ///// <summary>
         ///// Attches an <see cref="Effect"/> that is applied after every <see cref="Sketch"/> layer is drawn.
         ///// </summary>
-        ///// <param name="postProcessing"></param>
-        //public static void AttachPostProcessingEffect(Effect postProcessing)
-        //{
-            //SketchManager.postProcessing = postProcessing;
-        //}
+        ///// <param name="effect"></param>
+        public static void AttachEffect(Effect effect)
+        {
+            effects.Enqueue(effect);
+        }
 
         internal static void RegisterStage(StageType stage)
         {
@@ -88,19 +91,48 @@ namespace Relatus
 
         internal static void Draw()
         {
-            // Draw all the saved RenderTargets.
-            using (SpriteCollection collection = new SpriteCollection(BatchExecution.DrawElements, (uint)layers.Count))
+            float x = WindowManager.WindowWidth * 0.5f - WindowManager.PillarBox * WindowManager.Scale;
+            float y = -WindowManager.WindowHeight * 0.5f + WindowManager.LetterBox * WindowManager.Scale;
+
+            Camera camera = Camera.CreateOrthographic(WindowManager.WindowWidth, WindowManager.WindowHeight, 0.5f, 2)
+                .SetPosition(x, y, 1)
+                .SetTarget(x, y, 0);
+
+            if (effects.Count == 0)
             {
-                float x = WindowManager.WindowWidth * 0.5f - WindowManager.PillarBox * WindowManager.Scale;
-                float y = -WindowManager.WindowHeight * 0.5f + WindowManager.LetterBox * WindowManager.Scale;
+                // Draw all the saved RenderTargets.
+                using (SpriteCollection collection = new SpriteCollection(BatchExecution.DrawElements, (uint)layers.Count))
+                {
+                    collection.AddRange(layers);
+                    collection.ApplyChanges();
+                    collection.Draw(camera);
+                }
+            }
+            else
+            {
+                RenderTarget2D squash = new RenderTarget2D(graphicsDevice, WindowManager.WindowWidth, WindowManager.WindowHeight);
 
-                Camera camera = Camera.CreateOrthographic(WindowManager.WindowWidth, WindowManager.WindowHeight, 0.5f, 2)
-                    .SetPosition(x, y, 1)
-                    .SetTarget(x, y, 0);
+                graphicsDevice.SetRenderTarget(squash);
 
-                collection.AddRange(layers);
-                collection.ApplyChanges();
-                collection.Draw(camera);
+                using (SpriteCollection collection = new SpriteCollection(BatchExecution.DrawElements, (uint)layers.Count))
+                {
+                    collection.AddRange(layers);
+                    collection.ApplyChanges();
+                    collection.Draw(camera);
+                }
+
+                graphicsDevice.SetRenderTarget(null);
+
+                BetterSprite sprite = CreateSprite(squash, effects);
+
+                using (SpriteCollection collection = new SpriteCollection(BatchExecution.DrawElements, 1))
+                {
+                    collection.Add(sprite);
+                    collection.ApplyChanges();
+                    collection.Draw(camera);
+                }
+
+                squash.Dispose();
             }
 
             // Clean up.
@@ -110,6 +142,78 @@ namespace Relatus
             }
             decommissioned.Clear();
             layers.Clear();
+        }
+
+        private static BetterSprite CreateSprite(Texture2D renderTarget, Queue<Effect> effects)
+        {
+            // If there are no effects then return a sprite with the renderTarget as the texture.
+            if (effects.Count == 0)
+            {
+                return new BetterSprite()
+                {
+                    Texture = renderTarget
+                };
+            }
+
+            // There is only one effect, so we can just return a sprite with the renderTarget as the texture and then simply attach the effect to the sprite's render options.
+            if (effects.Count == 1)
+            {
+                return new BetterSprite()
+                {
+                    Texture = renderTarget,
+                    RenderOptions = new RenderOptions()
+                    {
+                        Effect = effects.Dequeue()
+                    }
+                };
+            }
+
+            // There is more than one effect, so we are going to have to draw the renderTarget multiple times in order to apply every effect.
+
+            float x = renderTarget.Width * 0.5f;
+            float y = -renderTarget.Height * 0.5f;
+
+            Camera camera =
+                Camera.CreateOrthographic(renderTarget.Width, renderTarget.Height, 0.5f, 2)
+                .SetPosition(x, y, 1)
+                .SetTarget(x, y, 0);
+
+            RenderTarget2D accumulation = new RenderTarget2D(graphicsDevice, renderTarget.Width, renderTarget.Height);
+
+            graphicsDevice.SetRenderTarget(accumulation);
+            graphicsDevice.Clear(Color.Transparent);
+
+            int totalEffects = effects.Count;
+
+            for (int i = 0; i < totalEffects; i++)
+            {
+                using (SpriteCollection collection = new SpriteCollection(BatchExecution.DrawElements, 1))
+                {
+                    BetterSprite layer = new BetterSprite()
+                    {
+                        Texture = i == 0 ? renderTarget : accumulation,
+                        RenderOptions = new RenderOptions()
+                        {
+                            Effect = effects.Dequeue()
+                        }
+                    };
+
+                    collection.Add(layer);
+                    collection.ApplyChanges();
+                    collection.Draw(camera);
+                }
+            }
+
+            graphicsDevice.SetRenderTarget(null);
+
+            // We cannot dispose of the accumulation just yet. Instead we are going to have to add it to a list, and deal with it later.
+            Decomission(accumulation);
+
+            // Now that all the effects were applied, just return a sprite with the accumulation as the texture.
+            return new BetterSprite()
+            {
+                Texture = accumulation
+            };
         }
     }
 }
