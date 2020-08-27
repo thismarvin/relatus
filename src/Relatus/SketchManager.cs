@@ -164,20 +164,7 @@ namespace Relatus
                 };
             }
 
-            // There is only one effect, so we can just return a sprite with the texture attached and then simply attach the effect to the sprite's render options.
-            if (effects.Count == 1)
-            {
-                return new BetterSprite()
-                {
-                    Texture = texture,
-                    RenderOptions = new RenderOptions()
-                    {
-                        Effect = effects.Dequeue()
-                    }
-                };
-            }
-
-            // There is more than one effect. We are going to have to create a new RenderTarget2D, and then draw the texture multiple times on said render target in order to apply every effect.
+            // We are going to have to create a new RenderTarget2D, and then draw the texture multiple times on said render target in order to apply every effect.
 
             float x = texture.Width * 0.5f;
             float y = -texture.Height * 0.5f;
