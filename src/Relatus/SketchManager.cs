@@ -89,6 +89,8 @@ namespace Relatus
         {
             layers.Add(layer);
 
+            layer.SetPosition(layer.X + WindowManager.PillarBox * WindowManager.Scale, layer.Y - WindowManager.LetterBox * WindowManager.Scale, 0);
+
             // A Sketch has been completed successfully; reset the stage queue.
             completedStages.Clear();
         }
@@ -100,8 +102,8 @@ namespace Relatus
 
         internal static void Draw()
         {
-            float x = WindowManager.WindowWidth * 0.5f - WindowManager.PillarBox * WindowManager.Scale;
-            float y = -WindowManager.WindowHeight * 0.5f + WindowManager.LetterBox * WindowManager.Scale;
+            float x = WindowManager.WindowWidth * 0.5f;
+            float y = -WindowManager.WindowHeight * 0.5f;
 
             Camera camera = Camera.CreateOrthographic(WindowManager.WindowWidth, WindowManager.WindowHeight, 0.5f, 2)
                 .SetPosition(x, y, 1)
