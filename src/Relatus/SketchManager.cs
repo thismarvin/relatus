@@ -174,18 +174,24 @@ namespace Relatus
                 .SetPosition(x, y, 1)
                 .SetTarget(x, y, 0);
 
-            RenderTarget2D accumulation = new RenderTarget2D(graphicsDevice, texture.Width, texture.Height);
-
-            graphicsDevice.SetRenderTarget(accumulation);
-            graphicsDevice.Clear(Color.Transparent);
+            // In order to apply multiple effects, and avoid weird visual artifacts, we need to create a RenderTarget2D for each effect.
+            RenderTarget2D[] renderTargets = new RenderTarget2D[effects.Count];
+            for (int i = 0; i < renderTargets.Length; i++)
+            {
+                renderTargets[i] = new RenderTarget2D(graphicsDevice, texture.Width, texture.Height);
+            }
 
             int totalEffects = effects.Count;
 
             for (int i = 0; i < totalEffects; i++)
             {
+                graphicsDevice.SetRenderTarget(renderTargets[i]);
+                graphicsDevice.Clear(Color.Transparent);
+
                 BetterSprite sprite = new BetterSprite()
                 {
-                    Texture = i == 0 ? texture : accumulation,
+                    // The first pass starts with the initial texture. Every pass after that will use the last render target (which means the effects will accumulate).
+                    Texture = i == 0 ? texture : renderTargets[i - 1],
                     RenderOptions = new RenderOptions()
                     {
                         Effect = effects.Dequeue()
@@ -193,17 +199,23 @@ namespace Relatus
                 };
 
                 BetterSketch.DrawSprite(sprite, camera);
+
+                graphicsDevice.SetRenderTarget(null);
             }
 
-            graphicsDevice.SetRenderTarget(null);
+            // Dispose all render targets except for the last one.
+            for (int i = 0; i < renderTargets.Length - 1; i++)
+            {
+                renderTargets[i].Dispose();
+            }
 
-            // We cannot dispose of the accumulation just yet. Instead we are going to have to add it to a list, and deal with it later.
-            Decomission(accumulation);
+            // We cannot dispose of the last render target just yet. Instead we are going to have to add it to a list, and deal with it later.
+            Decomission(renderTargets[renderTargets.Length - 1]);
 
-            // Now that all the effects were applied, just return a sprite with the accumulation as the texture.
+            // Now that all the effects were applied, just return a sprite with the last render target as the texture.
             return new BetterSprite()
             {
-                Texture = accumulation
+                Texture = renderTargets[renderTargets.Length - 1]
             };
         }
     }
