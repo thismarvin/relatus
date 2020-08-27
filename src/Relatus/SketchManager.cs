@@ -41,6 +41,44 @@ namespace Relatus
             batchExecution = execution;
         }
 
+        public static BetterSprite CreatePage(Texture2D texture)
+        {
+            float scale;
+            if (texture.Width >= texture.Height)
+            {
+                scale = (float)WindowManager.WindowHeight / texture.Height;
+
+                if (texture.Width * scale > WindowManager.WindowWidth)
+                {
+                    scale = (float)WindowManager.WindowWidth / texture.Width;
+                }
+            }
+            else
+            {
+                scale = (float)WindowManager.WindowWidth / texture.Width;
+
+                if (texture.Height * scale > WindowManager.WindowHeight)
+                {
+                    scale = (float)WindowManager.WindowHeight / texture.Height;
+                }
+            }
+
+            float letterBox = (WindowManager.WindowWidth - texture.Width * scale) * 0.5f;
+            float pillarBox = (WindowManager.WindowHeight - texture.Height * scale) * 0.5f;
+
+            return new BetterSprite()
+            {
+                Texture = texture,
+                Position = new Vector3(letterBox, -pillarBox, 0),
+                Scale = new Vector3(scale, scale, 1)
+            };
+        }
+
+        public static void Submit(BetterSprite sprite)
+        {
+            layers.Add(sprite);
+        }
+
         ///// <summary>
         ///// Attches an <see cref="Effect"/> that is applied after every <see cref="Sketch"/> layer is drawn.
         ///// </summary>
@@ -137,7 +175,10 @@ namespace Relatus
                 graphicsDevice.SetRenderTarget(null);
 
                 // Now that we have a single texture to work with we can apply all of the effects to said texture.
-                BetterSprite sprite = CreateSprite(flatten, effects);
+                BetterSprite sprite = new BetterSprite()
+                {
+                    Texture = ApplyEffects(flatten, effects)
+                };
 
                 BetterSketch.DrawSprite(sprite, camera);
 
@@ -153,15 +194,12 @@ namespace Relatus
             layers.Clear();
         }
 
-        internal static BetterSprite CreateSprite(Texture2D texture, Queue<Effect> effects)
+        internal static Texture2D ApplyEffects(Texture2D texture, Queue<Effect> effects)
         {
             // If there are no effects then return a new sprite with the texture attached.
             if (effects.Count == 0)
             {
-                return new BetterSprite()
-                {
-                    Texture = texture
-                };
+                return texture;
             }
 
             // We are going to have to create a new RenderTarget2D, and then draw the texture multiple times on said render target in order to apply every effect.
@@ -213,10 +251,7 @@ namespace Relatus
             Decomission(renderTargets[renderTargets.Length - 1]);
 
             // Now that all the effects were applied, just return a sprite with the last render target as the texture.
-            return new BetterSprite()
-            {
-                Texture = renderTargets[renderTargets.Length - 1]
-            };
+            return renderTargets[renderTargets.Length - 1];
         }
     }
 }

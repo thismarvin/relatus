@@ -13,8 +13,7 @@ namespace Relatus.Graphics
         private static readonly Stack<RenderTarget2D> idle;
 
         private static RenderTarget2D current;
-        private static Texture2D intercept;
-        private static bool disableRelay;
+        private static Texture2D result;
 
         private static Color clearColor;
         private static int width;
@@ -45,6 +44,9 @@ namespace Relatus.Graphics
 
         public static void Begin()
         {
+            // Let's hope the end user dealt with this already.
+            result = null;
+
             if (current != null)
             {
                 idle.Push(current);
@@ -71,11 +73,6 @@ namespace Relatus.Graphics
             effects.Peek().Enqueue(effect);
         }
 
-        public static void DisableRelay()
-        {
-            disableRelay = true;
-        }
-
         public static void End()
         {
             graphicsDevice.SetRenderTarget(null);
@@ -85,7 +82,10 @@ namespace Relatus.Graphics
                 /// If there are any nested layers then we have to do additional logic before we can submit anything.
 
                 // Apply all of this layer's effects. (Note that CreateSprite must be called while the current RenderTarget is null).
-                BetterSprite sprite = SketchManager.CreateSprite(current, effects.Pop());
+                BetterSprite sprite = new BetterSprite()
+                {
+                    Texture = SketchManager.ApplyEffects(current, effects.Pop())
+                };
 
                 // Get the current layer's parent.
                 RenderTarget2D previous = idle.Pop();
@@ -117,47 +117,7 @@ namespace Relatus.Graphics
             }
             else
             {
-                /// At this point we should be safe to start the submition process.
-
-                // Apply all of this layer's effects. (Note that CreateSprite must be called while the current RenderTarget is null).
-                BetterSprite layer = SketchManager.CreateSprite(current, effects.Pop());
-
-                if (disableRelay)
-                {
-                    // If the user has disabled the relay to the SketchManager, then set the intercept to the current layer's sprite's texture.
-                    intercept = layer.Texture;
-                }
-                else
-                {
-                    // Before we submit the finished product, we must first figure out what the layer must be scaled by to fit the entire screen.
-                    float scale;
-                    if (current.Width > current.Height)
-                    {
-                        scale = (float)WindowManager.WindowHeight / current.Height;
-
-                        // Check if letterboxing is required.
-                        if (current.Width * scale > WindowManager.WindowWidth)
-                        {
-                            scale = (float)WindowManager.WindowWidth / current.Width;
-                        }
-                    }
-                    else
-                    {
-                        scale = (float)WindowManager.WindowWidth / current.Width;
-
-                        // Check if letterboxing is required.
-                        if (current.Height * scale > WindowManager.WindowHeight)
-                        {
-                            scale = (float)WindowManager.WindowHeight / current.Height;
-                        }
-                    }
-
-                    // Apply the scale to the sprite.
-                    layer.Scale = new Vector3(scale, scale, 1);
-
-                    // Everything should be setup, so we can finally submit the layer to the SketchManager.
-                    SketchManager.AddSketch(layer);
-                }
+                result = SketchManager.ApplyEffects(current, effects.Pop());
 
                 // We cannot dispose of the current layer just yet. Instead we are going to have to add it to a list, and deal with it later.
                 SketchManager.Decomission(current);
@@ -167,11 +127,9 @@ namespace Relatus.Graphics
             }
         }
 
-        public static Texture2D InterceptRelay()
+        public static void Save(out Texture2D texture)
         {
-            disableRelay = false;
-
-            return intercept;
+            texture = result;
         }
 
         public static void DrawSprite(BetterSprite sprite, Camera camera)
