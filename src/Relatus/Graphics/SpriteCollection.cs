@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Relatus.Graphics
 {
-    public class SpriteCollection : DrawCollection<BetterSprite>
+    public class SpriteCollection : DrawCollection<Sprite>
     {
         public const uint MaxSpriteElementsBatchSize = SpriteElements.MaxBatchSize;
 
@@ -13,11 +13,11 @@ namespace Relatus.Graphics
                 throw new RelatusException($"DrawElements does not support support a batch size greater than {MaxSpriteElementsBatchSize}.", new ArgumentOutOfRangeException());
         }
 
-        public SpriteCollection(BatchExecution execution, uint batchSize, IEnumerable<BetterSprite> entries) : base(execution, batchSize, entries)
+        public SpriteCollection(BatchExecution execution, uint batchSize, IEnumerable<Sprite> entries) : base(execution, batchSize, entries)
         {
         }
 
-        protected override DrawGroup<BetterSprite> CreateDrawGroup(BetterSprite sprite)
+        protected override DrawGroup<Sprite> CreateDrawGroup(Sprite sprite)
         {
             switch (execution)
             {

@@ -13,10 +13,10 @@ namespace Relatus
         Post,
     }
 
-    public static class SketchManager
+    public static class Sketchbook
     {
         private static readonly GraphicsDevice graphicsDevice;
-        private static readonly List<BetterSprite> layers;
+        private static readonly List<Sprite> layers;
         private static readonly Queue<Effect> effects;
         private static readonly List<RenderTarget2D> decommissioned;
 
@@ -24,10 +24,10 @@ namespace Relatus
 
         private static BatchExecution batchExecution;
 
-        static SketchManager()
+        static Sketchbook()
         {
             graphicsDevice = Engine.Graphics.GraphicsDevice;
-            layers = new List<BetterSprite>();
+            layers = new List<Sprite>();
             effects = new Queue<Effect>();
             decommissioned = new List<RenderTarget2D>();
 
@@ -41,7 +41,7 @@ namespace Relatus
             batchExecution = execution;
         }
 
-        public static BetterSprite CreatePage(Texture2D texture)
+        public static Sprite CreatePage(Texture2D texture)
         {
             float scale;
             if (texture.Width >= texture.Height)
@@ -66,7 +66,7 @@ namespace Relatus
             float letterBox = (WindowManager.WindowWidth - texture.Width * scale) * 0.5f;
             float pillarBox = (WindowManager.WindowHeight - texture.Height * scale) * 0.5f;
 
-            return new BetterSprite()
+            return new Sprite()
             {
                 Texture = texture,
                 Position = new Vector3(letterBox, -pillarBox, 0),
@@ -74,7 +74,7 @@ namespace Relatus
             };
         }
 
-        public static void Submit(BetterSprite sprite)
+        public static void Add(Sprite sprite)
         {
             layers.Add(sprite);
         }
@@ -108,29 +108,6 @@ namespace Relatus
             }
 
             return true;
-        }
-
-        internal static void GiveUpControl()
-        {
-            completedStages.Clear();
-        }
-
-        internal static void AddSketch(RenderTarget2D renderTarget)
-        {
-            //renderTargets.Add(renderTarget);
-
-            // A Sketch has been completed successfully; reset the stage queue.
-            completedStages.Clear();
-        }
-
-        internal static void AddSketch(BetterSprite layer)
-        {
-            layers.Add(layer);
-
-            layer.SetPosition(layer.X + WindowManager.PillarBox * WindowManager.Scale, layer.Y - WindowManager.LetterBox * WindowManager.Scale, 0);
-
-            // A Sketch has been completed successfully; reset the stage queue.
-            completedStages.Clear();
         }
 
         internal static void Decomission(RenderTarget2D renderTarget)
@@ -175,12 +152,12 @@ namespace Relatus
                 graphicsDevice.SetRenderTarget(null);
 
                 // Now that we have a single texture to work with we can apply all of the effects to said texture.
-                BetterSprite sprite = new BetterSprite()
+                Sprite sprite = new Sprite()
                 {
                     Texture = ApplyEffects(flatten, effects)
                 };
 
-                BetterSketch.DrawSprite(sprite, camera);
+                Sketch.DrawSprite(sprite, camera);
 
                 flatten.Dispose();
             }
@@ -226,7 +203,7 @@ namespace Relatus
                 graphicsDevice.SetRenderTarget(renderTargets[i]);
                 graphicsDevice.Clear(Color.Transparent);
 
-                BetterSprite sprite = new BetterSprite()
+                Sprite sprite = new Sprite()
                 {
                     // The first pass starts with the initial texture. Every pass after that will use the last render target (which means the effects will accumulate).
                     Texture = i == 0 ? texture : renderTargets[i - 1],
@@ -236,7 +213,7 @@ namespace Relatus
                     }
                 };
 
-                BetterSketch.DrawSprite(sprite, camera);
+                Sketch.DrawSprite(sprite, camera);
 
                 graphicsDevice.SetRenderTarget(null);
             }

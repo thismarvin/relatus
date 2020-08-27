@@ -64,7 +64,7 @@ namespace Relatus
         protected override void Draw(GameTime gameTime)
         {
             SceneManager.Draw();
-            SketchManager.Draw();
+            Sketchbook.Draw();
             DebugManager.Draw();
             WindowManager.Draw();
 

@@ -80,7 +80,7 @@ namespace Relatus.Graphics
             indexBuffer.SetData(indices);
         }
 
-        public override bool Add(BetterSprite sprite)
+        public override bool Add(Sprite sprite)
         {
             if (count >= BatchSize)
                 return false;
@@ -122,7 +122,7 @@ namespace Relatus.Graphics
 
         }
 
-        public override DrawGroup<BetterSprite> ApplyChanges()
+        public override DrawGroup<Sprite> ApplyChanges()
         {
             if (!dataModified)
                 return this;
@@ -158,7 +158,7 @@ namespace Relatus.Graphics
             return this;
         }
 
-        public override DrawGroup<BetterSprite> Draw(Camera camera)
+        public override DrawGroup<Sprite> Draw(Camera camera)
         {
             if (dataModified)
                 throw new RelatusException("The sprite group was modified, but ApplyChanges() was never called.", new MethodExpectedException());

@@ -17,7 +17,7 @@ namespace Relatus.Graphics
         FlipVertically = 2
     }
 
-    public class BetterSprite
+    public class Sprite
     {
         #region Properties
         public Texture2D Texture
@@ -113,29 +113,29 @@ namespace Relatus.Graphics
         private SpriteMirroringType spriteMirroring;
         private RenderOptions renderOptions;
 
-        public BetterSprite()
+        public Sprite()
         {
             tint = Color.White;
             scale = Vector3.One;
             renderOptions = new RenderOptions();
         }
 
-        public static BetterSprite Create()
+        public static Sprite Create()
         {
-            return new BetterSprite();
+            return new Sprite();
         }
 
-        public static BetterSprite CreateFromAtlas(SpriteAtlas spriteAtlas, string name)
+        public static Sprite CreateFromAtlas(SpriteAtlas spriteAtlas, string name)
         {
             SpriteAtlasEntry entry = spriteAtlas.GetEntry(name);
 
             return
-                new BetterSprite()
+                new Sprite()
                     .SetTexture(spriteAtlas.GetPage(entry.Page))
                     .SetSampleRegion(entry.ImageRegion);
         }
 
-        public virtual BetterSprite SetTexture(Texture2D texture)
+        public virtual Sprite SetTexture(Texture2D texture)
         {
             this.texture = texture;
 
@@ -151,105 +151,105 @@ namespace Relatus.Graphics
         }
 
 
-        public virtual BetterSprite SetPosition(Vector3 position)
+        public virtual Sprite SetPosition(Vector3 position)
         {
             this.position = position;
 
             return this;
         }
 
-        public BetterSprite SetPosition(float x, float y, float z)
+        public Sprite SetPosition(float x, float y, float z)
         {
             return SetPosition(new Vector3(x, y, z));
         }
 
-        public virtual BetterSprite SetTranslation(Vector3 translation)
+        public virtual Sprite SetTranslation(Vector3 translation)
         {
             this.translation = translation;
 
             return this;
         }
 
-        public BetterSprite SetTranslation(float x, float y, float z)
+        public Sprite SetTranslation(float x, float y, float z)
         {
             return SetTranslation(new Vector3(x, y, z));
         }
 
-        public virtual BetterSprite SetScale(Vector3 scale)
+        public virtual Sprite SetScale(Vector3 scale)
         {
             this.scale = scale;
 
             return this;
         }
 
-        public BetterSprite SetScale(float x, float y, float z)
+        public Sprite SetScale(float x, float y, float z)
         {
             return SetScale(new Vector3(x, y, z));
         }
 
-        public virtual BetterSprite SetOrigin(Vector3 origin)
+        public virtual Sprite SetOrigin(Vector3 origin)
         {
             this.origin = origin;
 
             return this;
         }
 
-        public BetterSprite SetOrigin(float x, float y, float z)
+        public Sprite SetOrigin(float x, float y, float z)
         {
             return SetOrigin(new Vector3(x, y, z));
         }
 
-        public virtual BetterSprite SetRotation(Vector3 rotation)
+        public virtual Sprite SetRotation(Vector3 rotation)
         {
             this.rotation = rotation;
 
             return this;
         }
 
-        public BetterSprite SetRotation(float roll, float pitch, float yaw)
+        public Sprite SetRotation(float roll, float pitch, float yaw)
         {
             return SetRotation(new Vector3(roll, pitch, yaw));
         }
 
-        public virtual BetterSprite SetTint(Color tint)
+        public virtual Sprite SetTint(Color tint)
         {
             this.tint = tint;
 
             return this;
         }
 
-        public BetterSprite SetTint(int r, int g, int b, float a = 1)
+        public Sprite SetTint(int r, int g, int b, float a = 1)
         {
             return SetTint(new Color(r, g, b) * a);
         }
 
-        public virtual BetterSprite SetSampleRegion(ImageRegion sampleRegion)
+        public virtual Sprite SetSampleRegion(ImageRegion sampleRegion)
         {
             this.sampleRegion = sampleRegion;
 
             return this;
         }
 
-        public BetterSprite SetSampleRegion(int x, int y, int width, int height)
+        public Sprite SetSampleRegion(int x, int y, int width, int height)
         {
             return SetSampleRegion(new ImageRegion(x, y, width, height));
         }
 
-        public virtual BetterSprite SetSpriteMirroring(SpriteMirroringType mirroringType)
+        public virtual Sprite SetSpriteMirroring(SpriteMirroringType mirroringType)
         {
             spriteMirroring = mirroringType;
 
             return this;
         }
 
-        public virtual BetterSprite SetRenderOptions(RenderOptions options)
+        public virtual Sprite SetRenderOptions(RenderOptions options)
         {
             renderOptions = options;
 
             return this;
         }
 
-        public BetterSprite SetCenter(float x, float y)
+        public Sprite SetCenter(float x, float y)
         {
             position = new Vector3(x - Width * 0.5f, y + Height * 0.5f, position.Z);
 
