@@ -95,8 +95,8 @@ namespace Relatus.Input
 
             WindowPosition = new Vector2
             (
-                currentMouseState.X / WindowManager.Scale - WindowManager.PillarBox,
-                WindowManager.PixelHeight - (currentMouseState.Y / WindowManager.Scale - WindowManager.LetterBox)
+                currentMouseState.X,
+                WindowManager.WindowHeight - currentMouseState.Y
             );
         }
     }
