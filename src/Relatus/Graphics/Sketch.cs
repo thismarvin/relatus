@@ -1,262 +1,188 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Relatus.Utilities;
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Relatus.Graphics
 {
     public static class Sketch
     {
-        private static readonly GraphicsDevice graphicsDevice;
-        private static readonly SpriteBatch spriteBatch;
-
-        private static readonly Queue<Effect> shaders;
-        private static RenderTarget2D accumulation;
-        private static RenderTarget2D result;
-        private static Color clearColor;
-        private static bool disableRelay;
-        private static bool preventFumbledRelay;
-
         public static SpriteBatcher SpriteBatcher { get; private set; }
         public static GeometryBatcher GeometryBatcher { get; private set; }
 
+        private static readonly GraphicsDevice graphicsDevice;
+        private static readonly Stack<Queue<Effect>> effects;
+        private static readonly Stack<RenderTarget2D> idle;
+
+        private static RenderTarget2D current;
+        private static Texture2D result;
+
+        private static Color clearColor;
+        private static int width;
+        private static int height;
+
         static Sketch()
         {
-            graphicsDevice = Engine.Graphics.GraphicsDevice;
-            spriteBatch = GraphicsManager.SpriteBatch;
-
-            shaders = new Queue<Effect>();
-
             SpriteBatcher = new SpriteBatcher();
             GeometryBatcher = new GeometryBatcher();
+
+            graphicsDevice = Engine.Graphics.GraphicsDevice;
+
+            effects = new Stack<Queue<Effect>>();
+            idle = new Stack<RenderTarget2D>();
+
+            clearColor = Color.Transparent;
+            width = WindowManager.WindowWidth;
+            height = WindowManager.WindowHeight;
         }
 
-        /// <summary>
-        /// Creates a background layer that fills the entire screen with a specified color.
-        /// </summary>
-        /// <param name="spriteBatch">The default Game's SpriteBatch object.</param>
-        /// <param name="color">The color used to fill the background layer.</param>
-        public static void CreateBackgroundLayer(Color color)
+        public static void SetClearColor(Color color)
         {
-            PreventFumble();
-
-            if (!SketchManager.VerifyQueue())
-                throw new RelatusException("CreateBackgroundLayer(spriteBatch, color) must be independent of any other Sketch calls.", new MethodOrderException());
-
-            // Initialize a RenderTarget2D to accumulate all spriteBatch draw calls.
-            accumulation = new RenderTarget2D(graphicsDevice, WindowManager.WindowWidth, WindowManager.WindowHeight);
-
-            // Setup the GraphicsDevice with the new accumulation RenderTarget2D.
-            graphicsDevice.SetRenderTarget(accumulation);
-            graphicsDevice.Clear(color);
-
-            // Reset the GraphicsDevice's RenderTarget.
-            graphicsDevice.SetRenderTarget(null);
-            graphicsDevice.Clear(Color.Transparent);
-
-            // Relay the final RenderTarget2D to be drawn by the LayerManager.
-            SketchManager.AddSketch(accumulation);
-        }
-
-        /// <summary>
-        /// Sets the upcoming layer's background to a specified color.
-        /// This method should be called before <see cref="Begin()"/>.
-        /// </summary>
-        /// <param name="color">The color used to fill the background of the upcoming layer.</param>
-        public static void SetBackgroundColor(Color color)
-        {
-            PreventFumble();
-
-            SketchManager.RegisterStage(StageType.Setup);
-
-            // Make sure that this method is always called before Begin(spriteBatch).
-            if (!SketchManager.VerifyQueue(StageType.Setup))
-                throw new RelatusException("SetBackgroundColor(color) must be called before Begin(spriteBatch).", new MethodOrderException());
-
             clearColor = color;
         }
 
-        /// <summary>
-        /// Attaches an effect that will be applied to the entire upcoming layer.
-        /// More than one effect can be attached to a Sketch at a time.
-        /// Effects are applied in the same order as they are attached.
-        /// This method should be called before <see cref="Begin()"/>.
-        /// </summary>
-        /// <param name="effect">The shader that will be applied to the entire upcoming layer.</param>
-        public static void AttachEffect(Effect effect)
+        public static void SetDimensions(int width, int height)
         {
-            PreventFumble();
-
-            SketchManager.RegisterStage(StageType.Setup);
-
-            // Make sure that this method is always called before Begin(spriteBatch).
-            if (!SketchManager.VerifyQueue(StageType.Setup))
-                throw new RelatusException("AttachEffect(effect) must be called before Begin(spriteBatch).", new MethodOrderException());
-
-            shaders.Enqueue(effect);
+            Sketch.width = width;
+            Sketch.height = height;
         }
 
-        /// <summary>
-        /// This will disable the upcoming layer from being drawn.
-        /// This is useful for any effects that require additional passes.
-        /// Note that if this method is called, you must call <see cref="InterceptRelay"/> after <see cref="End()"/>.
-        /// This method should be called before <see cref="Begin()"/>.
-        /// </summary>
-        public static void DisableRelay()
-        {
-            SketchManager.RegisterStage(StageType.Setup);
-
-            // Make sure that this method is always called before Begin(spriteBatch).
-            if (!SketchManager.VerifyQueue(StageType.Setup))
-                throw new RelatusException("AttachEffect(effect) must be called before Begin(spriteBatch).", new MethodOrderException());
-
-            disableRelay = true;
-        }
-
-        /// <summary>
-        /// Creates a layer to accumulate all upcoming spriteBatch calls.
-        /// This method should be called before <see cref="End()"/>.
-        /// </summary>
         public static void Begin()
         {
-            PreventFumble();
-            if (disableRelay)
-                preventFumbledRelay = true;
+            // Let's hope the end user dealt with this already.
+            result = null;
 
-            SketchManager.RegisterStage(StageType.Setup);
-            SketchManager.RegisterStage(StageType.Begin);
+            if (current != null)
+            {
+                idle.Push(current);
 
-            // Make sure that this method is always called before End(spriteBatch).
-            if (!SketchManager.VerifyQueue(StageType.Setup, StageType.Begin))
-                throw new RelatusException("Begin(spriteBatch) must be called before End(spriteBatch).", new MethodOrderException());
+                // The dimensions of any nested layer should not exceed the dimensions of the parent layer, but it is okay for the dimensions to be smaller.
+                width = Math.Min(current.Width, width);
+                height = Math.Min(current.Height, height);
+            }
 
-            // Initialize a RenderTarget2D to accumulate all spriteBatch draw calls.
-            accumulation = new RenderTarget2D(graphicsDevice, WindowManager.WindowWidth, WindowManager.WindowHeight);
+            effects.Push(new Queue<Effect>());
+            current = new RenderTarget2D(graphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None, 0, RenderTargetUsage.PreserveContents);
 
-            // Setup the GraphicsDevice with the new accumulation RenderTarget2D.
-            graphicsDevice.SetRenderTarget(accumulation);
+            graphicsDevice.SetRenderTarget(current);
             graphicsDevice.Clear(clearColor);
+
+            // Reset properties to default.
             clearColor = Color.Transparent;
+            width = (int)Math.Round(WindowManager.PixelWidth * WindowManager.Scale);
+            height = (int)Math.Round(WindowManager.PixelHeight * WindowManager.Scale);
         }
 
-        /// <summary>
-        /// Applies any attached effects to the current layer, and passes the layer to the SketchManager to be drawn.
-        /// This method should be called after <see cref="Begin()"/>.
-        /// </summary>
+        public static void AttachEffect(Effect effect)
+        {
+            effects.Peek().Enqueue(effect);
+        }
+
         public static void End()
         {
-            SketchManager.RegisterStage(StageType.End);
-
-            // Make sure that this method is always called after Begin(spriteBatch).
-            if (!SketchManager.VerifyQueue(StageType.Setup, StageType.Begin, StageType.End))
-                throw new RelatusException("End(spriteBatch) must be called after Begin(spriteBatch).", new MethodOrderException());
-
-            // Reset the GraphicsDevice's RenderTarget.
             graphicsDevice.SetRenderTarget(null);
 
-            if (shaders.Count > 0)
+            if (idle.Count > 0)
             {
-                // Create an array of RenderTarget2Ds to store the accumulation of each shader.
-                RenderTarget2D[] renderTargets = new RenderTarget2D[shaders.Count];
-                for (int i = 0; i < renderTargets.Length; i++)
+                /// If there are any nested layers then we have to do additional logic before we can submit anything.
+
+                // Apply all of this layer's effects. (Note that CreateSprite must be called while the current RenderTarget is null).
+                Sprite sprite = new Sprite()
                 {
-                    renderTargets[i] = new RenderTarget2D(graphicsDevice, WindowManager.WindowWidth, WindowManager.WindowHeight);
+                    Texture = Sketchbook.ApplyEffects(current, effects.Pop())
+                };
+
+                // Get the current layer's parent.
+                RenderTarget2D previous = idle.Pop();
+
+                // Set the current RenderTarget back to the parent layer.
+                graphicsDevice.SetRenderTarget(previous);
+
+                // Draw the current layer on top of its parent layer.
+                using (SpriteCollection collection = new SpriteCollection(BatchExecution.DrawElements, 1))
+                {
+                    float x = current.Width * 0.5f;
+                    float y = -current.Height * 0.5f;
+
+                    Camera camera =
+                        Camera.CreateOrthographic(current.Width, current.Height, 0.5f, 2)
+                        .SetPosition(x, y, 1)
+                        .SetTarget(x, y, 0);
+
+                    collection.Add(sprite);
+                    collection.ApplyChanges();
+                    collection.Draw(camera);
                 }
 
-                int totalShaders = shaders.Count;
-                Effect shader;
+                // We cannot dispose of the current layer just yet. Instead we are going to have to add it to a list, and deal with it later.
+                Sketchbook.Decomission(current);
 
-                // Iterate through all the shaders in the queue.
-                for (int i = 0; i < totalShaders; i++)
-                {
-                    shader = shaders.Dequeue();
-
-                    // Setup the GraphicsDevice with the current RenderTarget2D.
-                    graphicsDevice.SetRenderTarget(renderTargets[i]);
-                    graphicsDevice.Clear(Color.Transparent);
-
-                    // Apply the shader.
-                    spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, shader, null);
-                    {
-                        spriteBatch.Draw(i == 0 ? accumulation : renderTargets[i - 1], Vector2.Zero, Color.White);
-                    }
-                    spriteBatch.End();
-
-                    // Dispose of the current shader.
-                    shader.Dispose();
-                }
-
-                // Initialize a RenderTarget2D to capture the result of all the shaders.
-                result = new RenderTarget2D(graphicsDevice, WindowManager.WindowWidth, WindowManager.WindowHeight);
-
-                // Setup the GraphicsDevice with the result RenderTarget2D.
-                graphicsDevice.SetRenderTarget(result);
-                graphicsDevice.Clear(Color.Transparent);
-
-                spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null, null);
-                {
-                    spriteBatch.Draw(renderTargets[renderTargets.Length - 1], Vector2.Zero, Color.White);
-                }
-                spriteBatch.End();
-
-                // Dispose of all the unnecessary RenderTarget2Ds.
-                for (int i = 0; i < renderTargets.Length; i++)
-                {
-                    renderTargets[i].Dispose();
-                }
-                accumulation.Dispose();
-
-                // Reset the GraphicsDevice's RenderTarget.
-                graphicsDevice.SetRenderTarget(null);
-
-                // Relay the final RenderTarget2D to be drawn by the LayerManager.
-                if (!disableRelay)
-                    SketchManager.AddSketch(result);
+                // Everything has been taken care of, so we can set the current layer back to the parent layer.
+                current = previous;
             }
             else
             {
-                // Relay the accumulation RenderTarget2D to be drawn by the LayerManager.
-                if (!disableRelay)
-                    SketchManager.AddSketch(accumulation);
-                // Otherwise set the result as the current accumulation to be intercepted by the user.
-                else
-                    result = accumulation;
+                result = Sketchbook.ApplyEffects(current, effects.Pop());
+
+                // We cannot dispose of the current layer just yet. Instead we are going to have to add it to a list, and deal with it later.
+                Sketchbook.Decomission(current);
+
+                // Make sure to set the current layer to null in order to prevent any unwanted nesting!
+                current = null;
             }
         }
 
-        /// <summary>
-        /// Passes the entire layer to the user. The SketchManager is no longer managing the life cycle of the layer.
-        /// Failure to properly manage the layer will result in a memory leak, among other problems.
-        /// This method should be called after <see cref="End()"/>.
-        /// </summary>
-        /// <returns>Returns the entire layer that was just created.</returns>
-        public static RenderTarget2D InterceptRelay()
+        public static void Save(out Texture2D texture)
         {
-            SketchManager.RegisterStage(StageType.Post);
-
-            // Make sure that this method is always called after End(spriteBatch).
-            if (!SketchManager.VerifyQueue(StageType.Setup, StageType.Begin, StageType.End, StageType.Post))
-                throw new RelatusException("InterceptRelay() must be called after End(spriteBatch).", new MethodOrderException());
-
-            // Make sure that DisableRelay() was called.
-            if (result == null)
-                throw new RelatusException("There is nothing to intercept. Make sure to call DisableRelay() before calling Begin(spriteBatch)", new MethodOrderException());
-
-            SketchManager.GiveUpControl();
-            disableRelay = false;
-            preventFumbledRelay = false;
-
-            return result;
+            texture = result;
         }
 
-        /// <summary>
-        /// Make sure that the unmanaged layer is addressed by the user.
-        /// </summary>
-        private static void PreventFumble()
+        public static void DrawSprite(Sprite sprite, Camera camera)
         {
-            if (preventFumbledRelay)
-                throw new RelatusException("DisableRelay() was called, but InterceptRelay() was never called.", new MethodOrderException());
+            SpriteElements spriteGroup = new SpriteElements(1, sprite.Texture, sprite.RenderOptions);
+            spriteGroup.Add(sprite);
+            spriteGroup.ApplyChanges();
+            spriteGroup.Draw(camera);
+        }
+
+        public static void DrawSpriteCollection(BatchExecution batchExecution, uint batchSize, IEnumerable<Sprite> sprites, Camera camera)
+        {
+            using (SpriteCollection collection = new SpriteCollection(batchExecution, batchSize, sprites))
+            {
+                collection.Draw(camera);
+            }
+        }
+
+        public static void DrawText(float x, float y, string text, BMFont font, BMFontShader fontShader, Camera camera)
+        {
+            DrawSpriteCollection(BatchExecution.DrawElements, 1, ImText.Create(x, y, text, font, fontShader), camera);
+        }
+
+        public static void DrawPolygon(Polygon polygon, Camera camera)
+        {
+            PolygonElements polygonGroup = new PolygonElements(1, polygon.Geometry, polygon.RenderOptions);
+            polygonGroup.Add(polygon);
+            polygonGroup.ApplyChanges();
+            polygonGroup.Draw(camera);
+        }
+
+        public static void DrawPolygonCollection(BatchExecution batchExecution, uint batchSize, IEnumerable<Polygon> polygons, Camera camera)
+        {
+            using (PolygonCollection collection = new PolygonCollection(batchExecution, batchSize, polygons))
+            {
+                collection.Draw(camera);
+            }
+        }
+
+        public static void DrawLineSegment(float x1, float y1, float x2, float y2, float lineWidth, Camera camera)
+        {
+            DrawPolygon(ImLineSegment.Create(x1, y1, x2, y2, lineWidth), camera);
+        }
+
+        public static void DrawLineGraph(Vector2[] points, float lineWidth, Camera camera)
+        {
+            DrawPolygon(ImLineSegment.Create(points, lineWidth), camera);
         }
     }
 }

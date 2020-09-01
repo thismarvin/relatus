@@ -1,9 +1,6 @@
 using Microsoft.Xna.Framework;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace Relatus.Graphics.Palettes
+namespace Relatus.Graphics.Bundled
 {
     public static class PICO8
     {

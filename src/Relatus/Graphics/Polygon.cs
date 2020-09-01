@@ -1,29 +1,11 @@
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Relatus.Graphics
 {
     public class Polygon : IDisposable
     {
         #region Properties
-        public float X
-        {
-            get => x;
-            set => SetPosition(value, y, z);
-        }
-        public float Y
-        {
-            get => y;
-            set => SetPosition(x, value, z);
-        }
-        public float Z
-        {
-            get => z;
-            set => SetPosition(x, y, value);
-        }
         public float Width
         {
             get => width;
@@ -33,6 +15,11 @@ namespace Relatus.Graphics
         {
             get => height;
             set => SetDimensions(width, value);
+        }
+        public Vector3 Position
+        {
+            get => position;
+            set => SetPosition(value);
         }
         public Color Color
         {
@@ -47,17 +34,17 @@ namespace Relatus.Graphics
         public Vector3 Origin
         {
             get => origin;
-            set => SetOrigin(value.X, value.Y, value.Z);
+            set => SetOrigin(value);
         }
         public Vector3 Translation
         {
             get => translation;
-            set => SetTranslation(value.X, value.Y, value.Z);
+            set => SetTranslation(value);
         }
         public Vector3 Scale
         {
             get => scale;
-            set => SetScale(value.X, value.Y, value.Z);
+            set => SetScale(value);
         }
         public GeometryData Geometry
         {
@@ -71,67 +58,50 @@ namespace Relatus.Graphics
         }
         #endregion
 
-        public Vector3 Position
-        {
-            get => new Vector3(x, y, z);
-            set => SetPosition(value.X, value.Y, value.Z);
-        }
-
-        // I just want to note that although this is a Vector3, it is really treated like a Vector2.
         public Vector3 Center
         {
-            get => new Vector3(x + width * 0.5f, y - height * 0.5f, z);
+            get => new Vector3(position.X + width * 0.5f, position.Y - height * 0.5f, position.Z);
             set => SetCenter(value.X, value.Y);
         }
-
         public RectangleF Bounds
         {
-            get => new RectangleF(x, y, width, height);
-            set => SetBounds(value.X, value.Y, value.Width, value.Height);
+            get => new RectangleF(position.X, position.Y, width, height);
+        }
+        public float X
+        {
+            get => position.X;
+            set => SetPosition(value, position.Y, position.Z);
+        }
+        public float Y
+        {
+            get => position.Y;
+            set => SetPosition(position.X, value, position.Z);
+        }
+        public float Z
+        {
+            get => position.Z;
+            set => SetPosition(position.X, position.Y, value);
         }
 
-        private float x;
-        private float y;
-        private float z;
         private float width;
         private float height;
-        private Color color;
+        private Vector3 position;
         private Vector3 rotation;
         private Vector3 origin;
         private Vector3 translation;
         private Vector3 scale;
+        private Color color;
         private GeometryData geometry;
         private RenderOptions renderOptions;
 
-        private bool geometryChanged;
-        private bool modelChanged;
-        private bool colorChanged;
         private bool transformNeedsUpdating;
         private Matrix transformCache;
-        private DynamicVertexBuffer transformBuffer;
-        private DynamicVertexBuffer colorBuffer;
-        private VertexBufferBinding[] vertexBufferBindings;
-
-        private static readonly GraphicsDevice graphicsDevice;
-        private static readonly Effect polygonShader;
-        private static readonly EffectPass polygonPass;
-
-        static Polygon()
-        {
-            graphicsDevice = Engine.Graphics.GraphicsDevice;
-            polygonShader = AssetManager.GetEffect("Relatus_RelatusEffect");
-            polygonPass = polygonShader.Techniques[1].Passes[0];
-        }
 
         public Polygon()
         {
             color = Color.White;
             scale = Vector3.One;
             renderOptions = new RenderOptions();
-
-            geometryChanged = true;
-            modelChanged = true;
-            colorChanged = true;
 
             transformNeedsUpdating = true;
             transformCache = Matrix.Identity;
@@ -153,21 +123,22 @@ namespace Relatus.Graphics
             }
 
             this.geometry = geometry;
-            geometryChanged = true;
 
             return this;
         }
 
-        public virtual Polygon SetPosition(float x, float y, float z)
+        public virtual Polygon SetPosition(Vector3 position)
         {
-            this.x = x;
-            this.y = y;
-            this.z = z;
+            this.position = position;
 
-            modelChanged = true;
             transformNeedsUpdating = true;
 
             return this;
+        }
+
+        public Polygon SetPosition(float x, float y, float z)
+        {
+            return SetPosition(new Vector3(x, y, z));
         }
 
         public virtual Polygon SetDimensions(float width, float height)
@@ -175,7 +146,6 @@ namespace Relatus.Graphics
             this.width = width;
             this.height = height;
 
-            modelChanged = true;
             transformNeedsUpdating = true;
 
             return this;
@@ -185,46 +155,62 @@ namespace Relatus.Graphics
         {
             this.color = color;
 
-            colorChanged = true;
+            return this;
+        }
+
+        public Polygon SetColor(int r, int g, int b, float a = 1)
+        {
+            this.color = new Color(r, g, b) * a;
 
             return this;
         }
 
-        public virtual Polygon SetTranslation(float x, float y, float z)
+        public virtual Polygon SetTranslation(Vector3 translation)
         {
-            translation = new Vector3(x, y, z);
+            this.translation = translation;
 
-            modelChanged = true;
             transformNeedsUpdating = true;
 
             return this;
         }
 
-        public virtual Polygon SetScale(float x, float y, float z)
+        public Polygon SetTranslation(float x, float y, float z)
         {
-            scale = new Vector3(x, y, z);
+            return SetTranslation(new Vector3(x, y, z));
+        }
 
-            modelChanged = true;
+        public virtual Polygon SetScale(Vector3 scale)
+        {
+            this.scale = scale;
+
             transformNeedsUpdating = true;
 
             return this;
         }
 
-        public virtual Polygon SetOrigin(float x, float y, float z)
+        public Polygon SetScale(float x, float y, float z)
         {
-            origin = new Vector3(x, y, z);
+            return SetScale(new Vector3(x, y, z));
+        }
 
-            modelChanged = true;
+        public virtual Polygon SetOrigin(Vector3 origin)
+        {
+            this.origin = origin;
+
             transformNeedsUpdating = true;
 
             return this;
+        }
+
+        public Polygon SetOrigin(float x, float y, float z)
+        {
+            return SetOrigin(new Vector3(x, y, z));
         }
 
         public virtual Polygon SetRotation(float roll, float pitch, float yaw)
         {
             rotation = new Vector3(roll, pitch, yaw);
 
-            modelChanged = true;
             transformNeedsUpdating = true;
 
             return this;
@@ -237,58 +223,10 @@ namespace Relatus.Graphics
             return this;
         }
 
-        public Polygon ApplyChanges()
-        {
-            if (!geometryChanged && !modelChanged && !colorChanged)
-                return this;
-
-            if (modelChanged)
-            {
-                transformBuffer?.Dispose();
-                transformBuffer = new DynamicVertexBuffer(graphicsDevice, typeof(VertexTransform), 1, BufferUsage.WriteOnly);
-                transformBuffer.SetData(new VertexTransform[] { GetVertexTransform() });
-            }
-
-            if (colorChanged)
-            {
-                colorBuffer?.Dispose();
-                colorBuffer = new DynamicVertexBuffer(graphicsDevice, typeof(VertexColor), 1, BufferUsage.WriteOnly);
-                colorBuffer.SetData(new VertexColor[] { GetVertexColor() });
-            }
-
-            vertexBufferBindings = new VertexBufferBinding[]
-            {
-                new VertexBufferBinding(geometry.VertexBuffer),
-                new VertexBufferBinding(transformBuffer, 0, 1),
-                new VertexBufferBinding(colorBuffer, 0, 1)
-            };
-
-            geometryChanged = false;
-            modelChanged = false;
-            colorChanged = false;
-
-            return this;
-        }
-
         public virtual Polygon SetCenter(float x, float y)
         {
-            this.x = x - width * 0.5f;
-            this.y = y + height * 0.5f;
+            position = new Vector3(x - width * 0.5f, y + height * 0.5f, position.Z);
 
-            modelChanged = true;
-            transformNeedsUpdating = true;
-
-            return this;
-        }
-
-        public virtual Polygon SetBounds(float x, float y, float width, float height)
-        {
-            this.x = x;
-            this.y = y;
-            this.width = width;
-            this.height = height;
-
-            modelChanged = true;
             transformNeedsUpdating = true;
 
             return this;
@@ -338,10 +276,9 @@ namespace Relatus.Graphics
 
         internal VertexTransform GetVertexTransform()
         {
-            Vector3 translation = new Vector3(x + this.translation.X, y + this.translation.Y, z + this.translation.Z);
             Vector3 scale = new Vector3(width * this.scale.X, height * this.scale.Y, this.scale.Z);
 
-            return new VertexTransform(translation, scale, origin, rotation);
+            return new VertexTransform(position + translation, scale, origin, rotation);
         }
 
         internal VertexColor GetVertexColor()
@@ -349,70 +286,35 @@ namespace Relatus.Graphics
             return new VertexColor(color);
         }
 
-        public virtual void Draw(Camera camera)
+        protected virtual void OnDispose()
         {
-            if (geometryChanged || modelChanged || colorChanged)
-                throw new RelatusException("The polygon was modified, but ApplyChanges() was never called.", new MethodExpectedException());
 
-            graphicsDevice.RasterizerState = GraphicsManager.RasterizerState;
-            graphicsDevice.SamplerStates[0] = renderOptions.SamplerState;
-            graphicsDevice.BlendState = renderOptions.BlendState;
-            graphicsDevice.DepthStencilState = renderOptions.DepthStencilState;
-            graphicsDevice.SetVertexBuffers(vertexBufferBindings);
-            graphicsDevice.Indices = geometry.IndexBuffer;
-
-            polygonShader.Parameters["WVP"].SetValue(camera.WVP);
-
-            polygonPass.Apply();
-
-            if (renderOptions.Effect == null)
-            {
-                graphicsDevice.DrawInstancedPrimitives(PrimitiveType.TriangleList, 0, 0, geometry.TotalTriangles, 1);
-            }
-            else
-            {
-                foreach (EffectPass pass in renderOptions.Effect.CurrentTechnique.Passes)
-                {
-                    pass.Apply();
-                    graphicsDevice.DrawInstancedPrimitives(PrimitiveType.TriangleList, 0, 0, geometry.TotalTriangles, 1);
-                }
-            }
         }
 
         #region IDisposable Support
-        private bool disposedValue = false; // To detect redundant calls
+        private bool disposedValue;
 
-        protected virtual void Dispose(bool disposing)
+        private void Dispose(bool disposing)
         {
             if (!disposedValue)
             {
                 if (disposing)
                 {
-                    Geometry.Dispose();
-                    transformBuffer.Dispose();
-                }
+                    if (!Geometry.Managed)
+                    {
+                        Geometry.Dispose();
+                    }
 
-                // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
-                // TODO: set large fields to null.
+                    OnDispose();
+                }
 
                 disposedValue = true;
             }
         }
 
-        // TODO: override a finalizer only if Dispose(bool disposing) above has code to free unmanaged resources.
-        // ~Polygon()
-        // {
-        //   // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
-        //   Dispose(false);
-        // }
-
-        // This code added to correctly implement the disposable pattern.
         public void Dispose()
         {
-            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
             Dispose(true);
-            // TODO: uncomment the following line if the finalizer is overridden above.
-            // GC.SuppressFinalize(this);
         }
         #endregion
     }

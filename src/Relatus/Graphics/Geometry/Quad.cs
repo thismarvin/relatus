@@ -1,6 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
+using Microsoft.Xna.Framework;
 
 namespace Relatus.Graphics
 {
@@ -14,20 +12,49 @@ namespace Relatus.Graphics
 
         private float lineWidth;
 
-        public Quad(float x, float y, float width, float height)
+        private readonly static GeometryData geometry;
+
+        static Quad()
         {
-            SetBounds(x, y, width, height);
-            AttachGeometry(GeometryManager.GetShapeData(ShapeType.Square));
-            ApplyChanges();
+            geometry = GeometryManager.GetShapeData(ShapeType.Square);
         }
 
-        public Quad SetLineWidth(float lineWidth)
+        public Quad()
+        {
+            AttachGeometry(geometry);
+        }
+
+        public Quad(float x, float y, float width, float height)
+        {
+            SetPosition(x, y, 0);
+            SetDimensions(width, height);
+            AttachGeometry(geometry);
+        }
+
+        public static Quad Create(float x, float y, float width, float height, Color color)
+        {
+            Quad result = new Quad(x, y, width, height);
+            result.SetColor(color);
+
+            return result;
+        }
+
+        public static Quad Create(float x, float y, float width, float height, float lineWidth, Color color)
+        {
+            Quad result = new Quad(x, y, width, height);
+            result.SetColor(color);
+            result.SetLineWidth(lineWidth);
+
+            return result;
+        }
+
+        public Polygon SetLineWidth(float lineWidth)
         {
             if (this.lineWidth == lineWidth)
                 return this;
 
             this.lineWidth = lineWidth;
-            AttachGeometry(GeometryManager.CreateHollowSquare(Width, Height, lineWidth));
+            AttachGeometry(GeometryManager.CreateHollowSquare(Width, Height, this.lineWidth));
 
             return this;
         }

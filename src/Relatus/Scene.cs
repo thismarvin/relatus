@@ -1,8 +1,5 @@
 using Relatus.Graphics;
-using Relatus.Graphics.Transitions;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using Relatus.Graphics.Bundled;
 
 namespace Relatus
 {

@@ -54,7 +54,7 @@ namespace Relatus
             }
         }
 
-        public static bool AlmostEqual(this ref Vector2 self, Vector2 vector, float precision)
+        public static bool AlmostEqual(this Vector2 self, Vector2 vector, float precision)
         {
             return
                 MathExt.AlmostEqual(self.X, vector.X, precision) &&

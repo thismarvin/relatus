@@ -1,9 +1,6 @@
 using Microsoft.Xna.Framework;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace Relatus.Graphics.Transitions
+namespace Relatus.Graphics.Bundled
 {
     public class Fade : Transition
     {
@@ -21,7 +18,6 @@ namespace Relatus.Graphics.Transitions
         {
             defaultColor = color;
             fade = new Quad(0, 0, 1, 1) { Color = Color.Black };
-            fade.ApplyChanges();
         }
 
         protected override void AccommodateToCamera()
@@ -30,7 +26,6 @@ namespace Relatus.Graphics.Transitions
             fade.Height = Camera.Bounds.Height * 1.4f;
 
             fade.SetCenter(Camera.Position.X, Camera.Position.Y);
-            fade.ApplyChanges();
         }
 
         protected override void SetupTransition()
@@ -39,7 +34,6 @@ namespace Relatus.Graphics.Transitions
             fadeColor = defaultColor * alpha;
 
             fade.Color = fadeColor;
-            fade.ApplyChanges();
         }
 
         protected override void UpdateLogic()
@@ -70,12 +64,16 @@ namespace Relatus.Graphics.Transitions
         {
             fadeColor = defaultColor * alpha;
             fade.Color = fadeColor;
-            fade.ApplyChanges();
         }
 
         protected override void DrawTransition()
         {
-            fade.Draw(Camera);
+            Sketch.GeometryBatcher
+                .SetBatchSize(1)
+                .AttachCamera(Camera)
+                .Begin()
+                    .Add(fade)
+                .End();
         }
 
         protected override void OnDispose()

@@ -4,9 +4,9 @@ using System.Collections.Generic;
 
 namespace Relatus.Graphics
 {
-    public class SpriteBatcher : Batcher<BetterSprite>
+    public class SpriteBatcher : Batcher<Sprite>
     {
-        private readonly List<List<BetterSprite>> sprites;
+        private readonly List<List<Sprite>> sprites;
         private int index;
 
         private static readonly GraphicsDevice graphicsDevice;
@@ -18,36 +18,36 @@ namespace Relatus.Graphics
 
         internal SpriteBatcher()
         {
-            sprites = new List<List<BetterSprite>>();
+            sprites = new List<List<Sprite>>();
             execution = BatchExecution.DrawElements;
             batchSize = SpriteElements.MaxBatchSize;
         }
 
-        public override Batcher<BetterSprite> Begin()
+        public override Batcher<Sprite> Begin()
         {
             sprites.Clear();
 
-            sprites.Add(new List<BetterSprite>((int)batchSize));
+            sprites.Add(new List<Sprite>((int)batchSize));
             index = 0;
 
             return this;
         }
 
-        public override Batcher<BetterSprite> Add(BetterSprite sprite)
+        public override Batcher<Sprite> Add(Sprite sprite)
         {
             sprites[sprites.Count - 1].Add(sprite);
             index++;
 
             if (index >= batchSize)
             {
-                sprites.Add(new List<BetterSprite>((int)batchSize));
+                sprites.Add(new List<Sprite>((int)batchSize));
                 index = 0;
             }
 
             return this;
         }
 
-        public override Batcher<BetterSprite> End()
+        public override Batcher<Sprite> End()
         {
             if (camera == null)
                 throw new RelatusException("A Camera has not been attached yet. Make sure to call AttachCamera(camera).", new ArgumentNullException());
