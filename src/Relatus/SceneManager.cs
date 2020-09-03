@@ -1,8 +1,5 @@
 using Microsoft.Xna.Framework.Input;
 using Relatus.Graphics;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Relatus
 {
@@ -82,7 +79,7 @@ namespace Relatus
             {
                 exitTransition = CurrentScene.ExitTransition;
                 enterTransition = NextScene.EnterTransition;
-                exitTransition.Begin();
+                exitTransition?.Begin();
             }
 
             transitionInProgress = true;
@@ -105,7 +102,7 @@ namespace Relatus
                 if (exitTransition == null)
                 {
                     LoadNextScene();
-                    enterTransition.Begin();
+                    enterTransition?.Begin();
                     exitCompleted = true;
                 }
                 else
@@ -114,19 +111,24 @@ namespace Relatus
 
                     if (exitTransition.Done)
                     {
-                        CurrentScene?.OnExit();
+                        CurrentScene.OnExit();
                         exitTransition.Reset();
                         exitTransition = null;
 
                         LoadNextScene();
-                        enterTransition.Begin();
+                        enterTransition?.Begin();
                         exitCompleted = true;
                     }
                 }
             }
             else
             {
-                if (enterTransition != null)
+                if (enterTransition == null)
+                {
+                    transitionInProgress = false;
+                    exitCompleted = true;
+                }
+                else
                 {
                     enterTransition.Update();
 
@@ -134,6 +136,7 @@ namespace Relatus
                     {
                         enterTransition.Reset();
                         enterTransition = null;
+
                         transitionInProgress = false;
                         exitCompleted = false;
                     }
