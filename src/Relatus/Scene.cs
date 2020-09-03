@@ -1,5 +1,4 @@
 using Relatus.Graphics;
-using Relatus.Graphics.Bundled;
 
 namespace Relatus
 {
@@ -19,8 +18,8 @@ namespace Relatus
         public Scene(string name)
         {
             Name = name;
-            EnterTransition = new Pinhole(TransitionType.Enter);
-            ExitTransition = new Fade(TransitionType.Exit);
+            EnterTransition = null;
+            ExitTransition = null;
         }
 
         /// <summary>
