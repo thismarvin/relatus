@@ -47,7 +47,7 @@ namespace Relatus
         {
             IntersectionInformation result = GetIntersectionInformation(segment);
 
-            return result.Valid ? result.Intersected : false;
+            return result.Valid && result.Intersected;
         }
 
         private Vector2 IntersectionPoint(float t)

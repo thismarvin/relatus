@@ -35,7 +35,7 @@ namespace Relatus.Graphics
 
         public override Batcher<Polygon> Add(Polygon polygon)
         {
-            polygons[polygons.Count - 1].Add(polygon);
+            polygons[^1].Add(polygon);
             index++;
 
             if (index >= batchSize)
@@ -56,17 +56,13 @@ namespace Relatus.Graphics
             {
                 if (i + 1 == polygons.Count)
                 {
-                    using (PolygonCollection polygonCollection = new PolygonCollection(execution, (uint)index, polygons[i]))
-                    {
-                        polygonCollection.Draw(camera);
-                    }
+                    using PolygonCollection polygonCollection = new PolygonCollection(execution, (uint)index, polygons[i]);
+                    polygonCollection.Draw(camera);
                 }
                 else
                 {
-                    using (PolygonCollection polygonCollection = new PolygonCollection(execution, batchSize, polygons[i]))
-                    {
-                        polygonCollection.Draw(camera);
-                    }
+                    using PolygonCollection polygonCollection = new PolygonCollection(execution, batchSize, polygons[i]);
+                    polygonCollection.Draw(camera);
                 }
             }
 

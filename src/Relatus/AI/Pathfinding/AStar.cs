@@ -59,7 +59,7 @@ namespace Relatus.AI.Pathfinding
 
             return new List<Node>();
 
-            Node MinF(HashSet<Node> _openSet, Dictionary<Node, float> _fScores)
+            static Node MinF(HashSet<Node> _openSet, Dictionary<Node, float> _fScores)
             {
                 Node result = null;
                 float min = float.MaxValue;
@@ -76,7 +76,7 @@ namespace Relatus.AI.Pathfinding
                 return result;
             }
 
-            List<Node> ReconstructPath(Node _start, Dictionary<Node, Node> _cameFrom)
+            static List<Node> ReconstructPath(Node _start, Dictionary<Node, Node> _cameFrom)
             {
                 List<Node> result = new List<Node>() { _start };
 

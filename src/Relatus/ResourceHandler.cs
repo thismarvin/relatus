@@ -69,9 +69,9 @@ namespace Relatus
                 {
                     foreach (KeyValuePair<string, T> entry in data)
                     {
-                        if (entry.Value is IDisposable)
+                        if (entry.Value is IDisposable disposable)
                         {
-                            ((IDisposable)entry.Value).Dispose();
+                            disposable.Dispose();
                         }
                     }
                 }

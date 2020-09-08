@@ -14,7 +14,7 @@ namespace Relatus
         public static float MasterVolume
         {
             get => SoundEffect.MasterVolume;
-            set { SoundEffect.MasterVolume = value; }
+            set => SoundEffect.MasterVolume = value;
         }
 
         private static readonly AudioEmitter audioEmitter;

@@ -38,8 +38,8 @@ namespace Relatus.ECS.Bundled
         {
             partitioner.Clear();
 
-            positions = positions ?? factory.GetData<CPosition>();
-            dimensions = dimensions ?? factory.GetData<CDimension>();
+            positions ??= factory.GetData<CPosition>();
+            dimensions ??= factory.GetData<CDimension>();
 
             base.Update();
         }

@@ -30,16 +30,16 @@ namespace Relatus.Graphics
             if (groups.Count == 0)
             {
                 groups.Add(CreateDrawGroup(entry));
-                groups[groups.Count - 1].Add(entry);
+                groups[^1].Add(entry);
 
                 return true;
             }
 
-            if (groups[groups.Count - 1].Add(entry))
+            if (groups[^1].Add(entry))
                 return true;
 
             groups.Add(CreateDrawGroup(entry));
-            groups[groups.Count - 1].Add(entry);
+            groups[^1].Add(entry);
 
             return false;
         }
@@ -89,31 +89,22 @@ namespace Relatus.Graphics
 
         }
 
-        private void Dispose(bool disposing)
+        public void Dispose()
         {
             if (!disposedValue)
             {
-                if (disposing)
+                for (int i = 0; i < groups.Count; i++)
                 {
-                    for (int i = 0; i < groups.Count; i++)
+                    if (groups[i] is IDisposable disposable)
                     {
-                        if (groups[i] is IDisposable disposable)
-                        {
-                            disposable.Dispose();
-                        }
+                        disposable.Dispose();
                     }
-
-                    OnDispose();
                 }
+
+                OnDispose();
 
                 disposedValue = true;
             }
-        }
-
-        public void Dispose()
-        {
-            Dispose(disposing: true);
-            GC.SuppressFinalize(this);
         }
         #endregion
     }

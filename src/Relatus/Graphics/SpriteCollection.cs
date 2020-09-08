@@ -19,17 +19,12 @@ namespace Relatus.Graphics
 
         protected override DrawGroup<Sprite> CreateDrawGroup(Sprite sprite)
         {
-            switch (execution)
+            return execution switch
             {
-                case BatchExecution.DrawElements:
-                    return new SpriteElements(batchSize, sprite.Texture, sprite.RenderOptions);
-
-                case BatchExecution.DrawElementsInstanced:
-                    return new SpriteElementsInstanced(batchSize, sprite.Texture, sprite.RenderOptions);
-
-                default:
-                    throw new RelatusException("Unknown batch execution type.", new ArgumentException());
-            }
+                BatchExecution.DrawElements => new SpriteElements(batchSize, sprite.Texture, sprite.RenderOptions),
+                BatchExecution.DrawElementsInstanced => new SpriteElementsInstanced(batchSize, sprite.Texture, sprite.RenderOptions),
+                _ => throw new RelatusException("Unknown batch execution type.", new ArgumentException()),
+            };
         }
     }
 }

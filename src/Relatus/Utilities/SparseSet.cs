@@ -10,7 +10,7 @@ namespace Relatus.Utilities
     /// </summary>
     public class SparseSet : IEnumerable<uint>
     {
-        public int Count { get => (int)n; }
+        public int Count => (int)n; 
 
         private readonly uint[] dense;
         private readonly uint[] sparse;
@@ -151,9 +151,9 @@ namespace Relatus.Utilities
 
             private int index;
 
-            public uint Current { get { return dense[index]; } }
+            public uint Current => dense[index];
 
-            object IEnumerator.Current { get { return dense[index]; } }
+            object IEnumerator.Current => dense[index]; 
 
             public SparseSetEnumerator(uint[] dense, uint n)
             {

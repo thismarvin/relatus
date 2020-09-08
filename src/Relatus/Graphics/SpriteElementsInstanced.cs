@@ -19,7 +19,6 @@ namespace Relatus.Graphics
 
         private uint textureCoordIndex;
         private uint count;
-        private uint totalPrimitives;
 
         private static readonly GraphicsDevice graphicsDevice;
         private static readonly GeometryData sharedGeometry;
@@ -69,7 +68,6 @@ namespace Relatus.Graphics
 
             textureCoordIndex += 4;
             count++;
-            totalPrimitives += 2;
 
             return true;
         }

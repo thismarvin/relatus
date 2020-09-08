@@ -41,8 +41,8 @@ namespace Relatus.ECS.Bundled
 
         public override void Update()
         {
-            positions = positions ?? factory.GetData<CPosition>();
-            kinetics = kinetics ?? factory.GetData<CKinetic>();
+            positions ??= factory.GetData<CPosition>();
+            kinetics ??= factory.GetData<CKinetic>();
 
             base.Update();
         }
