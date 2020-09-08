@@ -294,27 +294,19 @@ namespace Relatus.Graphics
         #region IDisposable Support
         private bool disposedValue;
 
-        private void Dispose(bool disposing)
+        public void Dispose()
         {
             if (!disposedValue)
             {
-                if (disposing)
+                if (!Geometry.Managed)
                 {
-                    if (!Geometry.Managed)
-                    {
-                        Geometry.Dispose();
-                    }
-
-                    OnDispose();
+                    Geometry.Dispose();
                 }
+
+                OnDispose();
 
                 disposedValue = true;
             }
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
         }
         #endregion
     }

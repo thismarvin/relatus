@@ -36,23 +36,14 @@ namespace Relatus.Graphics
 
         }
 
-        private void Dispose(bool disposing)
+        public void Dispose()
         {
             if (!disposedValue)
             {
-                if (disposing)
-                {
-                    OnDispose();
-                }
+                OnDispose();
 
                 disposedValue = true;
             }
-        }
-
-        public void Dispose()
-        {
-            Dispose(disposing: true);
-            GC.SuppressFinalize(this);
         }
         #endregion
     }
