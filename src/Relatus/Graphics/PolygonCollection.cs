@@ -15,17 +15,12 @@ namespace Relatus.Graphics
 
         protected override DrawGroup<Polygon> CreateDrawGroup(Polygon polygon)
         {
-            switch (execution)
+            return execution switch
             {
-                case BatchExecution.DrawElements:
-                    return new PolygonElements(batchSize, polygon.Geometry, polygon.RenderOptions);
-
-                case BatchExecution.DrawElementsInstanced:
-                    return new PolygonElementsInstanced(batchSize, polygon.Geometry, polygon.RenderOptions);
-
-                default:
-                    throw new RelatusException("Unknown batch execution type.", new ArgumentException());
-            }
+                BatchExecution.DrawElements => new PolygonElements(batchSize, polygon.Geometry, polygon.RenderOptions),
+                BatchExecution.DrawElementsInstanced => new PolygonElementsInstanced(batchSize, polygon.Geometry, polygon.RenderOptions),
+                _ => throw new RelatusException("Unknown batch execution type.", new ArgumentException()),
+            };
         }
     }
 }

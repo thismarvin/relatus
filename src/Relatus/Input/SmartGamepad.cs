@@ -14,7 +14,7 @@ namespace Relatus.Input
     {
         public PlayerIndex PlayerIndex { get; private set; }
         public bool Vibrating { get; private set; }
-        public bool IsConnected { get => currentGamePadState.IsConnected; }
+        public bool IsConnected => currentGamePadState.IsConnected; 
 
         private bool isBeingUpdated;
         private GamePadState previousGamePadState;

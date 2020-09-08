@@ -35,7 +35,7 @@ namespace Relatus.Graphics
 
         public override Batcher<Sprite> Add(Sprite sprite)
         {
-            sprites[sprites.Count - 1].Add(sprite);
+            sprites[^1].Add(sprite);
             index++;
 
             if (index >= batchSize)
@@ -56,17 +56,13 @@ namespace Relatus.Graphics
             {
                 if (i + 1 == sprites.Count)
                 {
-                    using (SpriteCollection spriteCollection = new SpriteCollection(execution, (uint)index, sprites[i]))
-                    {
-                        spriteCollection.Draw(camera);
-                    }
+                    using SpriteCollection spriteCollection = new SpriteCollection(execution, (uint)index, sprites[i]);
+                    spriteCollection.Draw(camera);
                 }
                 else
                 {
-                    using (SpriteCollection spriteCollection = new SpriteCollection(execution, batchSize, sprites[i]))
-                    {
-                        spriteCollection.Draw(camera);
-                    }
+                    using SpriteCollection spriteCollection = new SpriteCollection(execution, batchSize, sprites[i]);
+                    spriteCollection.Draw(camera);
                 }
             }
 

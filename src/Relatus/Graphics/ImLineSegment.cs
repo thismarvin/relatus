@@ -185,7 +185,7 @@ namespace Relatus.Graphics
                     }
                     else if (i == totalPoints - 1)
                     {
-                        vertices[vertexIndex++] = new Vector3(_sloppyVertices[_sloppyVertices.Length - 1].X, _sloppyVertices[_sloppyVertices.Length - 1].Y, 0);
+                        vertices[vertexIndex++] = new Vector3(_sloppyVertices[^1].X, _sloppyVertices[^1].Y, 0);
                     }
                     else
                     {
@@ -197,7 +197,7 @@ namespace Relatus.Graphics
                 return vertices;
             }
 
-            Vector2 PointOfIntersection(Vector2 a1, Vector2 a2, Vector2 b1, Vector2 b2)
+            static Vector2 PointOfIntersection(Vector2 a1, Vector2 a2, Vector2 b1, Vector2 b2)
             {
                 // Prevents a slope of NaN.
                 if (a2.X == a1.X)

@@ -13,7 +13,7 @@ namespace Relatus.Input
     {
         public static Vector2 WindowPosition { get; private set; }
         public static RectangleF Bounds => new RectangleF(WindowPosition.X, WindowPosition.Y, 1, 1);
-        public static int ScrollStride { get => currentMouseState.ScrollWheelValue - previousMouseState.ScrollWheelValue; }
+        public static int ScrollStride => currentMouseState.ScrollWheelValue - previousMouseState.ScrollWheelValue; 
 
         private static MouseState previousMouseState;
         private static MouseState currentMouseState;

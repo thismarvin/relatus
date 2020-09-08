@@ -14,9 +14,9 @@ namespace Relatus
         public static bool Debugging { get; set; }
         public static bool ShowWireFrame { get; set; }
 
-        private static Camera camera;
-        private static BMFont font;
-        private static BMFontShader fontShader;
+        private static readonly Camera camera;
+        private static readonly BMFont font;
+        private static readonly BMFontShader fontShader;
 
         static DebugManager()
         {

@@ -110,10 +110,10 @@ namespace Relatus.ECS.Bundled
 
         public override void Update()
         {
-            positions = positions ?? factory.GetData<CPosition>();
-            dimensions = dimensions ?? factory.GetData<CDimension>();
-            transforms = transforms ?? factory.GetData<CTransform>();
-            colors = colors ?? factory.GetData<CColor>();
+            positions ??= factory.GetData<CPosition>();
+            dimensions ??= factory.GetData<CDimension>();
+            transforms ??= factory.GetData<CTransform>();
+            colors ??= factory.GetData<CColor>();
 
             Array.Clear(transformData, 0, transformData.Length);
             Array.Clear(colorData, 0, colorData.Length);

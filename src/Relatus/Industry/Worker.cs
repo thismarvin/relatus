@@ -15,30 +15,21 @@ namespace Relatus.Industry
         #region IDisposable Support
         private bool disposedValue;
 
-        private void Dispose(bool disposing)
+        public void Dispose()
         {
             if (!disposedValue)
             {
-                if (disposing)
+                List<IBehavior> behaviors = Behaviors;
+                for (int i = 0; i < behaviors.Count; i++)
                 {
-                    List<IBehavior> behaviors = Behaviors;
-                    for (int i = 0; i < behaviors.Count; i++)
+                    if (behaviors[i] is IDisposable disposable)
                     {
-                        if (behaviors[i] is IDisposable disposable)
-                        {
-                            disposable.Dispose();
-                        }
+                        disposable.Dispose();
                     }
                 }
 
                 disposedValue = true;
             }
-        }
-
-        public void Dispose()
-        {
-            Dispose(disposing: true);
-            GC.SuppressFinalize(this);
         }
         #endregion
     }

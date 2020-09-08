@@ -41,9 +41,9 @@ namespace Relatus.ECS.Bundled
 
         public override void Draw(Camera camera)
         {
-            sprites = sprites ?? factory.GetData<CSprite>();
-            positions = positions ?? factory.GetData<CPosition>();
-            transforms = transforms ?? factory.GetData<CTransform>();
+            sprites ??= factory.GetData<CSprite>();
+            positions ??= factory.GetData<CPosition>();
+            transforms ??= factory.GetData<CTransform>();
 
             //spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, camera.SpriteTransform);
             //{

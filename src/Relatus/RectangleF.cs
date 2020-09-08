@@ -118,8 +118,7 @@ namespace Relatus
 
         public override int GetHashCode()
         {
-            // For furture reference as to where I found this, and why it works, refer to this Stack Overflow post: https://stackoverflow.com/a/4630550.
-            return (X, Y, Width, Height).GetHashCode();
+            return HashCode.Combine(X, Y, Width, Height);
         }
 
         public override string ToString()

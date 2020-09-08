@@ -225,10 +225,10 @@ namespace Relatus
             }
 
             // We cannot dispose of the last render target just yet. Instead we are going to have to add it to a list, and deal with it later.
-            Decomission(renderTargets[renderTargets.Length - 1]);
+            Decomission(renderTargets[^1]);
 
             // Now that all the effects were applied, just return a sprite with the last render target as the texture.
-            return renderTargets[renderTargets.Length - 1];
+            return renderTargets[^1];
         }
     }
 }

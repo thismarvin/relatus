@@ -148,10 +148,8 @@ namespace Relatus.Graphics
 
         public static void DrawSpriteCollection(BatchExecution batchExecution, uint batchSize, IEnumerable<Sprite> sprites, Camera camera)
         {
-            using (SpriteCollection collection = new SpriteCollection(batchExecution, batchSize, sprites))
-            {
-                collection.Draw(camera);
-            }
+            using SpriteCollection collection = new SpriteCollection(batchExecution, batchSize, sprites);
+            collection.Draw(camera);
         }
 
         public static void DrawText(float x, float y, string text, BMFont font, BMFontShader fontShader, Camera camera)
@@ -169,10 +167,8 @@ namespace Relatus.Graphics
 
         public static void DrawPolygonCollection(BatchExecution batchExecution, uint batchSize, IEnumerable<Polygon> polygons, Camera camera)
         {
-            using (PolygonCollection collection = new PolygonCollection(batchExecution, batchSize, polygons))
-            {
-                collection.Draw(camera);
-            }
+            using PolygonCollection collection = new PolygonCollection(batchExecution, batchSize, polygons);
+            collection.Draw(camera);
         }
 
         public static void DrawLineSegment(float x1, float y1, float x2, float y2, float lineWidth, Camera camera)
