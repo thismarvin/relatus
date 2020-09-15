@@ -104,18 +104,36 @@ namespace Relatus
 
         public static Camera CreatePerspectiveFieldOfView(float fieldOfView, float aspectRatio, float near, float far)
         {
-            float width = 2 * (float)Math.Tan(fieldOfView * 0.5f);
+            float width = 2 * near * (float)Math.Tan(fieldOfView * 0.5f) * aspectRatio;
             float height = width / aspectRatio;
 
             return new Camera(width, height, near, far, ProjectionType.Perspective);
         }
 
-        public Camera SetPosition(float x, float y, float z)
+        public Camera SetPosition(Vector3 position)
         {
-            if (position.X == x && position.Y == y && position.Z == z)
+            if (this.position == position)
                 return this;
 
-            position = new Vector3(x, y, z);
+            this.position = position;
+
+            view = Matrix.CreateLookAt(position, target, up);
+            WVP = world * view * projection;
+
+            return this;
+        }
+
+        public Camera SetPosition(float x, float y, float z)
+        {
+            return SetPosition(new Vector3(x, y, z));
+        }
+
+        public Camera SetTarget(Vector3 target)
+        {
+            if (this.target == target)
+                return this;
+
+            this.target = target;
 
             view = Matrix.CreateLookAt(position, target, up);
             WVP = world * view * projection;
@@ -125,10 +143,15 @@ namespace Relatus
 
         public Camera SetTarget(float x, float y, float z)
         {
-            if (target.X == x && target.Y == y && target.Z == z)
+            return SetTarget(new Vector3(x, y, z));
+        }
+
+        public Camera SetUp(Vector3 up)
+        {
+            if (this.up == up)
                 return this;
 
-            target = new Vector3(x, y, z);
+            this.up = up;
 
             view = Matrix.CreateLookAt(position, target, up);
             WVP = world * view * projection;
@@ -138,15 +161,7 @@ namespace Relatus
 
         public Camera SetUp(float x, float y, float z)
         {
-            if (up.X == x && up.Y == y && up.Z == z)
-                return this;
-
-            up = new Vector3(x, y, z);
-
-            view = Matrix.CreateLookAt(position, target, up);
-            WVP = world * view * projection;
-
-            return this;
+            return SetUp(new Vector3(x, y, z));
         }
 
         public Camera SetWorld(Matrix world)
