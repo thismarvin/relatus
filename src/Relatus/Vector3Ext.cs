@@ -5,14 +5,19 @@ namespace Relatus
 {
     public static class Vector3Ext
     {
-        public static Vector3 SphericalToCartesian(float radius, float inclination, float azimuth)
+        /// <summary>
+        /// Converts spherical coordinates into Cartesian coordinates (represented as a Vector3).
+        /// </summary>
+        /// <param name="radius">The distance between the origin and the new point.</param>
+        /// <param name="latitide"></param>
+        /// <param name="longitude"></param>
+        /// <returns></returns>
+        public static Vector3 SphericalToCartesian(float radius, float longitude, float latitide)
         {
-            // Normally azimuth and inclination would be swapped in this formula.
-            // However, because of OpenGL's coordinate system, they were switched around for the sake of convenience.
             return new Vector3(
-                (float)(radius * Math.Sin(azimuth) * Math.Cos(inclination)),
-                (float)(radius * Math.Sin(azimuth) * Math.Sin(inclination)),
-                (float)(radius * Math.Cos(azimuth))
+                (float)(radius * Math.Sin(longitude) * Math.Sin(latitide)),
+                (float)(radius * Math.Cos(longitude)),
+                -(float)(radius * Math.Sin(longitude) * Math.Cos(latitide))
             );
         }
 
