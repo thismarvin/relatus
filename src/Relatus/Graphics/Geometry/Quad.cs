@@ -48,6 +48,21 @@ namespace Relatus.Graphics
             return result;
         }
 
+        public override Polygon SetDimensions(float width, float height)
+        {
+            if (width == Width && height == Height)
+                return this;
+
+            base.SetDimensions(width, height);
+
+            if (lineWidth != 0)
+            {
+                AttachGeometry(GeometryManager.CreateHollowSquare(Width, Height, lineWidth));
+            }
+
+            return this;
+        }
+
         public Polygon SetLineWidth(float lineWidth)
         {
             if (this.lineWidth == lineWidth)

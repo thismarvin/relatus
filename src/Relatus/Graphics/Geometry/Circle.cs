@@ -65,6 +65,11 @@ namespace Relatus.Graphics
             this.radius = radius;
             SetDimensions(radius * 2, radius * 2);
 
+            if (lineWidth != 0)
+            {
+                AttachGeometry(GeometryManager.CreateHollowCircle(this.radius, lineWidth));
+            }
+
             return this;
         }
 
