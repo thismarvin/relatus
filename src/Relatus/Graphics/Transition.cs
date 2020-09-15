@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Relatus.Graphics
 {
@@ -54,6 +52,15 @@ namespace Relatus.Graphics
 
         public void Begin()
         {
+            if (Started)
+                return;
+
+            if (!setup)
+            {
+                SetupTransition();
+                setup = true;
+            }
+
             Started = true;
         }
 
@@ -67,15 +74,7 @@ namespace Relatus.Graphics
 
         }
 
-        private void CalculateForce()
-        {
-            velocity += acceleration * deltaTime;
-            Force += velocity * deltaTime;
-        }
-
         protected abstract void SetupTransition();
-
-        protected abstract void AccommodateToCamera();
 
         protected abstract void UpdateLogic();
 
@@ -86,19 +85,13 @@ namespace Relatus.Graphics
             if (Done)
                 return;
 
-            AccommodateToCamera();
-
-            if (!setup)
-            {
-                SetupTransition();
-                setup = true;
-            }
-
             accumulator += Engine.DeltaTime;
 
             while (accumulator >= deltaTime)
             {
-                CalculateForce();
+                velocity += acceleration * deltaTime;
+                Force += velocity * deltaTime;
+
                 UpdateLogic();
 
                 accumulator -= deltaTime;

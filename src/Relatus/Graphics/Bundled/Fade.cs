@@ -20,20 +20,15 @@ namespace Relatus.Graphics.Bundled
             fade = new Quad(0, 0, 1, 1) { Color = Color.Black };
         }
 
-        protected override void AccommodateToCamera()
-        {
-            fade.Width = Camera.Bounds.Width * 1.4f;
-            fade.Height = Camera.Bounds.Height * 1.4f;
-
-            fade.SetCenter(Camera.Position.X, Camera.Position.Y);
-        }
-
         protected override void SetupTransition()
         {
             alpha = Type == TransitionType.Enter ? 1 : 0;
             fadeColor = defaultColor * alpha;
 
+            fade.Width = Camera.Bounds.Width * 1.4f;
+            fade.Height = Camera.Bounds.Height * 1.4f;
             fade.Color = fadeColor;
+            fade.SetCenter(Camera.Position.X, Camera.Position.Y);
         }
 
         protected override void UpdateLogic()
@@ -63,13 +58,16 @@ namespace Relatus.Graphics.Bundled
         protected override void AfterUpdate()
         {
             fadeColor = defaultColor * alpha;
+
+            fade.Width = Camera.Bounds.Width * 1.4f;
+            fade.Height = Camera.Bounds.Height * 1.4f;
             fade.Color = fadeColor;
+            fade.SetCenter(Camera.Position.X, Camera.Position.Y);
         }
 
         protected override void DrawTransition()
         {
             Sketch.GeometryBatcher
-                .SetBatchSize(1)
                 .AttachCamera(Camera)
                 .Begin()
                     .Add(fade)
