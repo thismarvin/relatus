@@ -63,13 +63,13 @@ namespace Relatus
                 }
             }
 
-            float letterBox = (WindowManager.WindowWidth - texture.Width * scale) * 0.5f;
-            float pillarBox = (WindowManager.WindowHeight - texture.Height * scale) * 0.5f;
+            float pillarBox = (WindowManager.WindowWidth - texture.Width * scale) * 0.5f;
+            float letterBox = (WindowManager.WindowHeight - texture.Height * scale) * 0.5f;
 
             return new Sprite()
             {
                 Texture = texture,
-                Position = new Vector3(letterBox, -pillarBox, 0),
+                Position = new Vector3(pillarBox, -letterBox, 0),
                 Scale = new Vector3(scale, scale, 1)
             };
         }
