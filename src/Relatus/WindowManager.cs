@@ -225,7 +225,10 @@ namespace Relatus
                 new Quad(PixelWidth * 0.5f, PixelHeight * 0.5f + buffer, buffer, PixelHeight + buffer * 2) { Color = Color.Black }
             };
 
+            polygonCollection.Dispose();
+            
             polygonCollection
+                .Clear()
                 .AddRange(boxing)
                 .ApplyChanges();
         }
@@ -238,7 +241,7 @@ namespace Relatus
             {
                 Scale = (float)WindowHeight / PixelHeight;
 
-                // Check if pillar boxing is required.
+                // Check if letter boxing is required.
                 if (PixelWidth * Scale > WindowWidth)
                 {
                     Scale = (float)WindowWidth / PixelWidth;
@@ -248,7 +251,7 @@ namespace Relatus
             {
                 Scale = (float)WindowWidth / PixelWidth;
 
-                // Check if letterboxing is required.
+                // Check if pillar boxing is required.
                 if (PixelHeight * Scale > WindowHeight)
                 {
                     Scale = (float)WindowHeight / PixelHeight;
