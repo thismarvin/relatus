@@ -12,12 +12,15 @@ namespace Relatus
         /// <param name="latitide"></param>
         /// <param name="longitude"></param>
         /// <returns></returns>
-        public static Vector3 SphericalToCartesian(float radius, float longitude, float latitide)
+        public static Vector3 SphericalToCartesian(float radius, float latitide, float longitude)
         {
+            latitide *= -1;
+            latitide += MathHelper.PiOver2;
+
             return new Vector3(
-                (float)(radius * Math.Sin(longitude) * Math.Sin(latitide)),
-                (float)(radius * Math.Cos(longitude)),
-                -(float)(radius * Math.Sin(longitude) * Math.Cos(latitide))
+                (float)(radius * Math.Sin(latitide) * Math.Sin(longitude)),
+                (float)(radius * Math.Cos(latitide)),
+                -(float)(radius * Math.Sin(latitide) * Math.Cos(longitude))
             );
         }
 
