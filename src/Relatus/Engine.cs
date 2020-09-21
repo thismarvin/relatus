@@ -53,7 +53,6 @@ namespace Relatus
 
             InputManager.Update();
             WindowManager.Update();
-            CameraManager.Update();
             SceneManager.Update();
             DebugManager.Update();
             SoundManager.Update();

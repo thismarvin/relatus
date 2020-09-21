@@ -106,9 +106,9 @@ namespace Relatus.Graphics
                     float y = -current.Height * 0.5f;
 
                     Camera camera =
-                        Camera.CreateOrthographic(current.Width, current.Height, 0.5f, 2)
-                        .SetPosition(x, y, 1)
-                        .SetTarget(x, y, 0);
+                        new OrthographicCamera()
+                        .SetProjection(current.Width, current.Height, 0.5f, 2)
+                        .SetPosition(x, y, 1);
 
                     collection.Add(sprite);
                     collection.ApplyChanges();

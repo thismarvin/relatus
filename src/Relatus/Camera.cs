@@ -7,19 +7,23 @@ namespace Relatus
         public Vector3 Position
         {
             get => position;
-            set => SetPosition(value.X, value.Y, value.Z);
+            set => SetPosition(value);
         }
-
-        public Vector3 Target
+        public Vector3 Axis
         {
-            get => target;
-            set => SetTarget(value.X, value.Y, value.Z);
+            get => axis;
+            set => SetAxis(value);
+        }
+        public Quaternion Rotation
+        {
+            get => rotation;
+            set => SetRotation(value);
         }
 
         public Vector3 Up
         {
             get => up;
-            set => SetUp(value.X, value.Y, value.Z);
+            set => SetUp(value);
         }
 
         public Matrix World
@@ -27,30 +31,76 @@ namespace Relatus
             get => world;
             set => SetWorld(value);
         }
+        public Matrix Projection
+        {
+            get => projection;
+            set => SetProjection(value);
+        }
 
+        public Vector3 Pointing => CalculatePointing();
+        public Matrix View => CalculateView();
         public Matrix WVP => CalculateWVP();
 
+        protected Matrix world;
+        protected Matrix view;
         protected Matrix projection;
         protected float near;
         protected float far;
 
-        private Vector3 position;
-        private Vector3 target;
-        private Vector3 up;
+        protected Vector3 position;
+        protected Vector3 axis;
+        protected Quaternion rotation;
+        protected Vector3 pointing;
+        protected Vector3 up;
 
-        private Matrix world;
-        private Matrix view;
-
-        private bool wvpModified;
         private Matrix wvpCache;
+        private bool pointingModified;
+        private bool viewModified;
+        private bool wvpModified;
 
         protected Camera()
         {
+            rotation = Quaternion.Identity;
+            axis = new Vector3(0, 0, -1);
+
+            up = Vector3.Up;
+
             world = Matrix.Identity;
             view = Matrix.Identity;
             projection = Matrix.Identity;
 
+            pointingModified = true;
+            viewModified = true;
+            wvpModified = true;
             wvpCache = Matrix.Identity;
+        }
+
+        public Camera SetAxis(Vector3 axis)
+        {
+            if (this.axis == axis)
+                return this;
+
+            this.axis = axis;
+
+            pointingModified = true;
+            viewModified = true;
+            wvpModified = true;
+
+            return this;
+        }
+
+        public Camera SetRotation(Quaternion rotation)
+        {
+            if (this.rotation == rotation)
+                return this;
+
+            this.rotation = rotation;
+
+            pointingModified = true;
+            viewModified = true;
+            wvpModified = true;
+
+            return this;
         }
 
         public Camera SetPosition(Vector3 position)
@@ -60,7 +110,7 @@ namespace Relatus
 
             this.position = position;
 
-            view = Matrix.CreateLookAt(position, target, up);
+            viewModified = true;
             wvpModified = true;
 
             return this;
@@ -71,24 +121,6 @@ namespace Relatus
             return SetPosition(new Vector3(x, y, z));
         }
 
-        public Camera SetTarget(Vector3 target)
-        {
-            if (this.target == target)
-                return this;
-
-            this.target = target;
-
-            view = Matrix.CreateLookAt(position, target, up);
-            wvpModified = true;
-
-            return this;
-        }
-
-        public Camera SetTarget(float x, float y, float z)
-        {
-            return SetTarget(new Vector3(x, y, z));
-        }
-
         public Camera SetUp(Vector3 up)
         {
             if (this.up == up)
@@ -96,7 +128,7 @@ namespace Relatus
 
             this.up = up;
 
-            view = Matrix.CreateLookAt(position, target, up);
+            viewModified = true;
             wvpModified = true;
 
             return this;
@@ -113,15 +145,54 @@ namespace Relatus
                 return this;
 
             this.world = world;
+            
             wvpModified = true;
 
             return this;
+        }
+
+        protected Camera SetProjection(Matrix projection)
+        {
+            if (this.projection == projection)
+                return this;
+
+            this.projection = projection;
+
+            wvpModified = true;
+
+            return this;
+        }
+
+        private Vector3 CalculatePointing()
+        {
+            if (pointingModified)
+            {
+                pointing = Vector3.Transform(axis, rotation);
+                pointingModified = false;
+            }
+
+            return pointing;
+        }
+
+        private Matrix CalculateView()
+        {
+            if (viewModified)
+            {
+                CalculatePointing();
+
+                view = Matrix.CreateLookAt(position, position + pointing, up);
+                viewModified = false;
+            }
+
+            return view;
         }
 
         private Matrix CalculateWVP()
         {
             if (wvpModified)
             {
+                CalculateView();
+
                 wvpCache = world * view * projection;
                 wvpModified = false;
             }

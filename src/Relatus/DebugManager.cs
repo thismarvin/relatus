@@ -14,15 +14,15 @@ namespace Relatus
         public static bool Debugging { get; set; }
         public static bool ShowWireFrame { get; set; }
 
-        private static readonly Camera camera;
+        private static readonly OrthographicCamera camera;
         private static readonly BMFont font;
         private static readonly BMFontShader fontShader;
 
         static DebugManager()
         {
-            camera = Camera.CreateOrthographic(WindowManager.ScaledWidth, WindowManager.ScaledHeight, 0.5f, 16)
-                .SetPosition(WindowManager.PixelWidth * 0.5f, WindowManager.PixelHeight * 0.5f, 1)
-                .SetTarget(WindowManager.PixelWidth * 0.5f, WindowManager.PixelHeight * 0.5f, 0);
+            camera = new OrthographicCamera()
+                .SetProjection(WindowManager.WindowWidth, WindowManager.WindowHeight, 0.5f, 2);
+            camera.SetPosition(WindowManager.WindowWidth * 0.5f, -WindowManager.WindowHeight * 0.5f, 1);
 
             WindowManager.WindowResize += HandleResize;
 
@@ -32,7 +32,8 @@ namespace Relatus
 
         private static void HandleResize(object sender, EventArgs args)
         {
-            camera.SetDimensions(WindowManager.ScaledWidth, WindowManager.ScaledHeight);
+            camera.SetProjection(WindowManager.WindowWidth, WindowManager.WindowHeight, 0.5f, 2);
+            camera.SetPosition(WindowManager.WindowWidth * 0.5f, -WindowManager.WindowHeight * 0.5f, 1);
         }
 
         private static void UpdateInput()
@@ -70,7 +71,7 @@ namespace Relatus
                 .AttachCamera(camera)
                 .SetBatchSize(1)
                 .Begin()
-                    .AddRange(ImText.Create(4, WindowManager.PixelHeight - 4, $"{Math.Round(WindowManager.FPS)} FPS", font, fontShader))
+                    .AddRange(ImText.Create(4, -4, $"{Math.Round(WindowManager.FPS)} FPS", font, fontShader))
                 .End();
         }
     }
