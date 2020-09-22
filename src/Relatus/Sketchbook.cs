@@ -120,9 +120,9 @@ namespace Relatus
             float x = WindowManager.WindowWidth * 0.5f;
             float y = -WindowManager.WindowHeight * 0.5f;
 
-            Camera camera = Camera.CreateOrthographic(WindowManager.WindowWidth, WindowManager.WindowHeight, 0.5f, 2)
-                .SetPosition(x, y, 1)
-                .SetTarget(x, y, 0);
+            Camera camera = new OrthographicCamera()
+                .SetProjection(WindowManager.WindowWidth, WindowManager.WindowHeight, 0.5f, 2)
+                .SetPosition(x, y, 1);
 
             if (effects.Count == 0)
             {
@@ -185,9 +185,9 @@ namespace Relatus
             float y = -texture.Height * 0.5f;
 
             Camera camera =
-                Camera.CreateOrthographic(texture.Width, texture.Height, 0.5f, 2)
-                .SetPosition(x, y, 1)
-                .SetTarget(x, y, 0);
+                new OrthographicCamera()
+                .SetProjection(texture.Width, texture.Height, 0.5f, 2)
+                .SetPosition(x, y, 1);
 
             // In order to apply multiple effects, and avoid weird visual artifacts, we need to create a RenderTarget2D for each effect.
             RenderTarget2D[] renderTargets = new RenderTarget2D[effects.Count];

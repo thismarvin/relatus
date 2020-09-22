@@ -20,7 +20,7 @@ namespace Relatus.Graphics.Bundled
 
         protected override void SetupTransition()
         {
-            radius = Camera.Bounds.Width > Camera.Bounds.Height ? Camera.Bounds.Width * 0.5f : Camera.Bounds.Height * 0.5f;
+            //radius = Camera.Bounds.Width > Camera.Bounds.Height ? Camera.Bounds.Width * 0.5f : Camera.Bounds.Height * 0.5f;
             radius *= 1.2f;
             lineWidth = Type == TransitionType.Enter ? radius : 1;
 

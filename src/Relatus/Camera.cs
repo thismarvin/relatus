@@ -1,113 +1,75 @@
 using Microsoft.Xna.Framework;
-using System;
 
 namespace Relatus
 {
-    public enum ProjectionType
+    public abstract class Camera
     {
-        None,
-        Orthographic,
-        Perspective
-    }
-
-    public class Camera
-    {
-        public Matrix WVP { get; private set; }
-
-        public RectangleF Bounds => new RectangleF(position.X, position.Y, width, height);
+        public Transform Transform
+        {
+            get => transform;
+            set => SetTransform(value);
+        }
 
         public Vector3 Position
         {
             get => position;
-            set => SetPosition(value.X, value.Y, value.Z);
+            set => SetPosition(value);
         }
-
-        public Vector3 Target
+        public Vector3 Forward
         {
-            get => target;
-            set => SetTarget(value.X, value.Y, value.Z);
+            get => forward;
+            set => SetForward(value);
         }
-
         public Vector3 Up
         {
             get => up;
-            set => SetUp(value.X, value.Y, value.Z);
+            set => SetUp(value);
         }
 
-        public Matrix World
+        public Matrix Projection
         {
-            get => world;
-            set => SetWorld(value);
+            get => projection;
+            protected set => SetProjection(value);
         }
 
-        private Vector3 target;
-        private Vector3 position;
-        private Vector3 up;
+        public Matrix View => CalculateView();
+        public Matrix WVP => CalculateWVP();
 
-        private Matrix world;
-        private Matrix view;
-        private Matrix projection;
+        protected Matrix view;
+        protected Matrix projection;
+        protected float near;
+        protected float far;
 
-        private readonly ProjectionType projectionType;
-        private readonly float near;
-        private readonly float far;
-        private float width;
-        private float height;
+        protected Transform transform;
 
-        internal Camera(float width, float height, float near, float far, ProjectionType projectionType)
+        protected Vector3 position;
+        protected Vector3 forward;
+        protected Vector3 up;
+
+        private Matrix wvpCache;
+        private bool viewModified;
+        private bool wvpModified;
+
+        protected Camera()
         {
-            target = Vector3.Zero;
-            position = new Vector3(target.X, target.Y, target.Z + 1);
+            Transform = new Transform();
+
+            forward = Vector3.Forward;
             up = Vector3.Up;
 
-            this.width = width;
-            this.height = height;
-            this.near = near;
-            this.far = far;
-            this.projectionType = projectionType;
+            view = Matrix.Identity;
+            projection = Matrix.Identity;
 
-            world = Matrix.Identity;
-            view = Matrix.CreateLookAt(position, target, up);
-
-            switch (this.projectionType)
-            {
-                case ProjectionType.Orthographic:
-                    projection = Matrix.CreateOrthographic(width, height, near, far);
-                    break;
-                case ProjectionType.Perspective:
-                    projection = Matrix.CreatePerspective(width, height, near, far);
-                    break;
-            }
-
-            WVP = world * view * projection;
+            viewModified = true;
+            wvpModified = true;
+            wvpCache = Matrix.Identity;
         }
 
-        public static Camera CreateOrthographic(float width, float height, float near, float far)
+        public Camera SetTransform(Transform transform)
         {
-            return new Camera(width, height, near, far, ProjectionType.Orthographic);
-        }
+            this.transform = transform;
 
-        public static Camera CreateOrthographicOffCenter(float left, float right, float bottom, float top, float near, float far)
-        {
-            return new Camera(right - left, top - bottom, near, far, ProjectionType.Orthographic);
-        }
-
-        public static Camera CreatePerspective(float width, float height, float near, float far)
-        {
-            return new Camera(width, height, near, far, ProjectionType.Perspective);
-        }
-
-        public static Camera CreatePerspectiveOffCenter(float left, float right, float bottom, float top, float near, float far)
-        {
-            return new Camera(right - left, top - bottom, near, far, ProjectionType.Perspective);
-        }
-
-        public static Camera CreatePerspectiveFieldOfView(float fieldOfView, float aspectRatio, float near, float far)
-        {
-            float width = 2 * near * (float)Math.Tan(fieldOfView * 0.5f) * aspectRatio;
-            float height = width / aspectRatio;
-
-            return new Camera(width, height, near, far, ProjectionType.Perspective);
+            return this;
         }
 
         public Camera SetPosition(Vector3 position)
@@ -117,8 +79,8 @@ namespace Relatus
 
             this.position = position;
 
-            view = Matrix.CreateLookAt(position, target, up);
-            WVP = world * view * projection;
+            viewModified = true;
+            wvpModified = true;
 
             return this;
         }
@@ -128,22 +90,23 @@ namespace Relatus
             return SetPosition(new Vector3(x, y, z));
         }
 
-        public Camera SetTarget(Vector3 target)
+        public Camera SetForward(Vector3 forward)
         {
-            if (this.target == target)
+            if (this.forward == forward)
                 return this;
 
-            this.target = target;
+            this.forward = forward;
 
-            view = Matrix.CreateLookAt(position, target, up);
-            WVP = world * view * projection;
+            viewModified = true;
+            wvpModified = true;
 
             return this;
+
         }
 
-        public Camera SetTarget(float x, float y, float z)
+        public Camera SetForward(float x, float y, float z)
         {
-            return SetTarget(new Vector3(x, y, z));
+            return SetForward(x, y, z);
         }
 
         public Camera SetUp(Vector3 up)
@@ -153,8 +116,8 @@ namespace Relatus
 
             this.up = up;
 
-            view = Matrix.CreateLookAt(position, target, up);
-            WVP = world * view * projection;
+            viewModified = true;
+            wvpModified = true;
 
             return this;
         }
@@ -164,39 +127,40 @@ namespace Relatus
             return SetUp(new Vector3(x, y, z));
         }
 
-        public Camera SetWorld(Matrix world)
+        protected Camera SetProjection(Matrix projection)
         {
-            if (this.world == world)
+            if (this.projection == projection)
                 return this;
 
-            this.world = world;
+            this.projection = projection;
 
-            WVP = world * view * projection;
+            wvpModified = true;
 
             return this;
         }
 
-        public Camera SetDimensions(float width, float height)
+        private Matrix CalculateView()
         {
-            if (this.width == width && this.height == height)
-                return this;
-
-            this.width = width;
-            this.height = height;
-
-            switch (projectionType)
+            if (viewModified)
             {
-                case ProjectionType.Orthographic:
-                    projection = Matrix.CreateOrthographic(this.width, this.height, near, far);
-                    break;
-                case ProjectionType.Perspective:
-                    projection = Matrix.CreatePerspective(this.width, this.height, near, far);
-                    break;
+                view = Matrix.CreateLookAt(position, position + forward, up);
+                viewModified = false;
             }
 
-            WVP = world * view * projection;
+            return view;
+        }
 
-            return this;
+        private Matrix CalculateWVP()
+        {
+            if (wvpModified)
+            {
+                CalculateView();
+
+                wvpCache = Transform.Matrix * view * projection;
+                wvpModified = false;
+            }
+
+            return wvpCache;
         }
     }
 }

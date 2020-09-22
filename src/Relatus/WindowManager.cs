@@ -226,7 +226,7 @@ namespace Relatus
             };
 
             polygonCollection.Dispose();
-            
+
             polygonCollection
                 .Clear()
                 .AddRange(boxing)
@@ -356,7 +356,7 @@ namespace Relatus
         {
             if (!WideScreenSupported)
             {
-                polygonCollection.Draw(CameraManager.Static);
+                //polygonCollection.Draw();
             }
         }
     }

@@ -25,8 +25,8 @@ namespace Relatus.Graphics.Bundled
             alpha = Type == TransitionType.Enter ? 1 : 0;
             fadeColor = defaultColor * alpha;
 
-            fade.Width = Camera.Bounds.Width * 1.4f;
-            fade.Height = Camera.Bounds.Height * 1.4f;
+            //fade.Width = Camera.Bounds.Width * 1.4f;
+            //fade.Height = Camera.Bounds.Height * 1.4f;
             fade.Color = fadeColor;
             fade.SetCenter(Camera.Position.X, Camera.Position.Y);
         }
@@ -59,8 +59,8 @@ namespace Relatus.Graphics.Bundled
         {
             fadeColor = defaultColor * alpha;
 
-            fade.Width = Camera.Bounds.Width * 1.4f;
-            fade.Height = Camera.Bounds.Height * 1.4f;
+            //fade.Width = Camera.Bounds.Width * 1.4f;
+            //fade.Height = Camera.Bounds.Height * 1.4f;
             fade.Color = fadeColor;
             fade.SetCenter(Camera.Position.X, Camera.Position.Y);
         }
