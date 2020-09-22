@@ -34,6 +34,11 @@ namespace Relatus
             Roll = roll;
         }
 
+        public override string ToString()
+        {
+            return $"{{Yaw:{Yaw}, Pitch:{Pitch}, Roll:{Roll}}}";
+        }
+
         /// <summary>
         /// Derives the respective Euler angles from a given <see cref="Quaternion"/>.
         /// </summary>
