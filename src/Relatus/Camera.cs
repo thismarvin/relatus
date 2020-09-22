@@ -4,12 +4,17 @@ namespace Relatus
 {
     public abstract class Camera
     {
+        public Transform Transform
+        {
+            get => transform;
+            set => SetTransform(value);
+        }
+
         public Vector3 Position
         {
             get => position;
             set => SetPosition(value);
         }
-
         public Vector3 Forward
         {
             get => forward;
@@ -21,25 +26,21 @@ namespace Relatus
             set => SetUp(value);
         }
 
-        public Matrix World
-        {
-            get => world;
-            set => SetWorld(value);
-        }
         public Matrix Projection
         {
             get => projection;
-            set => SetProjection(value);
+            protected set => SetProjection(value);
         }
 
         public Matrix View => CalculateView();
         public Matrix WVP => CalculateWVP();
 
-        protected Matrix world;
         protected Matrix view;
         protected Matrix projection;
         protected float near;
         protected float far;
+
+        protected Transform transform;
 
         protected Vector3 position;
         protected Vector3 forward;
@@ -51,16 +52,24 @@ namespace Relatus
 
         protected Camera()
         {
+            Transform = new Transform();
+
             forward = Vector3.Forward;
             up = Vector3.Up;
 
-            world = Matrix.Identity;
             view = Matrix.Identity;
             projection = Matrix.Identity;
 
             viewModified = true;
             wvpModified = true;
             wvpCache = Matrix.Identity;
+        }
+
+        public Camera SetTransform(Transform transform)
+        {
+            this.transform = transform;
+
+            return this;
         }
 
         public Camera SetPosition(Vector3 position)
@@ -118,18 +127,6 @@ namespace Relatus
             return SetUp(new Vector3(x, y, z));
         }
 
-        public Camera SetWorld(Matrix world)
-        {
-            if (this.world == world)
-                return this;
-
-            this.world = world;
-
-            wvpModified = true;
-
-            return this;
-        }
-
         protected Camera SetProjection(Matrix projection)
         {
             if (this.projection == projection)
@@ -159,7 +156,7 @@ namespace Relatus
             {
                 CalculateView();
 
-                wvpCache = world * view * projection;
+                wvpCache = Transform.Matrix * view * projection;
                 wvpModified = false;
             }
 
