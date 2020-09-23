@@ -17,8 +17,8 @@ namespace Relatus.Graphics
         {
             return execution switch
             {
-                BatchExecution.DrawElements => new PolygonElements(batchSize, polygon.Geometry, polygon.RenderOptions),
-                BatchExecution.DrawElementsInstanced => new PolygonElementsInstanced(batchSize, polygon.Geometry, polygon.RenderOptions),
+                BatchExecution.DrawElements => new PolygonElements(batchSize, polygon.GeometryData, polygon.RenderOptions),
+                BatchExecution.DrawElementsInstanced => new PolygonElementsInstanced(batchSize, polygon.GeometryData, polygon.RenderOptions),
                 _ => throw new RelatusException("Unknown batch execution type.", new ArgumentException()),
             };
         }

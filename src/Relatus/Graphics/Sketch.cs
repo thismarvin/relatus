@@ -159,7 +159,7 @@ namespace Relatus.Graphics
 
         public static void DrawPolygon(Polygon polygon, Camera camera)
         {
-            PolygonElements polygonGroup = new PolygonElements(1, polygon.Geometry, polygon.RenderOptions);
+            PolygonElements polygonGroup = new PolygonElements(1, polygon.GeometryData, polygon.RenderOptions);
             polygonGroup.Add(polygon);
             polygonGroup.ApplyChanges();
             polygonGroup.Draw(camera);

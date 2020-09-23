@@ -17,7 +17,7 @@ namespace Relatus.Graphics.Bundled
         public Fade(TransitionType type, float velocity, float acceleration, Color color) : base(type, velocity, acceleration)
         {
             defaultColor = color;
-            fade = new Quad(0, 0, 1, 1) { Color = Color.Black };
+            fade = new Quad(0, 0, 1, 1) { Tint = Color.Black };
         }
 
         protected override void SetupTransition()
@@ -27,8 +27,8 @@ namespace Relatus.Graphics.Bundled
 
             //fade.Width = Camera.Bounds.Width * 1.4f;
             //fade.Height = Camera.Bounds.Height * 1.4f;
-            fade.Color = fadeColor;
-            fade.SetCenter(Camera.Position.X, Camera.Position.Y);
+            fade.Tint = fadeColor;
+            fade.SetCenter(Camera.Position);
         }
 
         protected override void UpdateLogic()
@@ -61,8 +61,8 @@ namespace Relatus.Graphics.Bundled
 
             //fade.Width = Camera.Bounds.Width * 1.4f;
             //fade.Height = Camera.Bounds.Height * 1.4f;
-            fade.Color = fadeColor;
-            fade.SetCenter(Camera.Position.X, Camera.Position.Y);
+            fade.Tint = fadeColor;
+            fade.SetCenter(Camera.Position);
         }
 
         protected override void DrawTransition()

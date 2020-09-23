@@ -31,24 +31,24 @@ namespace Relatus.Graphics
             AttachGeometry(geometry);
         }
 
-        public static Quad Create(float x, float y, float width, float height, Color color)
+        public static Quad Create(float x, float y, float width, float height, Color tint)
         {
             Quad result = new Quad(x, y, width, height);
-            result.SetColor(color);
+            result.SetTint(tint);
 
             return result;
         }
 
-        public static Quad Create(float x, float y, float width, float height, float lineWidth, Color color)
+        public static Quad Create(float x, float y, float width, float height, float lineWidth, Color tint)
         {
             Quad result = new Quad(x, y, width, height);
-            result.SetColor(color);
+            result.SetTint(tint);
             result.SetLineWidth(lineWidth);
 
             return result;
         }
 
-        public override Polygon SetDimensions(float width, float height)
+        public override Renderable SetDimensions(float width, float height)
         {
             if (width == Width && height == Height)
                 return this;

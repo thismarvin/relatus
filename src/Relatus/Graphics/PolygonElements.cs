@@ -78,7 +78,7 @@ namespace Relatus.Graphics
             if (count >= BatchSize)
                 return false;
 
-            if (!polygon.Geometry.Equals(sharedGeometry) || !polygon.RenderOptions.Equals(sharedRenderOptions))
+            if (!polygon.GeometryData.Equals(sharedGeometry) || !polygon.RenderOptions.Equals(sharedRenderOptions))
                 return false;
 
             VertexTransform transform = polygon.GetVertexTransform();
