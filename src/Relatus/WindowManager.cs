@@ -52,7 +52,7 @@ namespace Relatus
         /// </summary>
         public static int WindowWidth => Engine.Graphics.PreferredBackBufferWidth;
 
-        private static readonly PolygonCollection polygonCollection;
+        private static readonly GeometryCollection polygonCollection;
         private static readonly Queue<float> sampleFPS;
         private static Polygon[] boxing;
         private static int defaultWindowWidth;
@@ -68,7 +68,7 @@ namespace Relatus
         static WindowManager()
         {
             sampleFPS = new Queue<float>();
-            polygonCollection = new PolygonCollection(BatchExecution.DrawElements, 4);
+            polygonCollection = new GeometryCollection(BatchExecution.DrawElements, 4);
 
             Engine.Instance.Window.ClientSizeChanged += HandleWindowResize;
 

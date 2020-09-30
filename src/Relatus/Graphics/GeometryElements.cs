@@ -3,7 +3,7 @@ using System;
 
 namespace Relatus.Graphics
 {
-    internal class PolygonElements : PolygonGroup
+    internal class GeometryElements : GeometryGroup
     {
         private readonly GeometryData sharedGeometry;
         private readonly RenderOptions sharedRenderOptions;
@@ -35,14 +35,14 @@ namespace Relatus.Graphics
         private static readonly Effect polygonShader;
         private static readonly EffectPass polygonPass;
 
-        static PolygonElements()
+        static GeometryElements()
         {
             graphicsDevice = Engine.Graphics.GraphicsDevice;
             polygonShader = AssetManager.GetEffect("Relatus_RelatusEffect");
             polygonPass = polygonShader.Techniques[1].Passes[0];
         }
 
-        public PolygonElements(uint batchSize, GeometryData sharedGeometry, RenderOptions sharedRenderOptions) : base(BatchExecution.DrawElements, batchSize)
+        public GeometryElements(uint batchSize, GeometryData sharedGeometry, RenderOptions sharedRenderOptions) : base(BatchExecution.DrawElements, batchSize)
         {
             this.sharedGeometry = sharedGeometry;
             this.sharedRenderOptions = sharedRenderOptions;
@@ -73,16 +73,16 @@ namespace Relatus.Graphics
             indexBuffer.SetData(indices);
         }
 
-        public override bool Add(Polygon polygon)
+        public override bool Add(Geometry geometry)
         {
             if (count >= BatchSize)
                 return false;
 
-            if (!polygon.GeometryData.Equals(sharedGeometry) || !polygon.RenderOptions.Equals(sharedRenderOptions))
+            if (!geometry.GeometryData.Equals(sharedGeometry) || !geometry.RenderOptions.Equals(sharedRenderOptions))
                 return false;
 
-            VertexTransform transform = polygon.GetVertexTransform();
-            VertexColor color = polygon.GetVertexColor();
+            VertexTransform transform = geometry.GetVertexTransform();
+            VertexColor color = geometry.GetVertexColor();
 
             for (int i = 0; i < TotalVertices; i++)
             {
@@ -100,7 +100,7 @@ namespace Relatus.Graphics
             return true;
         }
 
-        public override DrawGroup<Polygon> ApplyChanges()
+        public override DrawGroup<Geometry> ApplyChanges()
         {
             if (!dataModified)
                 return this;
@@ -131,7 +131,7 @@ namespace Relatus.Graphics
             return this;
         }
 
-        public override DrawGroup<Polygon> Draw(Camera camera)
+        public override DrawGroup<Geometry> Draw(Camera camera)
         {
             if (dataModified)
                 throw new RelatusException("The polygon group was modified, but ApplyChanges() was never called.", new MethodExpectedException());

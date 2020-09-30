@@ -157,28 +157,28 @@ namespace Relatus.Graphics
             DrawSpriteCollection(BatchExecution.DrawElements, 1, ImText.Create(x, y, text, font, fontShader), camera);
         }
 
-        public static void DrawPolygon(Polygon polygon, Camera camera)
+        public static void DrawGeometry(Geometry geometry, Camera camera)
         {
-            PolygonElements polygonGroup = new PolygonElements(1, polygon.GeometryData, polygon.RenderOptions);
-            polygonGroup.Add(polygon);
+            GeometryElements polygonGroup = new GeometryElements(1, geometry.GeometryData, geometry.RenderOptions);
+            polygonGroup.Add(geometry);
             polygonGroup.ApplyChanges();
             polygonGroup.Draw(camera);
         }
 
-        public static void DrawPolygonCollection(BatchExecution batchExecution, uint batchSize, IEnumerable<Polygon> polygons, Camera camera)
+        public static void DrawGeometryCollection(BatchExecution batchExecution, uint batchSize, IEnumerable<Geometry> geometry, Camera camera)
         {
-            using PolygonCollection collection = new PolygonCollection(batchExecution, batchSize, polygons);
+            using GeometryCollection collection = new GeometryCollection(batchExecution, batchSize, geometry);
             collection.Draw(camera);
         }
 
         public static void DrawLineSegment(float x1, float y1, float x2, float y2, float lineWidth, Camera camera)
         {
-            DrawPolygon(ImLineSegment.Create(x1, y1, x2, y2, lineWidth), camera);
+            DrawGeometry(ImLineSegment.Create(x1, y1, x2, y2, lineWidth), camera);
         }
 
         public static void DrawLineGraph(Vector2[] points, float lineWidth, Camera camera)
         {
-            DrawPolygon(ImLineSegment.Create(points, lineWidth), camera);
+            DrawGeometry(ImLineSegment.Create(points, lineWidth), camera);
         }
     }
 }

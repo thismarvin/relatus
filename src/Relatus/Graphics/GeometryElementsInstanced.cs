@@ -2,7 +2,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Relatus.Graphics
 {
-    internal class PolygonElementsInstanced : PolygonGroup
+    internal class GeometryElementsInstanced : GeometryGroup
     {
         private readonly GeometryData sharedGeometry;
         private readonly RenderOptions sharedRenderOptions;
@@ -21,14 +21,14 @@ namespace Relatus.Graphics
         private static readonly Effect polygonShader;
         private static readonly EffectPass polygonPass;
 
-        static PolygonElementsInstanced()
+        static GeometryElementsInstanced()
         {
             graphicsDevice = Engine.Graphics.GraphicsDevice;
             polygonShader = AssetManager.GetEffect("Relatus_RelatusEffect");
             polygonPass = polygonShader.Techniques[1].Passes[0];
         }
 
-        public PolygonElementsInstanced(uint batchSize, GeometryData sharedGeometry, RenderOptions sharedRenderOptions) : base(BatchExecution.DrawElementsInstanced, batchSize)
+        public GeometryElementsInstanced(uint batchSize, GeometryData sharedGeometry, RenderOptions sharedRenderOptions) : base(BatchExecution.DrawElementsInstanced, batchSize)
         {
             this.sharedGeometry = sharedGeometry;
             this.sharedRenderOptions = sharedRenderOptions;
@@ -37,16 +37,16 @@ namespace Relatus.Graphics
             colors = new VertexColor[batchSize];
         }
 
-        public override bool Add(Polygon polygon)
+        public override bool Add(Geometry geometry)
         {
             if (count >= BatchSize)
                 return false;
 
-            if (!polygon.GeometryData.Equals(sharedGeometry) || !polygon.RenderOptions.Equals(sharedRenderOptions))
+            if (!geometry.GeometryData.Equals(sharedGeometry) || !geometry.RenderOptions.Equals(sharedRenderOptions))
                 return false;
 
-            VertexTransform transform = polygon.GetVertexTransform();
-            VertexColor color = polygon.GetVertexColor();
+            VertexTransform transform = geometry.GetVertexTransform();
+            VertexColor color = geometry.GetVertexColor();
 
             transforms[count] = transform;
             colors[count] = color;
@@ -58,7 +58,7 @@ namespace Relatus.Graphics
             return true;
         }
 
-        public override DrawGroup<Polygon> ApplyChanges()
+        public override DrawGroup<Geometry> ApplyChanges()
         {
             if (!dataModified)
                 return this;
@@ -83,7 +83,7 @@ namespace Relatus.Graphics
             return this;
         }
 
-        public override DrawGroup<Polygon> Draw(Camera camera)
+        public override DrawGroup<Geometry> Draw(Camera camera)
         {
             if (dataModified)
                 throw new RelatusException("The polygon group was modified, but ApplyChanges() was never called.", new MethodExpectedException());

@@ -1,4 +1,5 @@
 using System;
+using Microsoft.Xna.Framework;
 
 namespace Relatus.Graphics
 {
@@ -27,6 +28,17 @@ namespace Relatus.Graphics
             this.geometryData = geometryData;
 
             return this;
+        }
+
+        internal VertexTransform GetVertexTransform()
+        {
+            Vector3 rotation = new Vector3(transform.EulerAngles.Pitch, transform.EulerAngles.Yaw, transform.EulerAngles.Roll);
+            return new VertexTransform(transform.Translation, transform.Scale, transform.Origin, rotation);
+        }
+
+        internal VertexColor GetVertexColor()
+        {
+            return new VertexColor(tint);
         }
 
         protected virtual void OnDispose()
