@@ -52,7 +52,7 @@ namespace Relatus
         /// </summary>
         public static int WindowWidth => Engine.Graphics.PreferredBackBufferWidth;
 
-        private static readonly PolygonCollection polygonCollection;
+        private static readonly GeometryCollection polygonCollection;
         private static readonly Queue<float> sampleFPS;
         private static Polygon[] boxing;
         private static int defaultWindowWidth;
@@ -68,7 +68,7 @@ namespace Relatus
         static WindowManager()
         {
             sampleFPS = new Queue<float>();
-            polygonCollection = new PolygonCollection(BatchExecution.DrawElements, 4);
+            polygonCollection = new GeometryCollection(BatchExecution.DrawElements, 4);
 
             Engine.Instance.Window.ClientSizeChanged += HandleWindowResize;
 
@@ -218,11 +218,11 @@ namespace Relatus
             boxing = new Polygon[]
             {
                 // Letter boxing.
-                new Quad(-PixelWidth * 0.5f - buffer, PixelHeight * 0.5f + buffer, PixelWidth + buffer * 2, buffer) { Color = Color.Black },
-                new Quad(-PixelWidth * 0.5f - buffer, -PixelHeight * 0.5f, PixelWidth + buffer * 2, buffer) { Color = Color.Black },
+                new Quad(-PixelWidth * 0.5f - buffer, PixelHeight * 0.5f + buffer, PixelWidth + buffer * 2, buffer) { Tint = Color.Black },
+                new Quad(-PixelWidth * 0.5f - buffer, -PixelHeight * 0.5f, PixelWidth + buffer * 2, buffer) { Tint = Color.Black },
                 // Pillar boxing.
-                new Quad(-PixelWidth * 0.5f - buffer, PixelHeight * 0.5f + buffer, buffer, PixelHeight + buffer * 2) { Color = Color.Black },
-                new Quad(PixelWidth * 0.5f, PixelHeight * 0.5f + buffer, buffer, PixelHeight + buffer * 2) { Color = Color.Black }
+                new Quad(-PixelWidth * 0.5f - buffer, PixelHeight * 0.5f + buffer, buffer, PixelHeight + buffer * 2) { Tint = Color.Black },
+                new Quad(PixelWidth * 0.5f, PixelHeight * 0.5f + buffer, buffer, PixelHeight + buffer * 2) { Tint = Color.Black }
             };
 
             polygonCollection.Dispose();

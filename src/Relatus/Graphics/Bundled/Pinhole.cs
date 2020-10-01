@@ -15,7 +15,7 @@ namespace Relatus.Graphics.Bundled
 
         public Pinhole(TransitionType type, float speed, float acceleration) : base(type, speed, acceleration)
         {
-            pinhole = new Circle(0, 0, 1) { Color = Color.Black };
+            pinhole = new Circle(0, 0, 1) { Tint = Color.Black };
         }
 
         protected override void SetupTransition()
@@ -26,7 +26,7 @@ namespace Relatus.Graphics.Bundled
 
             pinhole.Radius = radius;
             pinhole.LineWidth = lineWidth;
-            pinhole.SetCenter(Camera.Position.X, Camera.Position.Y);
+            pinhole.SetCenter(Camera.Position);
         }
 
         protected override void UpdateLogic()
@@ -57,7 +57,7 @@ namespace Relatus.Graphics.Bundled
         {
             pinhole.Radius = radius;
             pinhole.LineWidth = lineWidth;
-            pinhole.SetCenter(Camera.Position.X, Camera.Position.Y);
+            pinhole.SetCenter(Camera.Position);
         }
 
         protected override void DrawTransition()

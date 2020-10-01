@@ -40,18 +40,18 @@ namespace Relatus.Graphics
             AttachGeometry(geometry);
         }
 
-        public static Circle Create(float x, float y, float radius, Color color)
+        public static Circle Create(float x, float y, float radius, Color tint)
         {
             Circle result = new Circle(x, y, radius);
-            result.SetColor(color);
+            result.SetTint(tint);
 
             return result;
         }
 
-        public static Circle Create(float x, float y, float radius, float lineWidth, Color color)
+        public static Circle Create(float x, float y, float radius, float lineWidth, Color tint)
         {
             Circle result = new Circle(x, y, radius);
-            result.SetColor(color);
+            result.SetTint(tint);
             result.SetLineWidth(lineWidth);
 
             return result;

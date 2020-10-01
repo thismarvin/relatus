@@ -13,9 +13,12 @@ namespace Relatus.Graphics
             LineInfo info = ProcessPoints(points, lineWidth);
 
             return new Polygon()
-                .SetPosition(info.Boundary.X, info.Boundary.Y, 0)
-                .SetDimensions(info.Boundary.Width, info.Boundary.Height)
-                .AttachGeometry(CreateShapeData(info, lineWidth));
+            {
+                Position = new Vector3(info.Boundary.X, info.Boundary.Y, 0),
+                Width = info.Boundary.Width,
+                Height = info.Boundary.Height,
+                GeometryData = CreateShapeData(info, lineWidth)
+            };
         }
 
         public static Polygon Create(float x1, float y1, float x2, float y2, float lineWidth)
