@@ -34,6 +34,11 @@ namespace Relatus
             Roll = roll;
         }
 
+        public Vector3 ToVector3()
+        {
+            return new Vector3(Pitch, Yaw, Roll);
+        }
+
         public override string ToString()
         {
             return $"{{Yaw:{Yaw}, Pitch:{Pitch}, Roll:{Roll}}}";
