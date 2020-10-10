@@ -117,6 +117,8 @@ namespace Relatus
 
         internal static void Draw()
         {
+            graphicsDevice.Clear(Color.Black);
+
             float x = WindowManager.WindowWidth * 0.5f;
             float y = -WindowManager.WindowHeight * 0.5f;
 
