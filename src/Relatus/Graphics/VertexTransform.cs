@@ -32,6 +32,14 @@ namespace Relatus.Graphics
             Origin = origin;
             Rotation = rotation;
         }
+
+        public VertexTransform(Transform transform)
+        {
+            Translation = transform.Translation;
+            Scale = transform.Scale;
+            Origin = transform.Origin;
+            Rotation = transform.EulerAngles.ToVector3();
+        }
     }
 }
 
