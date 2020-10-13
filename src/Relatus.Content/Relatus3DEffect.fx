@@ -100,8 +100,8 @@ VSOutput MainVS(in VSInput input)
 	output.Position = mul(position, WVP);
 	output.TextureCoordinates = input.TextureCoordinates;
 
-	float3 normal = normalize(mul(float4(input.Normal, 0), Normal));
-	float3 tangent = normalize(mul(float4(input.Tangent, 0), Normal));
+	float3 normal = normalize(mul(float4(input.Normal, 0), Normal)).xyz;
+	float3 tangent = normalize(mul(float4(input.Tangent, 0), Normal)).xyz;
 	float3 binormal = cross(normal, tangent);
 	float3x3 tbn = transpose(float3x3(tangent, binormal, normal));
 
