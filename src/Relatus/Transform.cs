@@ -27,6 +27,7 @@ namespace Relatus
 
         public EulerAngles EulerAngles => CalculateEulerAngles();
         public Matrix Matrix => CalculateMatrix();
+        public Matrix Normal => CalculateNormal();
 
         private Vector3 scale;
         private Vector3 origin;
@@ -37,7 +38,9 @@ namespace Relatus
         private bool rotationModified;
 
         private Matrix matrix;
+        private Matrix normal;
         private bool matrixModified;
+        private bool normalModified;
 
         public Transform(Vector3 scale, Vector3 origin, Quaternion rotation, Vector3 translation)
         {
@@ -48,6 +51,7 @@ namespace Relatus
 
             rotationModified = true;
             matrixModified = true;
+            normalModified = true;
         }
 
         public Transform() : this(Vector3.One, Vector3.Zero, Quaternion.Identity, Vector3.Zero)
@@ -127,9 +131,24 @@ namespace Relatus
                     Matrix.CreateTranslation(-origin) *
                     Matrix.CreateFromQuaternion(rotation) *
                     Matrix.CreateTranslation(origin + translation);
+
+                normalModified = true;
             }
 
             return matrix;
+        }
+
+        private Matrix CalculateNormal()
+        {
+            Matrix matrix = CalculateMatrix();
+
+            if (normalModified)
+            {
+                normal = Matrix.Transpose(matrix);
+                normalModified = false;
+            }
+
+            return normal;
         }
     }
 }
