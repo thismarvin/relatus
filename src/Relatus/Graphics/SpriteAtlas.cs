@@ -1,9 +1,7 @@
 using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
 using System.Text;
 
-namespace Relatus.Utilities
+namespace Relatus.Graphics
 {
     public class SpriteAtlas
     {

@@ -1,8 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Relatus.Utilities
+namespace Relatus
 {
     public struct ImageRegion
     {
