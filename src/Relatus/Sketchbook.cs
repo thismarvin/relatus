@@ -169,6 +169,10 @@ namespace Relatus
             {
                 decommissioned[i].Dispose();
             }
+            for (int i = 0; i < layers.Count; i++)
+            {
+                layers[i].Texture.Dispose();
+            }
             decommissioned.Clear();
             layers.Clear();
         }
