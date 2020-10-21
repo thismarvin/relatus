@@ -4,6 +4,7 @@ namespace Relatus.Graphics
 {
     public class BetterSprite
     {
+        #region Base
         public Transform Transform { get; }
 
         public Vector3 Position
@@ -36,24 +37,7 @@ namespace Relatus.Graphics
             get => Transform.Rotation;
             set => SetRotation(value);
         }
-        public Color Tint
-        {
-            get => tint;
-            set => SetTint(value);
-        }
-
-        private Color tint;
-
-        public float Width
-        {
-            get => Transform.Scale.X;
-            set => SetDimensions(value, Transform.Scale.Y);
-        }
-        public float Height
-        {
-            get => Transform.Scale.Y;
-            set => SetDimensions(Transform.Scale.X, value);
-        }
+        #endregion
 
         public ImageRegion ImageRegion
         {
@@ -65,19 +49,68 @@ namespace Relatus.Graphics
             get => spriteMirroring;
             set => SetSpriteMirroring(value);
         }
+        public Color Tint
+        {
+            get => tint;
+            set => SetTint(value);
+        }
+        public Vector2 Scale
+        {
+            get => scale;
+            set => SetScale(value);
+        }
+
+        public float Width
+        {
+            get => ImageRegion.Width * Scale.X;
+        }
+        public float Height
+        {
+            get => ImageRegion.Width * Scale.Y;
+        }
+        public (float, float) Dimensions
+        {
+            get => (ImageRegion.Width * Transform.Scale.X, ImageRegion.Height * Transform.Scale.Y);
+        }
 
         private ImageRegion imageRegion;
         private SpriteMirroringType spriteMirroring;
+        private Color tint;
+        private Vector2 scale;
 
         public BetterSprite()
         {
             Transform = new Transform();
+            imageRegion = new ImageRegion(0, 0, 1, 1);
             tint = Color.White;
+            scale = Vector2.One;
         }
 
         public static BetterSprite Create()
         {
             return new BetterSprite();
+        }
+
+        #region Sprite Specific Data
+        public virtual BetterSprite SetImageRegion(ImageRegion imageRegion)
+        {
+            this.imageRegion = imageRegion;
+
+            Transform.Scale = new Vector3(Width, Height, 0);
+
+            return this;
+        }
+
+        public BetterSprite SetImageRegion(int x, int y, int width, int height)
+        {
+            return SetImageRegion(new ImageRegion(x, y, width, height));
+        }
+
+        public virtual BetterSprite SetSpriteMirroring(SpriteMirroringType mirroringType)
+        {
+            spriteMirroring = mirroringType;
+
+            return this;
         }
 
         public virtual BetterSprite SetTint(Color tint)
@@ -91,6 +124,21 @@ namespace Relatus.Graphics
         {
             return SetTint(new Color(r, g, b) * a);
         }
+
+        public virtual BetterSprite SetScale(Vector2 scale)
+        {
+            this.scale = scale;
+
+            Transform.Scale = new Vector3(Width, Height, 0);
+
+            return this;
+        }
+
+        public BetterSprite SetScale(float x, float y)
+        {
+            return SetScale(new Vector2(x, y));
+        }
+        #endregion
 
         public virtual BetterSprite SetPosition(Vector3 position)
         {
@@ -119,32 +167,6 @@ namespace Relatus.Graphics
         public virtual BetterSprite SetRotation(Quaternion rotation)
         {
             Transform.Rotation = rotation;
-
-            return this;
-        }
-
-        public virtual BetterSprite SetDimensions(float width, float height)
-        {
-            Transform.Scale = new Vector3(width, height, Transform.Scale.Z);
-
-            return this;
-        }
-
-        public virtual BetterSprite SetImageRegion(ImageRegion imageRegion)
-        {
-            this.imageRegion = imageRegion;
-
-            return this;
-        }
-
-        public BetterSprite SetImageRegion(int x, int y, int width, int height)
-        {
-            return SetImageRegion(new ImageRegion(x, y, width, height));
-        }
-
-        public virtual BetterSprite SetSpriteMirroring(SpriteMirroringType mirroringType)
-        {
-            spriteMirroring = mirroringType;
 
             return this;
         }
