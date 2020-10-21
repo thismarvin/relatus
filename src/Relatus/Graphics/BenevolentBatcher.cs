@@ -44,16 +44,67 @@ namespace Relatus.Graphics
             );
         }
 
-        public static Batch CreateInstancedSpriteBatch(params BetterSprite[] data)
+        public static BatchCollection CreateSpriteBatch(SpriteBatchInfo info, params BetterSprite[] data)
         {
-            return CreateInstancedSpriteBatch(data as IEnumerable<BetterSprite>);
+            return CreateSpriteBatch(info, data as IEnumerable<BetterSprite>);
         }
 
-        public static Batch CreateInstancedSpriteBatch(IEnumerable<BetterSprite> data)
+        public static BatchCollection CreateSpriteBatch(SpriteBatchInfo info, IEnumerable<BetterSprite> data)
+        {
+            BatchCollection result = new BatchCollection();
+
+            BetterSprite[] container = data.ToArray();
+
+            int batchSize = (int)info.BatchSize;
+            int total = data.Count();
+
+            if (total < batchSize)
+            {
+                result.Batches.Add(CreateBatch(info.Execution, new Span<BetterSprite>(container)));
+                return result;
+            }
+
+            int maxBatches = total / batchSize;
+
+            int i = 0;
+            for (; i < maxBatches; i++)
+            {
+                var span = new Span<BetterSprite>(container, i * batchSize, batchSize);
+                result.Batches.Add(CreateBatch(info.Execution, span));
+            }
+
+            if (i < total)
+            {
+                int remaining = total - (maxBatches * batchSize);
+                var span = new Span<BetterSprite>(container, i * batchSize, remaining);
+
+                result.Batches.Add(CreateBatch(info.Execution, span));
+            }
+
+            return result;
+
+            static Batch CreateBatch(BatchExecution execution, Span<BetterSprite> _data)
+            {
+                return execution switch
+                {
+                    BatchExecution.DrawElements => CreateIndexedSpriteBatch(_data),
+                    BatchExecution.DrawElementsInstanced => CreateInstancedSpriteBatch(_data),
+                    _ => throw new RelatusException("")
+                };
+            }
+        }
+
+        #region Sprite
+        public static Batch CreateInstancedSpriteBatch(params BetterSprite[] data)
+        {
+            return CreateInstancedSpriteBatch(new Span<BetterSprite>(data));
+        }
+
+        public static Batch CreateInstancedSpriteBatch(Span<BetterSprite> data)
         {
             Texture2D texture = graphicsDevice.Textures[0] as Texture2D ?? throw new RelatusException("", new ArgumentException());
 
-            int batchSize = data.Count();
+            int batchSize = data.Length;
             int totalVertices = batchSize * 4;
 
             Vector3[] positions = new Vector3[totalVertices];
@@ -101,12 +152,12 @@ namespace Relatus.Graphics
             vertexBuffer.SetData(12, textureCoords, 0, totalVertices, vertexStride);
 
             int vertexStride2 = instancedSpriteSchema1.VertexStride;
-            VertexBuffer colorBuffer = new VertexBuffer(graphicsDevice, instancedSpriteSchema1, batchSize, BufferUsage.WriteOnly);
-            colorBuffer.SetData(0, colors, 0, batchSize, vertexStride2);
-            colorBuffer.SetData(16, modelR0, 0, batchSize, vertexStride2);
-            colorBuffer.SetData(32, modelR1, 0, batchSize, vertexStride2);
-            colorBuffer.SetData(48, modelR2, 0, batchSize, vertexStride2);
-            colorBuffer.SetData(64, modelR3, 0, batchSize, vertexStride2);
+            VertexBuffer instancedBuffer = new VertexBuffer(graphicsDevice, instancedSpriteSchema1, batchSize, BufferUsage.WriteOnly);
+            instancedBuffer.SetData(0, colors, 0, batchSize, vertexStride2);
+            instancedBuffer.SetData(16, modelR0, 0, batchSize, vertexStride2);
+            instancedBuffer.SetData(32, modelR1, 0, batchSize, vertexStride2);
+            instancedBuffer.SetData(48, modelR2, 0, batchSize, vertexStride2);
+            instancedBuffer.SetData(64, modelR3, 0, batchSize, vertexStride2);
 
             short[] indices = new short[6]
             {
@@ -119,8 +170,9 @@ namespace Relatus.Graphics
 
             return new Batch()
             {
-                VertexBufferBindings = new VertexBufferBinding[] { new VertexBufferBinding(vertexBuffer), new VertexBufferBinding(colorBuffer, 0, 1) },
+                VertexBufferBindings = new VertexBufferBinding[] { new VertexBufferBinding(vertexBuffer), new VertexBufferBinding(instancedBuffer, 0, 1) },
                 IndexBuffer = indexBuffer,
+                Disposables = new IDisposable[] { vertexBuffer, instancedBuffer, indexBuffer },
                 BatchExecution = BatchExecution.DrawElementsInstanced,
                 PrimitiveType = PrimitiveType.TriangleList,
                 TotalPrimitives = batchSize * 2,
@@ -128,16 +180,16 @@ namespace Relatus.Graphics
             };
         }
 
-        public static Batch CreateSpriteBatch(params BetterSprite[] data)
+        public static Batch CreateIndexedSpriteBatch(params BetterSprite[] data)
         {
-            return CreateSpriteBatch(data as IEnumerable<BetterSprite>);
+            return CreateIndexedSpriteBatch(new Span<BetterSprite>(data));
         }
 
-        public static Batch CreateSpriteBatch(IEnumerable<BetterSprite> data)
+        public static Batch CreateIndexedSpriteBatch(Span<BetterSprite> data)
         {
             Texture2D texture = graphicsDevice.Textures[0] as Texture2D ?? throw new RelatusException("", new ArgumentException());
 
-            int batchSize = data.Count();
+            int batchSize = data.Length;
             int totalVertices = batchSize * 4;
 
             Vector3[] positions = new Vector3[totalVertices];
@@ -224,12 +276,14 @@ namespace Relatus.Graphics
             {
                 VertexBufferBindings = new VertexBufferBinding[] { new VertexBufferBinding(vertexBuffer) },
                 IndexBuffer = indexBuffer,
+                Disposables = new IDisposable[] { vertexBuffer, indexBuffer },
                 BatchExecution = BatchExecution.DrawElements,
                 PrimitiveType = PrimitiveType.TriangleList,
                 TotalPrimitives = batchSize * 2,
                 Instances = batchSize
             };
         }
+        #endregion
 
         private static Vector2[] CreateTextureCoordsFromImageRegion(Texture2D texture, ImageRegion imageRegion, SpriteMirroringType spriteMirroring)
         {
