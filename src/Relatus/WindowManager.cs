@@ -170,6 +170,28 @@ namespace Relatus
             WideScreenSupported = enabled;
         }
 
+        public static (int, int, int, int) MaximizeSpace((int, int) region, float aspectRatio)
+        {
+            int width = 0;
+            int height = 0;
+
+            if (region.Item1 < region.Item2)
+            {
+                width = region.Item1;
+                height = (int)Math.Round(width / aspectRatio);
+            }
+            else
+            {
+                height = region.Item2;
+                width = (int)Math.Round(height * aspectRatio);
+            }
+
+            int pillar = (region.Item1 - width) / 2;
+            int letter = (region.Item2 - height) / 2;
+
+            return (width, height, pillar, letter);
+        }
+
         private static void InitializeWindow()
         {
             PixelWidth = 320;
