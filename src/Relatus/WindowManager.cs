@@ -172,15 +172,10 @@ namespace Relatus
 
         public static (int, int, int, int) MaximizeSpace((int, int) region, float aspectRatio)
         {
-            int width = 0;
-            int height = 0;
+            int width = region.Item1;
+            int height = (int)Math.Round(width / aspectRatio);
 
-            if (region.Item1 < region.Item2)
-            {
-                width = region.Item1;
-                height = (int)Math.Round(width / aspectRatio);
-            }
-            else
+            if (height > region.Item2)
             {
                 height = region.Item2;
                 width = (int)Math.Round(height * aspectRatio);
