@@ -4,25 +4,26 @@ namespace Relatus.Graphics
 {
     public class RenderOptions
     {
-        public SamplerState SamplerState { get; set; }
+        public RasterizerState RasterizerState { get; set; }
         public BlendState BlendState { get; set; }
         public DepthStencilState DepthStencilState { get; set; }
         public Effect Effect { get; set; }
 
         public RenderOptions()
         {
-            SamplerState = SamplerState.PointClamp;
+            RasterizerState = GraphicsManager.DefaultRasterizerState;
             BlendState = BlendState.AlphaBlend;
-            DepthStencilState = DepthStencilState.None;
+            DepthStencilState = DepthStencilState.Default;
             Effect = null;
         }
 
         public bool Equals(RenderOptions other)
         {
-            return SamplerState == other.SamplerState &&
-                   BlendState == other.BlendState &&
-                   DepthStencilState == other.DepthStencilState &&
-                   Effect == other.Effect;
+            return
+                RasterizerState == other.RasterizerState &&
+                BlendState == other.BlendState &&
+                DepthStencilState == other.DepthStencilState &&
+                Effect == other.Effect;
         }
     }
 }
