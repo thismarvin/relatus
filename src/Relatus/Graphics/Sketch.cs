@@ -63,7 +63,7 @@ namespace Relatus.Graphics
             }
 
             effects.Push(new Queue<Effect>());
-            current = new RenderTarget2D(graphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None, 0, RenderTargetUsage.PreserveContents);
+            current = new RenderTarget2D(graphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.Depth24, 0, RenderTargetUsage.PreserveContents);
 
             graphicsDevice.SetRenderTarget(current);
             graphicsDevice.Clear(clearColor);
@@ -138,9 +138,24 @@ namespace Relatus.Graphics
             texture = result;
         }
 
+        public static void DrawTriangle(Vector3 a, Vector3 b, Vector3 c, Color color, Camera camera)
+        {
+            GeometryData temp = new GeometryData(new Mesh(new Vector3[] { a, b, c }, new short[] { 0, 1, 2 }));
+            RenderOptions renderOptions = new RenderOptions(); //{ RasterizerState = RasterizerState.CullNone };
+            using GeometryElements geometryGroup = new GeometryElements(1, temp, renderOptions);
+            geometryGroup.Add(new Polygon() { GeometryData = temp, RenderOptions = renderOptions, Tint = color });
+            geometryGroup.ApplyChanges();
+            geometryGroup.Draw(camera);
+        }
+
+        // public static void DrawRectangle()
+        // {
+
+        // }
+
         public static void DrawSprite(Sprite sprite, Camera camera)
         {
-            SpriteElements spriteGroup = new SpriteElements(1, sprite.Texture, sprite.RenderOptions);
+            using SpriteElements spriteGroup = new SpriteElements(1, sprite.Texture, sprite.RenderOptions);
             spriteGroup.Add(sprite);
             spriteGroup.ApplyChanges();
             spriteGroup.Draw(camera);
@@ -159,7 +174,7 @@ namespace Relatus.Graphics
 
         public static void DrawGeometry(Geometry geometry, Camera camera)
         {
-            GeometryElements polygonGroup = new GeometryElements(1, geometry.GeometryData, geometry.RenderOptions);
+            using GeometryElements polygonGroup = new GeometryElements(1, geometry.GeometryData, geometry.RenderOptions);
             polygonGroup.Add(geometry);
             polygonGroup.ApplyChanges();
             polygonGroup.Draw(camera);
