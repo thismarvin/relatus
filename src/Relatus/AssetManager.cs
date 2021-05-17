@@ -187,7 +187,7 @@ namespace Relatus
         }
         #endregion
 
-        #region Handle Models 
+        #region Handle Models
         /// <summary>
         /// Load a <see cref="Model"/> into memory.
         /// </summary>
@@ -223,6 +223,8 @@ namespace Relatus
             LoadEffect("Relatus_RelatusEffect", "Relatus.Content/RelatusEffect");
             LoadEffect("Relatus_3DEffect", "Relatus.Content/Relatus3DEffect");
             LoadEffect("Relatus_BMFontShader", "Relatus.Content/BMFontShader");
+
+            LoadEffect("Relatus_Sprite", "Relatus.Content/RelatusSprite");
 
             LoadFont("Relatus_Probity", "Relatus.Content/probity");
         }
