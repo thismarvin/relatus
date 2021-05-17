@@ -1,28 +1,26 @@
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
-using System.Collections.Generic;
-using System.Text;
+
+// !FIXME: This class is redundant. It does everything Mesh already does...
 
 namespace Relatus.Graphics
 {
     public class GeometryData : IDisposable
     {
+        public readonly Mesh Mesh;
+
+        public readonly VertexBuffer VertexPositionBuffer;
+        public readonly IndexBuffer IndexBuffer;
+
         internal bool Managed { get; set; }
-
-        public Mesh Mesh { get; private set; }
-        public VertexBuffer VertexBuffer { get; private set; }
-        public IndexBuffer IndexBuffer { get; private set; }
-
-        public int TotalTriangles => IndexBuffer.IndexCount / 3;
-        public int TotalVertices => VertexBuffer.VertexCount;
 
         public GeometryData(Mesh mesh)
         {
             Mesh = mesh;
 
-            VertexBuffer = new VertexBuffer(Engine.Graphics.GraphicsDevice, typeof(VertexPosition), Mesh.Vertices.Length, BufferUsage.WriteOnly);
-            VertexBuffer.SetData(Mesh.Vertices);
+            // !FIXME: Why are we creating a whole new VertextBuffer when Mesh's VertexBuffer will do??
+            VertexPositionBuffer = new VertexBuffer(Engine.Graphics.GraphicsDevice, typeof(VertexPosition), Mesh.Vertices.Length, BufferUsage.WriteOnly);
+            VertexPositionBuffer.SetData(Mesh.Vertices);
 
             IndexBuffer = new IndexBuffer(Engine.Graphics.GraphicsDevice, typeof(short), Mesh.Indices.Length, BufferUsage.WriteOnly);
             IndexBuffer.SetData(Mesh.Indices);
@@ -45,7 +43,7 @@ namespace Relatus.Graphics
         {
             if (!disposedValue)
             {
-                VertexBuffer.Dispose();
+                VertexPositionBuffer.Dispose();
                 IndexBuffer.Dispose();
 
                 disposedValue = true;
