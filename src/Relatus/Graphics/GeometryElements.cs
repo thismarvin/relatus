@@ -27,9 +27,9 @@ namespace Relatus.Graphics
         private uint count;
         private uint totalPrimitives;
 
-        private int TotalVertices => sharedGeometry.TotalVertices;
+        private int TotalVertices => sharedGeometry.Mesh.TotalVertices;
         private int TotalIndices => sharedGeometry.Mesh.Indices.Length;
-        private int TotalTriangles => sharedGeometry.TotalTriangles;
+        private int TotalTriangles => sharedGeometry.Mesh.TotalTriangles;
 
         private static readonly GraphicsDevice graphicsDevice;
         private static readonly Effect polygonShader;
@@ -136,8 +136,7 @@ namespace Relatus.Graphics
             if (dataModified)
                 throw new RelatusException("The polygon group was modified, but ApplyChanges() was never called.", new MethodExpectedException());
 
-            graphicsDevice.RasterizerState = GraphicsManager.RasterizerState;
-            graphicsDevice.SamplerStates[0] = sharedRenderOptions.SamplerState;
+            graphicsDevice.RasterizerState = sharedRenderOptions.RasterizerState;
             graphicsDevice.BlendState = sharedRenderOptions.BlendState;
             graphicsDevice.DepthStencilState = sharedRenderOptions.DepthStencilState;
             graphicsDevice.SetVertexBuffers(vertexBufferBindings);

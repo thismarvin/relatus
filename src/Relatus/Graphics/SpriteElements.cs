@@ -119,7 +119,6 @@ namespace Relatus.Graphics
             totalPrimitives += 2;
 
             return true;
-
         }
 
         public override DrawGroup<Sprite> ApplyChanges()
@@ -163,15 +162,16 @@ namespace Relatus.Graphics
             if (dataModified)
                 throw new RelatusException("The sprite group was modified, but ApplyChanges() was never called.", new MethodExpectedException());
 
-            graphicsDevice.RasterizerState = GraphicsManager.RasterizerState;
-            graphicsDevice.SamplerStates[0] = sharedRenderOptions.SamplerState;
+            graphicsDevice.RasterizerState = sharedRenderOptions.RasterizerState;
             graphicsDevice.BlendState = sharedRenderOptions.BlendState;
             graphicsDevice.DepthStencilState = sharedRenderOptions.DepthStencilState;
             graphicsDevice.SetVertexBuffers(vertexBufferBindings);
             graphicsDevice.Indices = indexBuffer;
 
             spriteShader.Parameters["WVP"].SetValue(camera.WVP);
+
             spriteShader.Parameters["SpriteTexture"].SetValue(sharedTexture);
+            graphicsDevice.SamplerStates[0] = SamplerState.PointClamp;
 
             spritePass.Apply();
 

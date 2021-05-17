@@ -53,7 +53,7 @@ namespace Relatus.Graphics
 
         public PolygonSchema CalculatePolygonSchema()
         {
-            int totalVertices = geometryData.TotalVertices;
+            int totalVertices = geometryData.Mesh.TotalVertices;
             Matrix polygonTransform = transform.Matrix;
 
             Vector2[] transformedVertices = new Vector2[totalVertices];

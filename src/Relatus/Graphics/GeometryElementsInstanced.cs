@@ -73,7 +73,7 @@ namespace Relatus.Graphics
 
             vertexBufferBindings = new VertexBufferBinding[]
             {
-                new VertexBufferBinding(sharedGeometry.VertexBuffer),
+                new VertexBufferBinding(sharedGeometry.VertexPositionBuffer),
                 new VertexBufferBinding(transformBuffer, 0, 1),
                 new VertexBufferBinding(colorBuffer, 0, 1),
             };
@@ -88,8 +88,7 @@ namespace Relatus.Graphics
             if (dataModified)
                 throw new RelatusException("The polygon group was modified, but ApplyChanges() was never called.", new MethodExpectedException());
 
-            graphicsDevice.RasterizerState = GraphicsManager.RasterizerState;
-            graphicsDevice.SamplerStates[0] = sharedRenderOptions.SamplerState;
+            graphicsDevice.RasterizerState = sharedRenderOptions.RasterizerState;
             graphicsDevice.BlendState = sharedRenderOptions.BlendState;
             graphicsDevice.DepthStencilState = sharedRenderOptions.DepthStencilState;
             graphicsDevice.SetVertexBuffers(vertexBufferBindings);
@@ -101,14 +100,14 @@ namespace Relatus.Graphics
 
             if (sharedRenderOptions.Effect == null)
             {
-                graphicsDevice.DrawInstancedPrimitives(PrimitiveType.TriangleList, 0, 0, sharedGeometry.TotalTriangles, (int)count);
+                graphicsDevice.DrawInstancedPrimitives(PrimitiveType.TriangleList, 0, 0, sharedGeometry.Mesh.TotalTriangles, (int)count);
             }
             else
             {
                 foreach (EffectPass pass in sharedRenderOptions.Effect.CurrentTechnique.Passes)
                 {
                     pass.Apply();
-                    graphicsDevice.DrawInstancedPrimitives(PrimitiveType.TriangleList, 0, 0, sharedGeometry.TotalTriangles, (int)count);
+                    graphicsDevice.DrawInstancedPrimitives(PrimitiveType.TriangleList, 0, 0, sharedGeometry.Mesh.TotalTriangles, (int)count);
                 }
             }
 

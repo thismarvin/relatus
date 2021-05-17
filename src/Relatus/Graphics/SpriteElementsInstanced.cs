@@ -93,7 +93,7 @@ namespace Relatus.Graphics
 
             vertexBufferBindings = new VertexBufferBinding[]
             {
-                new VertexBufferBinding(sharedGeometry.VertexBuffer),
+                new VertexBufferBinding(sharedGeometry.VertexPositionBuffer),
                 new VertexBufferBinding(transformBuffer, 0, 1),
                 new VertexBufferBinding(colorBuffer, 0, 1),
                 new VertexBufferBinding(textureCoordBuffer)
@@ -109,22 +109,23 @@ namespace Relatus.Graphics
             if (dataModified)
                 throw new RelatusException("The sprite group was modified, but ApplyChanges() was never called.", new MethodExpectedException());
 
-            graphicsDevice.RasterizerState = GraphicsManager.RasterizerState;
-            graphicsDevice.SamplerStates[0] = sharedRenderOptions.SamplerState;
+            graphicsDevice.RasterizerState = sharedRenderOptions.RasterizerState;
             graphicsDevice.BlendState = sharedRenderOptions.BlendState;
             graphicsDevice.DepthStencilState = sharedRenderOptions.DepthStencilState;
             graphicsDevice.SetVertexBuffers(vertexBufferBindings);
             graphicsDevice.Indices = sharedGeometry.IndexBuffer;
 
             spriteShader.Parameters["WVP"].SetValue(camera.WVP);
+
             spriteShader.Parameters["SpriteTexture"].SetValue(sharedTexture);
+            graphicsDevice.SamplerStates[0] = SamplerState.PointClamp;
 
             spritePass.Apply();
 
             if (sharedRenderOptions.Effect == null)
             {
                 graphicsDevice.Textures[0] = sharedTexture;
-                graphicsDevice.DrawInstancedPrimitives(PrimitiveType.TriangleList, 0, 0, sharedGeometry.TotalTriangles, (int)count);
+                graphicsDevice.DrawInstancedPrimitives(PrimitiveType.TriangleList, 0, 0, sharedGeometry.Mesh.TotalTriangles, (int)count);
             }
             else
             {
@@ -132,7 +133,7 @@ namespace Relatus.Graphics
                 {
                     pass.Apply();
                     graphicsDevice.Textures[0] = sharedTexture;
-                    graphicsDevice.DrawInstancedPrimitives(PrimitiveType.TriangleList, 0, 0, sharedGeometry.TotalTriangles, (int)count);
+                    graphicsDevice.DrawInstancedPrimitives(PrimitiveType.TriangleList, 0, 0, sharedGeometry.Mesh.TotalTriangles, (int)count);
                 }
             }
 
