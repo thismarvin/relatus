@@ -1,17 +1,16 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Relatus
 {
     public class Engine : Game
     {
         public static GraphicsDeviceManager Graphics { get; private set; }
-        internal static Engine Instance { get; private set; }
-        public static float DeltaTime { get; private set; }
         public static TimeSpan TotalGameTime { get; private set; }
+        public static float DeltaTime { get; private set; }
+
+        internal static Engine Instance { get; private set; }
 
         public Engine()
         {
@@ -42,6 +41,7 @@ namespace Relatus
             base.UnloadContent();
 
             AssetManager.UnloadContent();
+            DebugManager.UnloadContent();
             GeometryManager.UnloadContent();
             GraphicsManager.UnloadContent();
         }
@@ -53,7 +53,6 @@ namespace Relatus
 
             InputManager.Update();
             WindowManager.Update();
-            CameraManager.Update();
             SceneManager.Update();
             DebugManager.Update();
             SoundManager.Update();
@@ -64,7 +63,7 @@ namespace Relatus
         protected override void Draw(GameTime gameTime)
         {
             SceneManager.Draw();
-            SketchManager.Draw();
+            Sketchbook.Draw();
             DebugManager.Draw();
             WindowManager.Draw();
 

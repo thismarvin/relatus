@@ -10,7 +10,7 @@ namespace Relatus.Utilities
     /// </summary>
     public class SparseSet : IEnumerable<uint>
     {
-        public int Count { get => (int)n; }
+        public int Count => (int)n; 
 
         private readonly uint[] dense;
         private readonly uint[] sparse;
@@ -24,12 +24,12 @@ namespace Relatus.Utilities
         private uint n;
 
         /// <summary>
-        /// Creates a data structure that stores a set of <see cref="uint"/> that all fall within a given range. 
+        /// Creates a data structure that stores a set of <see cref="uint"/> that all fall within a given range.
         /// </summary>
         /// <param name="range">The maximum amount of elements allowed inside the sparse set AND the maximum value allowed inside the set.</param>
-        public SparseSet(int range)
+        public SparseSet(uint range)
         {
-            u = (uint)range;
+            u = range;
             dense = new uint[u];
             sparse = new uint[u];
         }
@@ -68,7 +68,7 @@ namespace Relatus.Utilities
         }
 
         /// <summary>
-        /// Removes a given <see cref="uint"/> from the set. 
+        /// Removes a given <see cref="uint"/> from the set.
         /// </summary>
         /// <param name="k">The element to remove from the set.</param>
         public bool Remove(uint k)
@@ -151,9 +151,9 @@ namespace Relatus.Utilities
 
             private int index;
 
-            public uint Current { get { return dense[index]; } }
+            public uint Current => dense[index];
 
-            object IEnumerator.Current { get { return dense[index]; } }
+            object IEnumerator.Current => dense[index]; 
 
             public SparseSetEnumerator(uint[] dense, uint n)
             {

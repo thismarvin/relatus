@@ -10,7 +10,7 @@ namespace Relatus
     /// <typeparam name="T">The element stored within the partitioner.</typeparam>
     public class Quadtree<T> : Partitioner<T> where T : IPartitionable
     {
-        private readonly int capacity;
+        private readonly uint capacity;
         private bool divided;
         private int insertionIndex;
         private T[] objects;
@@ -24,8 +24,11 @@ namespace Relatus
         /// </summary>
         /// <param name="boundary">The area that the partitioner will cover.</param>
         /// <param name="capacity">The total amount of entries that exist in a node before overflowing into a new tree.</param>
-        public Quadtree(RectangleF boundary, int capacity) : base(boundary)
+        public Quadtree(RectangleF boundary, uint capacity) : base(boundary)
         {
+            if (capacity == 0)
+                throw new RelatusException("The capacity of a node cannot be zero.", new ArgumentException());
+
             this.capacity = capacity;
 
             Initialize();
@@ -57,7 +60,7 @@ namespace Relatus
                     if (objects[i] == null)
                         continue;
 
-                    if (bounds.Intersects(objects[i].Bounds))
+                    if (bounds.Intersects(objects[i].Span))
                     {
                         result.Add(objects[i].Identifier);
                     }
@@ -77,7 +80,7 @@ namespace Relatus
 
         public override bool Add(T entry)
         {
-            if (!entry.Bounds.Intersects(Boundary))
+            if (!entry.Span.Intersects(Boundary))
                 return false;
 
             if (insertionIndex < capacity)

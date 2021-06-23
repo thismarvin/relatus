@@ -11,9 +11,9 @@ namespace Relatus.Input
     /// </summary>
     public static class MouseExt
     {
-        public static Vector2 WindowLocation { get; private set; }
-        public static RectangleF Bounds => new RectangleF(WindowLocation.X, WindowLocation.Y, 1, 1);
-        public static int ScrollStride { get => currentMouseState.ScrollWheelValue - previousMouseState.ScrollWheelValue; }
+        public static Vector2 WindowPosition { get; private set; }
+        public static RectangleF Bounds => new RectangleF(WindowPosition.X, WindowPosition.Y, 1, 1);
+        public static int ScrollStride => currentMouseState.ScrollWheelValue - previousMouseState.ScrollWheelValue; 
 
         private static MouseState previousMouseState;
         private static MouseState currentMouseState;
@@ -93,10 +93,10 @@ namespace Relatus.Input
             previousMouseState = currentMouseState;
             currentMouseState = Mouse.GetState();
 
-            WindowLocation = new Vector2
+            WindowPosition = new Vector2
             (
-                currentMouseState.X / WindowManager.Scale - WindowManager.PillarBox,
-                WindowManager.PixelHeight - (currentMouseState.Y / WindowManager.Scale - WindowManager.LetterBox)
+                currentMouseState.X,
+                WindowManager.WindowHeight - currentMouseState.Y
             );
         }
     }

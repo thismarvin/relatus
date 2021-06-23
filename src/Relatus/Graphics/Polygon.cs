@@ -1,363 +1,78 @@
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Relatus.Graphics
 {
-    public class Polygon : IDisposable
+    public class Polygon : Geometry
     {
-        #region Properties
-        public float X
-        {
-            get => x;
-            set
-            {
-                if (x == value)
-                    return;
-
-                x = value;
-                modelChanged = true;
-                transformNeedsUpdating = true;
-            }
-        }
-        public float Y
-        {
-            get => y;
-            set
-            {
-                if (y == value)
-                    return;
-
-                y = value;
-                modelChanged = true;
-                transformNeedsUpdating = true;
-            }
-        }
-        public float Z
-        {
-            get => z;
-            set
-            {
-                if (z == value)
-                    return;
-
-                z = value;
-                modelChanged = true;
-                transformNeedsUpdating = true;
-            }
-        }
         public float Width
         {
-            get => width;
-            set
-            {
-                if (width == value)
-                    return;
-
-                width = value;
-                modelChanged = true;
-                transformNeedsUpdating = true;
-            }
+            get => transform.Scale.X;
+            set => SetDimensions(value, transform.Scale.Y);
         }
         public float Height
         {
-            get => height;
-            set
-            {
-                if (height == value)
-                    return;
-
-                height = value;
-                modelChanged = true;
-                transformNeedsUpdating = true;
-            }
-        }
-        public Color Color
-        {
-            get => color;
-            set
-            {
-                if (color == value)
-                    return;
-
-                color = value;
-                modelChanged = true;
-                transformNeedsUpdating = true;
-            }
-        }
-        public virtual float Rotation
-        {
-            get => rotation;
-            set
-            {
-                if (rotation == value)
-                    return;
-
-                rotation = value;
-                modelChanged = true;
-                transformNeedsUpdating = true;
-            }
-        }
-        public Vector2 RotationOffset
-        {
-            get => rotationOffset;
-            set
-            {
-                if (rotationOffset == value)
-                    return;
-
-                rotationOffset = value;
-                modelChanged = true;
-                transformNeedsUpdating = true;
-            }
-        }
-        public Vector3 Translation
-        {
-            get => translation;
-            set
-            {
-                if (translation == value)
-                    return;
-
-                translation = value;
-                modelChanged = true;
-                transformNeedsUpdating = true;
-            }
-        }
-        public Vector3 Scale
-        {
-            get => scale;
-            set
-            {
-                if (scale == value)
-                    return;
-
-                scale = value;
-                modelChanged = true;
-                transformNeedsUpdating = true;
-            }
+            get => transform.Scale.Y;
+            set => SetDimensions(transform.Scale.X, value);
         }
 
-        public GeometryData Geometry
-        {
-            get => geometry;
-            set
-            {
-                AttachGeometry(value);
-            }
-        }
-        #endregion
-
-        public Vector3 Position
-        {
-            get => new Vector3(x, y, z);
-            set => SetPosition(value.X, value.Y, value.Z);
-        }
-
-        // I just want to note that although this is a Vector3, it is really treated like a Vector2.
         public Vector3 Center
         {
-            get => new Vector3(x + width / 2, y - height / 2, z);
-            set => SetCenter(value.X, value.Y);
+            get => new Vector3(Position.X + Width * 0.5f, Position.Y - Height * 0.5f, Position.Z);
+            set => SetCenter(value);
         }
 
-        public RectangleF Bounds
+        public RectangleF Bounds => new RectangleF(X, Y, Width, Height);
+
+        public Polygon() : base()
         {
-            get => new RectangleF(x, y, width, height);
-            set => SetBounds(value.X, value.Y, value.Width, value.Height);
         }
 
-        private float x;
-        private float y;
-        private float z;
-        private float width;
-        private float height;
-        private Color color;
-        private float rotation;
-        private Vector2 rotationOffset;
-        private Vector3 translation;
-        private Vector3 scale;
-
-        private GeometryData geometry;
-        private bool geometryChanged;
-        private bool modelChanged;
-        private bool transformNeedsUpdating;
-        private Matrix transformCache;
-        private DynamicVertexBuffer modelBuffer;
-        private VertexBufferBinding[] vertexBufferBindings;
-
-        private static readonly GraphicsDevice graphicsDevice;
-        static Polygon()
+        public static Polygon Create()
         {
-            graphicsDevice = Engine.Graphics.GraphicsDevice;
+            return new Polygon();
         }
 
-        public Polygon()
+        public virtual Renderable SetDimensions(float width, float height)
         {
-            color = Color.White;
-            scale = new Vector3(1);
-
-            transformNeedsUpdating = true;
-            transformCache = Matrix.Identity;
-        }
-
-        public Polygon AttachGeometry(GeometryData geometry)
-        {
-            if (this.geometry == geometry)
-                return this;
-
-            if (this.geometry != null && !this.geometry.Managed)
-            {
-                this.geometry.Dispose();
-            }
-
-            this.geometry = geometry;
-            geometryChanged = true;
+            transform.Scale = new Vector3(width, height, 0);
 
             return this;
         }
 
-        public Polygon ApplyChanges()
+        public virtual Renderable SetCenter(Vector3 center)
         {
-            if (!geometryChanged && !modelChanged)
-                return this;
-
-            if (modelChanged)
-            {
-                modelBuffer?.Dispose();
-                modelBuffer = new DynamicVertexBuffer(Engine.Graphics.GraphicsDevice, typeof(VertexTransformColor), 1, BufferUsage.WriteOnly);
-                modelBuffer.SetData(new VertexTransformColor[] { GetVertexTransformColor() });
-            }
-
-            vertexBufferBindings = new VertexBufferBinding[]
-            {
-                new VertexBufferBinding(geometry.VertexBuffer),
-                new VertexBufferBinding(modelBuffer, 0, 1)
-            };
-
-            geometryChanged = false;
-            modelChanged = false;
+            Position = new Vector3(center.X - Width * 0.5f, center.Y + Height * 0.5f, center.Z);
 
             return this;
         }
 
-        public virtual Polygon SetPosition(float x, float y, float z)
+        public Renderable SetCenter(float x, float y, float z)
         {
-            this.x = x;
-            this.y = y;
-            this.z = z;
-
-            modelChanged = true;
-            transformNeedsUpdating = true;
-
-            return this;
+            return SetCenter(new Vector3(x, y, z));
         }
 
-        public virtual Polygon SetCenter(float x, float y)
+        public PolygonSchema CalculatePolygonSchema()
         {
-            this.x = x - Width / 2;
-            this.y = y + Height / 2;
+            int totalVertices = geometryData.Mesh.TotalVertices;
+            Matrix polygonTransform = transform.Matrix;
 
-            modelChanged = true;
-            transformNeedsUpdating = true;
+            Vector2[] transformedVertices = new Vector2[totalVertices];
 
-            return this;
-        }
-
-        public virtual Polygon SetBounds(float x, float y, float width, float height)
-        {
-            this.x = x;
-            this.y = y;
-            this.width = width;
-            this.height = height;
-
-            modelChanged = true;
-            transformNeedsUpdating = true;
-
-            return this;
-        }
-
-        public Matrix CalculateTransform()
-        {
-            if (transformNeedsUpdating)
+            for (int i = 0; i < totalVertices; i++)
             {
-                transformNeedsUpdating = false;
-
-                transformCache =
-                Matrix.CreateScale(width * scale.X, height * scale.Y, 1 * scale.Z) *
-                Matrix.CreateTranslation(-new Vector3(rotationOffset.X, rotationOffset.Y, 0)) *
-                Matrix.CreateRotationZ(rotation) *
-                Matrix.CreateTranslation(x + translation.X + rotationOffset.X, y + translation.Y + rotationOffset.Y, translation.Z);
+                transformedVertices[i] = Vector2.Transform(new Vector2(geometryData.Mesh.Vertices[i].X, geometryData.Mesh.Vertices[i].Y), polygonTransform);
             }
 
-            return transformCache;
-        }
+            LineSegment[] transformedLineSegments = new LineSegment[totalVertices];
 
-        internal VertexTransformColor GetVertexTransformColor()
-        {
-            Vector3 scale = new Vector3(width * this.scale.X, height * this.scale.Y, this.scale.Z);
-            Vector3 translation = new Vector3(x + this.translation.X, y + this.translation.Y, z + this.translation.Z);
-
-            return new VertexTransformColor(scale, rotationOffset, rotation, translation, color);
-        }
-
-        public virtual void Draw(Camera camera)
-        {
-            if (geometryChanged || modelChanged)
+            for (int i = 0; i < totalVertices - 1; i++)
             {
-                throw new RelatusException("The polygon was modified, but ApplyChanges() was never called.", new MethodExpectedException());
+                transformedLineSegments[i] = new LineSegment(transformedVertices[i + 1].X, transformedVertices[i + 1].Y, transformedVertices[i].X, transformedVertices[i].Y);
             }
 
-            graphicsDevice.RasterizerState = GraphicsManager.RasterizerState;
-            graphicsDevice.SetVertexBuffers(vertexBufferBindings);
-            graphicsDevice.Indices = geometry.IndexBuffer;
+            transformedLineSegments[totalVertices - 1] = new LineSegment(transformedVertices[0].X, transformedVertices[0].Y, transformedVertices[totalVertices - 1].X, transformedVertices[totalVertices - 1].Y);
 
-            GeometryManager.SetupPolygonShader(camera);
-
-            foreach (EffectPass pass in GeometryManager.PolygonShader.Techniques[1].Passes)
-            {
-                pass.Apply();
-                graphicsDevice.DrawInstancedPrimitives(PrimitiveType.TriangleList, 0, 0, geometry.TotalTriangles, 1);
-            }
+            return new PolygonSchema(transformedVertices, transformedLineSegments);
         }
-
-        #region IDisposable Support
-        private bool disposedValue = false; // To detect redundant calls
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!disposedValue)
-            {
-                if (disposing)
-                {
-                    Geometry.Dispose();
-                    modelBuffer.Dispose();
-                }
-
-                // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
-                // TODO: set large fields to null.
-
-                disposedValue = true;
-            }
-        }
-
-        // TODO: override a finalizer only if Dispose(bool disposing) above has code to free unmanaged resources.
-        // ~Polygon()
-        // {
-        //   // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
-        //   Dispose(false);
-        // }
-
-        // This code added to correctly implement the disposable pattern.
-        public void Dispose()
-        {
-            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
-            Dispose(true);
-            // TODO: uncomment the following line if the finalizer is overridden above.
-            // GC.SuppressFinalize(this);
-        }
-        #endregion
     }
 }

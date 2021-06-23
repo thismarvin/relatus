@@ -21,10 +21,22 @@ namespace Relatus
             return newMin + (newMax - newMin) * (current - currentMin) / (currentMax - currentMin);
         }
 
-        public static Vector2 ConstrainPoint(float x, float y, RectangleF boundary)
+        /// <summary>
+        /// Returns whether or not a given value is almost equal to a given target.
+        /// </summary>
+        /// <param name="value">The value that is being tested.</param>
+        /// <param name="target">The target value that the previous parameter should equal.</param>
+        /// <param name="precision">The margin of freedom used to determine whether or not the value equals the target.</param>
+        /// <returns></returns>
+        public static bool AlmostEqual(double value, double target, double precision)
         {
-            float xConstrained = x;
-            float yConstrained = y;
+            return value - precision <= target && target <= value + precision;
+        }
+
+        public static Vector2 ConstrainPoint(double x, double y, RectangleF boundary)
+        {
+            double xConstrained = x;
+            double yConstrained = y;
 
             xConstrained = Math.Max(boundary.Left, xConstrained);
             xConstrained = Math.Min(boundary.Right, xConstrained);
@@ -32,7 +44,7 @@ namespace Relatus
             yConstrained = Math.Max(boundary.Bottom, yConstrained);
             yConstrained = Math.Min(boundary.Top, yConstrained);
 
-            return new Vector2(xConstrained, yConstrained);
+            return new Vector2((float)xConstrained, (float)yConstrained);
         }
 
         public static RectangleF ConstrainRectangle(RectangleF rectangle, RectangleF boundary)

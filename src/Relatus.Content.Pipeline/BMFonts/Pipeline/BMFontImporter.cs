@@ -15,11 +15,10 @@ namespace Relatus.Content.Pipeline.BMFonts.Pipeline
         {
             context.Logger.LogMessage("Importing XML file: {0}", filename);
 
-            using (var streamReader = new StreamReader(filename))
-            {
-                var deserializer = new XmlSerializer(typeof(BMFont));
-                return (BMFont)deserializer.Deserialize(streamReader);
-            }
+            using StreamReader streamReader = new StreamReader(filename);
+            XmlSerializer deserializer = new XmlSerializer(typeof(BMFont));
+
+            return (BMFont)deserializer.Deserialize(streamReader);
         }
     }
 }

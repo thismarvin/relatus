@@ -5,53 +5,54 @@ using System.Threading.Tasks;
 
 namespace Relatus.ECS
 {
-    public class UpdateSystemHandler
+    internal class UpdateSystemHandler
     {
-        public uint TotalTasks { get; set; }
+        public bool AsynchronousUpdateEnabled { get; set; }
         public bool FixedUpdateEnabled { get; set; }
-        public bool AsynchronousUpdateEnabled { get => TotalTasks > 1; }
 
-        public int TargetFPS
+        public uint TotalTasks
         {
-            get => targetFPS;
+            get => totalTasks;
             set
             {
-                if (value <= 0)
-                    throw new RelatusException("The target framerate cannot be less than 1.", new ArgumentException());
+                if (value == 0)
+                    throw new RelatusException("The total amount of tasks cannot be zero.", new ArgumentException());
 
-                targetFPS = value;
-                FixedUpdateEnabled = TargetFPS > 0;
-                threshold = 1f / TargetFPS;
+                totalTasks = value;
+            }
+        }
+        public uint UpdatesPerSecond
+        {
+            set
+            {
+                if (value == 0)
+                    throw new RelatusException("The total amount of updates per second cannot be zero.", new ArgumentException());
+
+                threshold = 1f / value;
             }
         }
 
         private readonly MorroSystem parent;
-        private readonly Action<int> onUpdate;
+        private readonly Action<uint> onUpdate;
 
-        private int targetFPS;
+        private uint totalTasks;
         private float threshold;
         private float accumulator;
 
-        public UpdateSystemHandler(MorroSystem parent, Action<int> onUpdate)
+        public UpdateSystemHandler(MorroSystem parent, Action<uint> onUpdate)
         {
             this.parent = parent;
             this.onUpdate = onUpdate;
-        }
 
-        public UpdateSystemHandler(MorroSystem parent, Action<int> onUpdate, uint totalTasks, int targetFPS)
-        {
-            this.parent = parent;
-            this.onUpdate = onUpdate;
-            TotalTasks = totalTasks;
-            TargetFPS = targetFPS;
-            accumulator = threshold;
+            totalTasks = 1;
+            threshold = 1f / 60;
         }
 
         public void Update()
         {
             if (FixedUpdateEnabled)
             {
-                if (AsynchronousUpdateEnabled)
+                if (AsynchronousUpdateEnabled && parent.Entities.Count >= TotalTasks)
                 {
                     ExecuteAsFixedUpdate(ParallelUpdate);
                 }
@@ -62,7 +63,7 @@ namespace Relatus.ECS
             }
             else
             {
-                if (AsynchronousUpdateEnabled)
+                if (AsynchronousUpdateEnabled && parent.Entities.Count >= TotalTasks)
                 {
                     ParallelUpdate();
                 }
@@ -85,15 +86,16 @@ namespace Relatus.ECS
 
         private void NormalUpdate()
         {
-            foreach (int entity in parent.Entities)
+            uint[] entities = parent.EntitiesAsArray;
+            for (int i = 0; i < parent.Entities.Count; i++)
             {
-                onUpdate(entity);
+                onUpdate(entities[i]);
             }
         }
 
         private void ParallelUpdate()
         {
-            int[] entities = parent.EntitiesAsArray;
+            uint[] entities = parent.EntitiesAsArray;
             Task.WaitAll(DivideUpdateIntoTasks(TotalTasks));
 
             Task[] DivideUpdateIntoTasks(uint totalTasks)
@@ -102,13 +104,12 @@ namespace Relatus.ECS
 
                 int increment = parent.Entities.Count / (int)totalTasks;
                 int start = 0;
-                int end = increment;
 
                 for (int i = 0; i < totalTasks; i++)
                 {
                     if (i != totalTasks - 1)
                     {
-                        result[i] = UpdateSection(start, end);
+                        result[i] = UpdateSection(start, start + increment);
                     }
                     else
                     {
@@ -116,7 +117,6 @@ namespace Relatus.ECS
                     }
 
                     start += increment;
-                    end += increment;
                 }
 
                 return result;

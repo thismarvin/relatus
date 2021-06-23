@@ -8,73 +8,110 @@ namespace Relatus
 {
     public abstract class RelatusObject : IComparable<RelatusObject>
     {
-        public float X { get; set; }
-        public float Y { get; set; }
-        public float Width { get; set; }
-        public float Height { get; set; }
-        public int Depth { get; set; }
-
-        public Vector2 Position
+        public float X
         {
-            get => new Vector2(X, Y);
-            set => SetPosition(value.X, value.Y);
+            get => x;
+            set => SetPosition(value, y, z);
         }
 
-        public Vector2 Center
+        public float Y
         {
-            get => new Vector2(X + Width / 2, Y - Height / 2);
-            set => SetCenter(value.X, value.Y);
+            get => y;
+            set => SetPosition(x, value, z);
         }
 
-        public RectangleF Bounds
+        public float Z
         {
-            get => new RectangleF(X, Y, Width, Height);
-            set => SetBounds(value.X, value.Y, value.Width, value.Height);
+            get => z;
+            set => SetPosition(x, y, value);
         }
 
-        public RelatusObject(float x, float y, int width, int height)
+        public float Width
         {
-            X = x;
-            Y = y;
-            Width = width;
-            Height = height;
-            Depth = 1;
+            get => width;
+            set => SetDimensions(value, height, depth);
         }
 
-        public virtual RelatusObject SetPosition(float x, float y)
+        public float Height
         {
-            X = x;
-            Y = y;
+            get => height;
+            set => SetDimensions(width, value, depth);
+        }
+
+        public float Depth
+        {
+            get => depth;
+            set => SetDimensions(width, height, value);
+        }
+
+        public Vector3 Position
+        {
+            get => new Vector3(x, y, z);
+            set => SetPosition(value.X, value.Y, value.Z);
+        }
+
+        public Vector3 Center
+        {
+            get => new Vector3(x + width * 0.5f, y - height * 0.5f, z - depth * 0.5f);
+            set => SetCenter(value.X, value.Y, value.Z);
+        }
+
+        private float x;
+        private float y;
+        private float z;
+        private float width;
+        private float height;
+        private float depth;
+
+        public RelatusObject(float x, float y, float z, float width, float height, float depth)
+        {
+            this.x = x;
+            this.y = y;
+            this.z = z;
+            this.width = width;
+            this.height = height;
+            this.depth = depth;
+        }
+
+        public RelatusObject() : this(0, 0, 0, 0, 0, 0)
+        {
+        }
+
+        public virtual RelatusObject SetPosition(float x, float y, float z)
+        {
+            this.x = x;
+            this.y = y;
+            this.z = z;
 
             return this;
         }
 
-        public virtual RelatusObject SetCenter(float x, float y)
+        public virtual RelatusObject SetCenter(float x, float y, float z)
         {
-            X = x - Width / 2;
-            Y = y + Height / 2;
+            this.x = x - width * 0.5f;
+            this.y = y + height * 0.5f;
+            this.z = z + depth * 0.5f;
 
             return this;
         }
 
-        public virtual RelatusObject SetBounds(float x, float y, float width, float height)
+        public virtual RelatusObject SetDimensions(float width, float height, float depth)
         {
-            X = x;
-            Y = y;
-            Width = width;
-            Height = height;
+            this.width = width;
+            this.height = height;
+            this.depth = depth;
 
             return this;
         }
 
-        public int CompareTo(RelatusObject relatusObject)
+        public int CompareTo(RelatusObject other)
         {
-            return Depth.CompareTo(relatusObject.Depth);
+            return z.CompareTo(other.Z);
         }
 
         public override string ToString()
         {
-            return base.ToString() + $": Position:(X:{X}, Y:{Y}), Dimensions:(W:{Width}, H:{Height}), Depth:{Depth}";
+            return $"<{x}, {y}, {z}>, [{width} x {height} x {depth}]";
         }
     }
 }

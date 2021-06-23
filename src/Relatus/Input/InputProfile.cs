@@ -21,9 +21,12 @@ namespace Relatus.Input
         }
 
         #region Handle Input Mappings
-        public InputProfile RegisterMapping(InputMapping mapping)
+        public InputProfile RegisterMapping(params InputMapping[] mappings)
         {
-            inputMappings.Register(mapping.Name, mapping);
+            for (int i = 0; i < mappings.Length; i++)
+            {
+                inputMappings.Register(mappings[i].Name, mappings[i]);
+            }
 
             return this;
         }

@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Relatus.Graphics
 {
@@ -10,14 +8,14 @@ namespace Relatus.Graphics
         Exit
     }
 
-    public abstract class Transition: IDisposable
+    public abstract class Transition : IDisposable
     {
         public bool Started { get; private set; }
         public bool Done { get; protected set; }
-        
+
         protected TransitionType Type { get; private set; }
         protected Camera Camera { get; private set; }
-        protected float Force { get; private set; }        
+        protected float Force { get; private set; }
 
         private bool setup;
         private bool lastDraw;
@@ -32,7 +30,6 @@ namespace Relatus.Graphics
         internal Transition(TransitionType type, float velocity, float acceleration)
         {
             Type = type;
-            Camera = CameraManager.Get(CameraType.Static);
 
             initialVelocity = velocity;
             this.velocity = initialVelocity;
@@ -54,6 +51,15 @@ namespace Relatus.Graphics
 
         public void Begin()
         {
+            if (Started)
+                return;
+
+            if (!setup)
+            {
+                SetupTransition();
+                setup = true;
+            }
+
             Started = true;
         }
 
@@ -67,15 +73,7 @@ namespace Relatus.Graphics
 
         }
 
-        private void CalculateForce()
-        {
-            velocity += acceleration * deltaTime;
-            Force += velocity * deltaTime;
-        }
-
         protected abstract void SetupTransition();
-
-        protected abstract void AccommodateToCamera();
 
         protected abstract void UpdateLogic();
 
@@ -86,19 +84,13 @@ namespace Relatus.Graphics
             if (Done)
                 return;
 
-            AccommodateToCamera();
-
-            if (!setup)
-            {                
-                SetupTransition();
-                setup = true;
-            }
-
             accumulator += Engine.DeltaTime;
 
             while (accumulator >= deltaTime)
             {
-                CalculateForce();
+                velocity += acceleration * deltaTime;
+                Force += velocity * deltaTime;
+
                 UpdateLogic();
 
                 accumulator -= deltaTime;
@@ -119,43 +111,21 @@ namespace Relatus.Graphics
         }
 
         #region IDisposable Support
-        protected bool disposedValue = false; // To detect redundant calls
+        protected bool disposedValue;
 
         protected virtual void OnDispose()
         {
 
         }
 
-        private void Dispose(bool disposing)
+        public void Dispose()
         {
             if (!disposedValue)
             {
-                if (disposing)
-                {
-                    OnDispose();
-                }
-
-                // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
-                // TODO: set large fields to null.
+                OnDispose();
 
                 disposedValue = true;
             }
-        }
-
-        // TODO: override a finalizer only if Dispose(bool disposing) above has code to free unmanaged resources.
-        // ~Transition()
-        // {
-        //   // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
-        //   Dispose(false);
-        // }
-
-        // This code added to correctly implement the disposable pattern.
-        public void Dispose()
-        {
-            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
-            Dispose(true);
-            // TODO: uncomment the following line if the finalizer is overridden above.
-            // GC.SuppressFinalize(this);
         }
         #endregion
     }

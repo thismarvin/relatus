@@ -1,37 +1,51 @@
-using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Relatus.Graphics
 {
-    public static class Batcher
+    public abstract class Batcher<T>
     {
-        /// <summary>
-        /// Creates a temporary <see cref="SpriteCollection"/> that batches and draws a given array of sprites.
-        /// </summary>
-        /// <param name="sprites">The array of sprites that will be batched and drawn together.</param>
-        /// <param name="camera">The camera used to draw the sprites.</param>
-        public static void DrawSprites(Sprite[] sprites, Camera camera)
+        protected BatchExecution execution;
+        protected uint batchSize;
+        protected Camera camera;
+
+        internal Batcher()
         {
-            SpriteCollection spriteCollection = new SpriteCollection();
-            spriteCollection
-                .SetCollection(sprites)
-                .Draw(camera);
+
         }
 
-        /// <summary>
-        /// Creates a temporary <see cref="PolygonCollection"/> that batches and draws a given array of polygons.
-        /// </summary>
-        /// <param name="polygons">The array of polygons that will be batched and drawn together.</param>
-        /// <param name="camera">The camera used to draw the sprites.</param>
-        public static void DrawPolygons(Polygon[] polygons, Camera camera)
+        public abstract Batcher<T> Begin();
+        public abstract Batcher<T> Add(params T[] entry);
+        public abstract Batcher<T> End();
+
+        public Batcher<T> SetBatchExecution(BatchExecution execution)
         {
-            using (PolygonCollection polygonCollection = new PolygonCollection())
+            this.execution = execution;
+
+            return this;
+        }
+
+        public Batcher<T> SetBatchSize(uint batchSize)
+        {
+            this.batchSize = batchSize;
+
+            return this;
+        }
+
+        public Batcher<T> AttachCamera(Camera camera)
+        {
+            this.camera = camera;
+
+            return this;
+        }
+
+        public Batcher<T> AddRange(IEnumerable<T> entries)
+        {
+            foreach (T entry in entries)
             {
-                polygonCollection
-                    .SetCollection(polygons)
-                    .Draw(camera);
+                Add(entry);
             }
+
+            return this;
         }
     }
 }

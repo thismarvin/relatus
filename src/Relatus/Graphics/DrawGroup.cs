@@ -1,41 +1,50 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Relatus.Graphics
 {
-    public abstract class DrawGroup<T>
+    public abstract class DrawGroup<T> : IDisposable
     {
-        protected readonly int capacity;
-        protected T[] group;
-        protected int groupIndex;
+        public BatchExecution Execution { get; private set; }
+        public uint BatchSize { get; protected set; }
 
-        internal DrawGroup(int capacity)
+        internal DrawGroup(BatchExecution execution, uint batchSize)
         {
-            this.capacity = capacity;
-            group = new T[this.capacity];
+            Execution = execution;
+            BatchSize = batchSize;
         }
 
-        public void Clear()
-        {
-            Array.Clear(group, 0, group.Length);
-        }
+        public abstract bool Add(T entry);
+        public abstract DrawGroup<T> ApplyChanges();
+        public abstract DrawGroup<T> Draw(Camera camera);
 
-        public virtual bool Add(T entry)
+        public DrawGroup<T> AddRange(IEnumerable<T> entries)
         {
-            if (groupIndex >= capacity)
-                return false;
-
-            if (ConditionToAdd(entry))
+            foreach (T entry in entries)
             {
-                group[groupIndex++] = entry;
-                return true;
+                Add(entry);
             }
 
-            return false;
+            return this;
         }
 
-        protected abstract bool ConditionToAdd(T entry);
-        public abstract void Draw(Camera camera);
+        #region IDisposable Support
+        private bool disposedValue;
+
+        protected virtual void OnDispose()
+        {
+
+        }
+
+        public void Dispose()
+        {
+            if (!disposedValue)
+            {
+                OnDispose();
+
+                disposedValue = true;
+            }
+        }
+        #endregion
     }
 }

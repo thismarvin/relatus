@@ -1,9 +1,8 @@
 using Microsoft.Xna.Framework.Audio;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Relatus.Graphics;
 using Relatus.Utilities;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Relatus
 {
@@ -12,19 +11,25 @@ namespace Relatus
     /// </summary>
     public static class AssetManager
     {
+        private static readonly ContentManager contentManager;
+
         private static readonly ResourceHandler<Texture2D> textures;
         private static readonly ResourceHandler<Effect> effects;
         private static readonly ResourceHandler<SoundEffect> soundEffects;
         private static readonly ResourceHandler<BMFont> fonts;
         private static readonly ResourceHandler<SpriteAtlas> atlases;
+        private static readonly ResourceHandler<Model> models;
 
         static AssetManager()
         {
+            contentManager = Engine.Instance.Content;
+
             textures = new ResourceHandler<Texture2D>();
             effects = new ResourceHandler<Effect>();
             soundEffects = new ResourceHandler<SoundEffect>();
             fonts = new ResourceHandler<BMFont>();
             atlases = new ResourceHandler<SpriteAtlas>();
+            models = new ResourceHandler<Model>();
         }
 
         #region Handle Images
@@ -35,7 +40,7 @@ namespace Relatus
         /// <param name="path">The relative path to the image contained in the Content folder.</param>
         public static void LoadImage(string name, string path)
         {
-            textures.Register(name, Engine.Instance.Content.Load<Texture2D>(path));
+            textures.Register(name, contentManager.Load<Texture2D>(path));
         }
 
         /// <summary>
@@ -66,7 +71,7 @@ namespace Relatus
         /// <param name="path">The relative path to the effect contained in the Content folder.</param>
         public static void LoadEffect(string name, string path)
         {
-            effects.Register(name, Engine.Instance.Content.Load<Effect>(path));
+            effects.Register(name, contentManager.Load<Effect>(path));
         }
 
         /// <summary>
@@ -97,7 +102,7 @@ namespace Relatus
         /// <param name="path">The relative path to the .wav file contained in the Content folder.</param>
         public static void LoadSoundEffect(string name, string path)
         {
-            soundEffects.Register(name, Engine.Instance.Content.Load<SoundEffect>(path));
+            soundEffects.Register(name, contentManager.Load<SoundEffect>(path));
         }
 
         /// <summary>
@@ -128,7 +133,7 @@ namespace Relatus
         /// <param name="path">The relative path to the BMFont contained in the Content folder.</param>
         public static void LoadFont(string name, string path)
         {
-            fonts.Register(name, Engine.Instance.Content.Load<BMFont>(path));
+            fonts.Register(name, contentManager.Load<BMFont>(path).LoadPages(path));
         }
 
         /// <summary>
@@ -159,7 +164,7 @@ namespace Relatus
         /// <param name="path">The relative path to the sprite atlas contained in the Content folder.</param>
         public static void LoadSpriteAtlas(string name, string path)
         {
-            atlases.Register(name, Engine.Instance.Content.Load<SpriteAtlas>(path));
+            atlases.Register(name, contentManager.Load<SpriteAtlas>(path).LoadSpriteSheet(path));
         }
 
         /// <summary>
@@ -182,13 +187,46 @@ namespace Relatus
         }
         #endregion
 
+        #region Handle Models
+        /// <summary>
+        /// Load a <see cref="Model"/> into memory.
+        /// </summary>
+        /// <param name="name">The name that the model being loaded will be referenced as.</param>
+        /// <param name="path">The relative path to the model contained in the Content folder.</param>
+        public static void LoadModel(string name, string path)
+        {
+            models.Register(name, contentManager.Load<Model>(path));
+        }
+
+        /// <summary>
+        /// Get a <see cref="Model"/> that was already loaded into memory.
+        /// </summary>
+        /// <param name="name">The name assigned to a previously loaded model.</param>
+        /// <returns>The loaded <see cref="Model"/> associated with the given name.</returns>
+        public static Model GetModel(string name)
+        {
+            return models.Get(name);
+        }
+
+        /// <summary>
+        /// Unload an already loaded <see cref="Model"/> from memory.
+        /// </summary>
+        /// <param name="name">The name assigned to a previously loaded model.</param>
+        public static void UnloadModel(string name)
+        {
+            models.Remove(name);
+        }
+        #endregion
+
         internal static void LoadContent()
         {
-            LoadEffect("Relatus_PolygonShader", "Assets/Effects/PolygonShader");
-            LoadEffect("Relatus_SpriteShader", "Assets/Effects/SpriteShader");
-            LoadEffect("Relatus_BMFontShader", "Assets/Effects/BMFontShader");
+            LoadEffect("Relatus_RelatusEffect", "Relatus.Content/RelatusEffect");
+            LoadEffect("Relatus_3DEffect", "Relatus.Content/Relatus3DEffect");
+            LoadEffect("Relatus_BMFontShader", "Relatus.Content/BMFontShader");
 
-            LoadFont("Relatus_Probity", "Assets/Fonts/probity");
+            LoadEffect("Relatus_Sprite", "Relatus.Content/RelatusSprite");
+
+            LoadFont("Relatus_Probity", "Relatus.Content/probity");
         }
 
         internal static void UnloadContent()
@@ -197,6 +235,8 @@ namespace Relatus
             effects.Dispose();
             soundEffects.Dispose();
             fonts.Dispose();
+            atlases.Dispose();
+            models.Dispose();
         }
     }
 }

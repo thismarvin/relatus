@@ -18,7 +18,7 @@ namespace Relatus
         public float Right => X + Width;
 
         public Vector2 Position => new Vector2(X, Y);
-        public Vector2 Center => new Vector2(X + Width / 2, Y - Height / 2);
+        public Vector2 Center => new Vector2(X + Width * 0.5f, Y - Height * 0.5f);
 
         public RectangleF(float x, float y, float width, float height)
         {
@@ -70,11 +70,27 @@ namespace Relatus
             if (MathExt.RemapRange(xDelta, 0, xMin, 0, 1) > MathExt.RemapRange(yDelta, 0, yMin, 0, 1))
             {
                 float xResolution = (xMin - xDelta) * (X < rectangle.X ? -1 : 1);
-                return new Vector2(xResolution, 0);
+
+                // Left
+                if (xResolution < 0)
+                    return new Vector2(-(Right - rectangle.Left), 0);
+                // Right
+                if (xResolution > 0)
+                    return new Vector2(rectangle.Right - Left, 0);
+            }
+            else
+            {
+                float yResolution = (yMin - yDelta) * (Y < rectangle.Y ? -1 : 1);
+
+                // Bottom
+                if (yResolution < 0)
+                    return new Vector2(0, -(Top - rectangle.Bottom));
+                // Top
+                if (yResolution > 0)
+                    return new Vector2(0, rectangle.Top - Bottom);
             }
 
-            float yResolution = (yMin - yDelta) * (Y < rectangle.Y ? -1 : 1);
-            return new Vector2(0, yResolution);
+            return Vector2.Zero;
         }
 
         public static bool operator ==(RectangleF a, RectangleF b)
@@ -102,8 +118,7 @@ namespace Relatus
 
         public override int GetHashCode()
         {
-            // For furture reference as to where I found this, and why it works, refer to this Stack Overflow post: https://stackoverflow.com/a/4630550.
-            return (X, Y, Width, Height).GetHashCode();
+            return HashCode.Combine(X, Y, Width, Height);
         }
 
         public override string ToString()

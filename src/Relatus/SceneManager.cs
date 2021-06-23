@@ -1,8 +1,6 @@
+using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Relatus.Graphics;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Relatus
 {
@@ -82,7 +80,7 @@ namespace Relatus
             {
                 exitTransition = CurrentScene.ExitTransition;
                 enterTransition = NextScene.EnterTransition;
-                exitTransition.Begin();
+                exitTransition?.Begin();
             }
 
             transitionInProgress = true;
@@ -91,7 +89,7 @@ namespace Relatus
         private static void LoadNextScene()
         {
             CurrentScene = NextScene;
-            CurrentScene.LoadScene();
+            CurrentScene.OnEnter();
             NextScene = null;
         }
 
@@ -105,8 +103,15 @@ namespace Relatus
                 if (exitTransition == null)
                 {
                     LoadNextScene();
-                    enterTransition.Begin();
+
+                    enterTransition?.Begin();
                     exitCompleted = true;
+
+                    if (enterTransition == null)
+                    {
+                        transitionInProgress = false;
+                        exitCompleted = false;
+                    }
                 }
                 else
                 {
@@ -114,29 +119,35 @@ namespace Relatus
 
                     if (exitTransition.Done)
                     {
-                        CurrentScene?.UnloadScene();
+                        CurrentScene.OnExit();
+
                         exitTransition.Reset();
                         exitTransition = null;
 
                         LoadNextScene();
-                        enterTransition.Begin();
+
+                        enterTransition?.Begin();
                         exitCompleted = true;
+
+                        if (enterTransition == null)
+                        {
+                            transitionInProgress = false;
+                            exitCompleted = false;
+                        }
                     }
                 }
             }
             else
             {
-                if (enterTransition != null)
-                {
-                    enterTransition.Update();
+                enterTransition.Update();
 
-                    if (enterTransition.Done)
-                    {
-                        enterTransition.Reset();
-                        enterTransition = null;
-                        transitionInProgress = false;
-                        exitCompleted = false;
-                    }
+                if (enterTransition.Done)
+                {
+                    enterTransition.Reset();
+                    enterTransition = null;
+
+                    transitionInProgress = false;
+                    exitCompleted = false;
                 }
             }
         }
@@ -158,16 +169,19 @@ namespace Relatus
                 }
             }
             Sketch.End();
+            Sketch.Save(out Texture2D transition);
+
+            Sketchbook.Add(Sketchbook.CreatePage(transition));
         }
 
         internal static void Update()
         {
-            UpdateTransitions();
             CurrentScene?.Update();
+            UpdateTransitions();
 
             if (DebugManager.Debugging && Input.KeyboardExt.Pressed(Keys.R))
             {
-                CurrentScene?.LoadScene();
+                CurrentScene?.OnEnter();
             }
         }
 

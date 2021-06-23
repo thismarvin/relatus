@@ -4,12 +4,12 @@ using System.Text;
 
 namespace Relatus.ECS
 {
-    public class DrawSystemHandler
+    internal class DrawSystemHandler
     {
         private readonly MorroSystem parent;
-        private readonly Action<int, Camera> onDraw;
+        private readonly Action<uint, Camera> onDraw;
 
-        public DrawSystemHandler(MorroSystem parent, Action<int, Camera> onDraw)
+        public DrawSystemHandler(MorroSystem parent, Action<uint, Camera> onDraw)
         {
             this.parent = parent;
             this.onDraw = onDraw;
@@ -17,7 +17,7 @@ namespace Relatus.ECS
 
         public void Draw(Camera camera)
         {
-            foreach (int entity in parent.Entities)
+            foreach (uint entity in parent.Entities)
             {
                 onDraw(entity, camera);
             }

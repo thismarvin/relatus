@@ -5,7 +5,6 @@ using Relatus.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace Relatus
 {
@@ -23,31 +22,39 @@ namespace Relatus
         public static float Scale { get; private set; }
         public static bool WideScreenSupported { get; private set; }
 
-        public static float AspectRatio { get => GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.AspectRatio; }
+        public static float AspectRatio => GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.AspectRatio;
         /// <summary>
         /// The width of the entire display/screen.
         /// </summary>
-        public static int DisplayWidth { get => GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width; }
+        public static int DisplayWidth => GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
         /// <summary>
         /// The height of the entire display/screen.
         /// </summary>
-        public static int DisplayHeight { get => GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height; }
-        public static bool IsWideScreen { get => GraphicsAdapter.DefaultAdapter.IsWideScreen; }
-        public static DisplayOrientation Orientation { get => Engine.Instance.Window.CurrentOrientation; }
-        public static string Title { get => Engine.Instance.Window.Title; }
-        public static GameWindow Window { get => Engine.Instance.Window; }
+        public static int DisplayHeight => GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
+        public static bool IsWideScreen => GraphicsAdapter.DefaultAdapter.IsWideScreen;
+        public static DisplayOrientation Orientation => Engine.Instance.Window.CurrentOrientation;
+        /// <summary>
+        /// The current window height divided by the scale.
+        /// </summary>
+        public static int ScaledHeight => (int)Math.Ceiling(WindowHeight / Scale);
+        /// <summary>
+        /// The current window width divided by the scale.
+        /// </summary>
+        public static int ScaledWidth => (int)Math.Ceiling(WindowWidth / Scale);
+        public static string Title => Engine.Instance.Window.Title;
+        public static GameWindow Window => Engine.Instance.Window;
         /// <summary>
         /// The current height of the window.
         /// </summary>
-        public static int WindowHeight { get => Engine.Graphics.PreferredBackBufferHeight; }
+        public static int WindowHeight => Engine.Graphics.PreferredBackBufferHeight;
         /// <summary>
         /// The current width of the window.
         /// </summary>
-        public static int WindowWidth { get => Engine.Graphics.PreferredBackBufferWidth; }
+        public static int WindowWidth => Engine.Graphics.PreferredBackBufferWidth;
 
-        private static readonly PolygonCollection polygonCollection;
+        private static readonly GeometryCollection polygonCollection;
         private static readonly Queue<float> sampleFPS;
-        private static AABB[] boxing;
+        private static Polygon[] boxing;
         private static int defaultWindowWidth;
         private static int defaultWindowHeight;
         private static bool manipulatingScreen;
@@ -61,7 +68,7 @@ namespace Relatus
         static WindowManager()
         {
             sampleFPS = new Queue<float>();
-            polygonCollection = new PolygonCollection();
+            polygonCollection = new GeometryCollection(BatchExecution.DrawElements, 4);
 
             Engine.Instance.Window.ClientSizeChanged += HandleWindowResize;
 
@@ -163,6 +170,23 @@ namespace Relatus
             WideScreenSupported = enabled;
         }
 
+        public static (int, int, int, int) MaximizeSpace((int, int) region, float aspectRatio)
+        {
+            int width = region.Item1;
+            int height = (int)Math.Round(width / aspectRatio);
+
+            if (height > region.Item2)
+            {
+                height = region.Item2;
+                width = (int)Math.Round(height * aspectRatio);
+            }
+
+            int pillar = (region.Item1 - width) / 2;
+            int letter = (region.Item2 - height) / 2;
+
+            return (width, height, pillar, letter);
+        }
+
         private static void InitializeWindow()
         {
             PixelWidth = 320;
@@ -208,17 +232,22 @@ namespace Relatus
         {
             int buffer = 1000;
 
-            boxing = new AABB[]
+            boxing = new Polygon[]
             {
                 // Letter boxing.
-                new AABB(-PixelWidth * 0.5f - buffer, PixelHeight * 0.5f + buffer, PixelWidth + buffer * 2, buffer) { Color = Color.Black },
-                new AABB(-PixelWidth * 0.5f - buffer, -PixelHeight * 0.5f, PixelWidth + buffer * 2, buffer) { Color = Color.Black },
+                new Quad(-PixelWidth * 0.5f - buffer, PixelHeight * 0.5f + buffer, PixelWidth + buffer * 2, buffer) { Tint = Color.Black },
+                new Quad(-PixelWidth * 0.5f - buffer, -PixelHeight * 0.5f, PixelWidth + buffer * 2, buffer) { Tint = Color.Black },
                 // Pillar boxing.
-                new AABB(-PixelWidth * 0.5f - buffer, PixelHeight * 0.5f + buffer, buffer, PixelHeight + buffer * 2) { Color = Color.Black },
-                new AABB(PixelWidth * 0.5f, PixelHeight * 0.5f + buffer, buffer, PixelHeight + buffer * 2) { Color = Color.Black }
+                new Quad(-PixelWidth * 0.5f - buffer, PixelHeight * 0.5f + buffer, buffer, PixelHeight + buffer * 2) { Tint = Color.Black },
+                new Quad(PixelWidth * 0.5f, PixelHeight * 0.5f + buffer, buffer, PixelHeight + buffer * 2) { Tint = Color.Black }
             };
 
-            polygonCollection.SetCollection(boxing);
+            polygonCollection.Dispose();
+
+            polygonCollection
+                .Clear()
+                .AddRange(boxing)
+                .ApplyChanges();
         }
 
         private static void CalculateScale()
@@ -229,7 +258,7 @@ namespace Relatus
             {
                 Scale = (float)WindowHeight / PixelHeight;
 
-                // Check if letterboxing is required.
+                // Check if letter boxing is required.
                 if (PixelWidth * Scale > WindowWidth)
                 {
                     Scale = (float)WindowWidth / PixelWidth;
@@ -239,7 +268,7 @@ namespace Relatus
             {
                 Scale = (float)WindowWidth / PixelWidth;
 
-                // Check if letterboxing is required.
+                // Check if pillar boxing is required.
                 if (PixelHeight * Scale > WindowHeight)
                 {
                     Scale = (float)WindowHeight / PixelHeight;
@@ -249,8 +278,8 @@ namespace Relatus
 
         private static void CalculateBoxing()
         {
-            LetterBox = (WindowHeight / Scale - PixelHeight) / 2;
-            PillarBox = (WindowWidth / Scale - PixelWidth) / 2;
+            LetterBox = (WindowHeight / Scale - PixelHeight) * 0.5f;
+            PillarBox = (WindowWidth / Scale - PixelWidth) * 0.5f;
         }
 
         private static void ToggleFullScreen()
@@ -344,7 +373,7 @@ namespace Relatus
         {
             if (!WideScreenSupported)
             {
-                polygonCollection.Draw(CameraManager.Get(CameraType.Static));
+                //polygonCollection.Draw();
             }
         }
     }

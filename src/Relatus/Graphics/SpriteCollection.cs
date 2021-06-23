@@ -1,18 +1,30 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Relatus.Graphics
 {
     public class SpriteCollection : DrawCollection<Sprite>
     {
-        public SpriteCollection() : base(2048)
+        public const uint MaxSpriteElementsBatchSize = SpriteElements.MaxBatchSize;
+
+        public SpriteCollection(BatchExecution execution, uint batchSize) : base(execution, batchSize)
+        {
+            if (this.execution == BatchExecution.DrawElements && this.batchSize > MaxSpriteElementsBatchSize)
+                throw new RelatusException($"DrawElements does not support support a batch size greater than {MaxSpriteElementsBatchSize}.", new ArgumentOutOfRangeException());
+        }
+
+        public SpriteCollection(BatchExecution execution, uint batchSize, IEnumerable<Sprite> entries) : base(execution, batchSize, entries)
         {
         }
 
-        protected override DrawGroup<Sprite> CreateDrawGroup(Sprite currentEntry, int capacity)
+        protected override DrawGroup<Sprite> CreateDrawGroup(Sprite sprite)
         {
-            return new SpriteGroup(currentEntry.BlendState, currentEntry.SamplerState, currentEntry.Effect, capacity);
+            return execution switch
+            {
+                BatchExecution.DrawElements => new SpriteElements(batchSize, sprite.Texture, sprite.RenderOptions),
+                BatchExecution.DrawElementsInstanced => new SpriteElementsInstanced(batchSize, sprite.Texture, sprite.RenderOptions),
+                _ => throw new RelatusException("Unknown batch execution type.", new ArgumentException()),
+            };
         }
     }
 }

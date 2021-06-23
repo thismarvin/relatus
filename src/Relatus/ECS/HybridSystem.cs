@@ -9,41 +9,49 @@ namespace Relatus.ECS
     /// </summary>
     public abstract class HybridSystem : MorroSystem, IUpdateableSystem, IDrawableSystem
     {
-        public int Priority { get; set; }
-
         private readonly UpdateSystemHandler updateSystemHandler;
         private readonly DrawSystemHandler drawSystemHandler;
 
         /// <summary>
         /// Create a <see cref="MorroSystem"/> that combines the functionality of an <see cref="UpdateSystem"/> and a <see cref="DrawSystem"/>.
         /// </summary>
-        /// <param name="scene">The scene this system will exist in.</param>
-        /// <param name="tasks">The total amount of tasks to divide the update cycle into. Assigning more than one task allows entities to be updated asynchronously.</param>
-        internal HybridSystem(Scene scene, uint tasks) : base(scene)
+        /// <param name="factory">The factory this system will exist in.</param>
+        public HybridSystem(MorroFactory factory) : base(factory)
         {
-            updateSystemHandler = new UpdateSystemHandler(this, UpdateEntity)
-            {
-                TotalTasks = tasks,
-            };
-
+            updateSystemHandler = new UpdateSystemHandler(this, UpdateEntity);
             drawSystemHandler = new DrawSystemHandler(this, DrawEntity);
         }
 
         /// <summary>
-        /// Create a <see cref="MorroSystem"/> that combines the functionality of an <see cref="UpdateSystem"/> and a <see cref="DrawSystem"/>.
+        /// Enables this system to update entities asynchronously by dividing entities into sections.
         /// </summary>
-        /// <param name="scene">The scene this system will exist in.</param>
-        /// <param name="tasks">The total amount of tasks to divide the update cycle into. Assigning more than one task allows entities to be updated asynchronously.</param>
-        /// <param name="targetFPS">The target framerate the system will update in.</param>
-        internal HybridSystem(Scene scene, uint tasks, int targetFPS) : base(scene)
+        /// <param name="sections">The total amount of sections to divide the entities into.</param>
+        public virtual void EnableDivideAndConquer(uint sections)
         {
-            updateSystemHandler = new UpdateSystemHandler(this, UpdateEntity)
-            {
-                TotalTasks = tasks,
-                TargetFPS = targetFPS
-            };
+            updateSystemHandler.AsynchronousUpdateEnabled = true;
+            updateSystemHandler.TotalTasks = sections;
+        }
 
-            drawSystemHandler = new DrawSystemHandler(this, DrawEntity);
+        public virtual void DisableDivideAndConquer()
+        {
+            updateSystemHandler.AsynchronousUpdateEnabled = false;
+            updateSystemHandler.TotalTasks = 1;
+        }
+
+        /// <summary>
+        /// Enables this systems to run at a fixed frame rate.
+        /// </summary>
+        /// <param name="updatesPerSecond">How often the system will update every second.</param>
+        public virtual void EnableFixedUpdate(uint updatesPerSecond)
+        {
+            updateSystemHandler.FixedUpdateEnabled = true;
+            updateSystemHandler.UpdatesPerSecond = updatesPerSecond;
+        }
+
+        public virtual void DisableFixedUpdate()
+        {
+            updateSystemHandler.FixedUpdateEnabled = false;
+            updateSystemHandler.UpdatesPerSecond = 60;
         }
 
         public virtual void Update()
@@ -56,13 +64,8 @@ namespace Relatus.ECS
             drawSystemHandler.Draw(camera);
         }
 
-        public abstract void UpdateEntity(int entity);
+        public abstract void UpdateEntity(uint entity);
 
-        public abstract void DrawEntity(int entity, Camera camera);
-
-        public int CompareTo(IDrawableSystem other)
-        {
-            return Priority.CompareTo(other.Priority);
-        }
+        public abstract void DrawEntity(uint entity, Camera camera);
     }
 }

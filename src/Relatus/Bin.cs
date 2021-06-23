@@ -23,8 +23,11 @@ namespace Relatus
         /// </summary>
         /// <param name="boundary">The area that the partitioner will cover.</param>
         /// <param name="maximumDimension">The maximum expected size of any <see cref="IPartitionable"/> entry inserted into the bin.</param>
-        public Bin(RectangleF boundary, int maximumDimension) : base(boundary)
+        public Bin(RectangleF boundary, uint maximumDimension) : base(boundary)
         {
+            if (maximumDimension == 0)
+                throw new RelatusException("The maximum dimension cannot be zero.", new ArgumentException());
+
             powerOfTwo = (int)Math.Ceiling(Math.Log(maximumDimension, 2));
             bucketSize = 1 << powerOfTwo;
 
@@ -108,10 +111,10 @@ namespace Relatus
 
         public override bool Add(T entry)
         {
-            if (!entry.Bounds.Intersects(Boundary))
+            if (!entry.Span.Intersects(Boundary))
                 return false;
 
-            HashSet<int> ids = GetHashIDs(entry.Bounds);
+            HashSet<int> ids = GetHashIDs(entry.Span);
 
             foreach (int id in ids)
             {

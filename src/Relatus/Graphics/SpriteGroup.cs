@@ -1,45 +1,10 @@
-using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
-using System.Text;
-
 namespace Relatus.Graphics
 {
-    internal class SpriteGroup : DrawGroup<Sprite>
+    internal abstract class SpriteGroup : DrawGroup<Sprite>
     {
-        private readonly BlendState sharedBlendState;
-        private readonly SamplerState sharedSamplerState;
-        private readonly Effect sharedEffect;
-
-        private static readonly SpriteBatch spriteBatch;
-
-        static SpriteGroup()
+        protected SpriteGroup(BatchExecution execution, uint batchSize) : base(execution, batchSize)
         {
-            spriteBatch = GraphicsManager.SpriteBatch;
-        }
-
-        public SpriteGroup(BlendState sharedBlendState, SamplerState sharedSamplerState, Effect sharedEffect, int capacity) : base(capacity)
-        {
-            this.sharedBlendState = sharedBlendState;
-            this.sharedSamplerState = sharedSamplerState;
-            this.sharedEffect = sharedEffect;
-        }
-
-        protected override bool ConditionToAdd(Sprite sprite)
-        {
-            return sprite.BlendState == sharedBlendState && sprite.SamplerState == sharedSamplerState && sprite.Effect == sharedEffect;
-        }
-
-        public override void Draw(Camera camera)
-        {
-            spriteBatch.Begin(SpriteSortMode.Deferred, sharedBlendState, sharedSamplerState, null, null, sharedEffect, camera.SpriteTransform);
-            {
-                for (int i = 0; i < groupIndex; i++)
-                {
-                    group[i]?.ManagedDraw();
-                }
-            }
-            spriteBatch.End();
         }
     }
 }
+

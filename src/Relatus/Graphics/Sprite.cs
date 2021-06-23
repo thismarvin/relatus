@@ -1,148 +1,311 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using Relatus.Utilities;
 
 namespace Relatus.Graphics
 {
-    public class Sprite : RelatusObject
+    public enum SpriteMirroringType
     {
-        public float Rotation { get; set; }
-        public string SpriteDataName { get; private set; }
-        public bool Visible { get; set; }
-        public Color Tint { get; private set; }
-        public SpriteEffects SpriteEffect { get; set; }
-        public Vector2 RotationOffset { get; set; }
-        public Vector2 Scale { get; set; }
-        public Effect Effect { get; set; }
-        public BlendState BlendState { get; set; }
-        public SamplerState SamplerState { get; set; }
-        public Texture2D SpriteSheet { get; private set; }
+        None = 0,
+        /// <summary>
+        /// Reverse the x-axis of the sprite.
+        /// </summary>
+        FlipHorizontally = 1,
+        /// <summary>
+        /// Reverse the y-axis of the sprite.
+        /// </summary>
+        FlipVertically = 2
+    }
 
-        private Rectangle sourceRectangle;
-        private Rectangle scissorRectangle;
-        private bool customScissorRectangle;
-        private int originalFrameX;
-        private int originalFrameY;
-        private int frameX;
-        private int frameY;
-
-        private static readonly SpriteBatch spriteBatch;
-
-        static Sprite()
+    public class Sprite
+    {
+        #region Properties
+        public Texture2D Texture
         {
-            spriteBatch = GraphicsManager.SpriteBatch;
+            get => texture;
+            set => SetTexture(value);
+        }
+        public Vector3 Position
+        {
+            get => position;
+            set => SetPosition(value);
+        }
+        public Vector3 Translation
+        {
+            get => translation;
+            set => SetTranslation(value);
+        }
+        public Vector3 Scale
+        {
+            get => scale;
+            set => SetScale(value);
+        }
+        public Vector3 Origin
+        {
+            get => origin;
+            set => SetOrigin(value);
+        }
+        public Vector3 Rotation
+        {
+            get => rotation;
+            set => SetRotation(value.X, value.Y, value.Z);
+        }
+        public Color Tint
+        {
+            get => tint;
+            set => SetTint(value);
+        }
+        public ImageRegion SampleRegion
+        {
+            get => sampleRegion;
+            set => SetSampleRegion(value.X, value.Y, value.Width, value.Height);
+        }
+        public SpriteMirroringType SpriteMirroring
+        {
+            get => spriteMirroring;
+            set => SetSpriteMirroring(value);
+        }
+        public RenderOptions RenderOptions
+        {
+            get => renderOptions;
+            set => SetRenderOptions(value);
+        }
+        #endregion
+
+        public int Width => SampleRegion.Width;
+        public int Height => SampleRegion.Height;
+
+        public Vector3 Center
+        {
+            get => new Vector3(position.X + Width * 0.5f, position.Y - Height * 0.5f, position.Z);
+            set => SetCenter(value.X, value.Y);
+        }
+        public RectangleF Bounds
+        {
+            get => new RectangleF(position.X, position.Y, Width, Height);
+        }
+        public float X
+        {
+            get => position.X;
+            set => SetPosition(value, position.Y, position.Z);
+        }
+        public float Y
+        {
+            get => position.Y;
+            set => SetPosition(position.X, value, position.Z);
+        }
+        public float Z
+        {
+            get => position.Z;
+            set => SetPosition(position.X, position.Y, value);
         }
 
-        public Sprite(float x, float y, int frame, int columns, string sprite) : this(x, y, sprite)
+        private Texture2D texture;
+        private float texelWidth;
+        private float texelHeight;
+        private Vector3 position;
+        private Vector3 translation;
+        private Vector3 scale;
+        private Vector3 origin;
+        private Vector3 rotation;
+        private Color tint;
+        private ImageRegion sampleRegion;
+        private SpriteMirroringType spriteMirroring;
+        private RenderOptions renderOptions;
+
+        public Sprite()
         {
-            SetFrame(frame, columns);
+            tint = Color.White;
+            scale = Vector3.One;
+            renderOptions = new RenderOptions();
         }
 
-        public Sprite(float x, float y, string spriteDataName) : base(x, y, 1, 1)
+        public static Sprite Create()
         {
-            Rotation = 0;
-            Visible = true;
-            SpriteDataName = spriteDataName;
-            RotationOffset = Vector2.Zero;
-            Scale = new Vector2(1, 1);
-            BlendState = BlendState.AlphaBlend;
-            SamplerState = SamplerState.PointClamp;
-            Tint = Color.White;
-
-            InitializeSprite();
+            return new Sprite();
         }
 
-        private void InitializeSprite()
+        public static Sprite CreateFromAtlas(SpriteAtlas spriteAtlas, string name)
         {
-            SpriteSetup(SpriteManager.GetSpriteData(SpriteDataName));
+            SpriteAtlasEntry entry = spriteAtlas.GetEntry(name);
+
+            return
+                new Sprite()
+                    .SetTexture(spriteAtlas.GetPage(entry.Page))
+                    .SetSampleRegion(entry.ImageRegion);
         }
 
-        private void SpriteSetup(SpriteData spriteData)
+        public virtual Sprite SetTexture(Texture2D texture)
         {
-            SpriteSheet = AssetManager.GetImage(spriteData.SpriteSheet);
-            frameX = spriteData.X;
-            frameY = spriteData.Y;
-            originalFrameX = frameX;
-            originalFrameY = frameY;
+            this.texture = texture;
 
-            SetBounds(X, Y, spriteData.Width, spriteData.Height);
+            texelWidth = 1f / texture.Width;
+            texelHeight = 1f / texture.Height;
 
-            sourceRectangle = new Rectangle(frameX, frameY, (int)Width, (int)Height);
-        }
-
-        public void IncrementFrameX(int pixels)
-        {
-            frameX += pixels;
-            sourceRectangle = new Rectangle(frameX, frameY, (int)Width, (int)Height);
-        }
-
-        public void IncrementFrameY(int pixels)
-        {
-            frameY += pixels;
-            sourceRectangle = new Rectangle(frameX, frameY, (int)Width, (int)Height);
-        }
-
-        public void SetFrame(int frame, int columns)
-        {
-            frameX = originalFrameX + frame % columns * (int)Width;
-            frameY = originalFrameY + frame / columns * (int)Height;
-            sourceRectangle = new Rectangle(frameX, frameY, (int)Width, (int)Height);
-        }
-
-        public void SetSprite(string spriteDataName)
-        {
-            if (SpriteDataName == spriteDataName)
-                return;
-
-            SpriteDataName = spriteDataName;
-            InitializeSprite();
-        }
-
-        public void SetScissorRectangle(Microsoft.Xna.Framework.Rectangle scissorRectangle)
-        {
-            this.scissorRectangle = scissorRectangle;
-            customScissorRectangle = true;
-        }
-
-        public virtual void Update()
-        {
-
-        }
-
-        internal virtual void ManagedDraw()
-        {
-           spriteBatch.Draw(SpriteSheet, Position, sourceRectangle, Tint, Rotation, RotationOffset, Scale, SpriteEffect, 0);
-        }
-
-        public void Draw(CameraType cameraType)
-        {
-            Draw(CameraManager.Get(cameraType));
-        }
-
-        public virtual void Draw(Camera camera)
-        {
-            if (!Visible)
-                return;
-
-            if (customScissorRectangle)
+            if (sampleRegion.X == 0 && sampleRegion.Y == 0 && sampleRegion.Width == 0 && sampleRegion.Height == 0)
             {
-                spriteBatch.Begin(SpriteSortMode.Deferred, BlendState, SamplerState, null, GraphicsManager.ScissorRasterizerState, Effect, camera.SpriteTransform);
-                {
-                    spriteBatch.GraphicsDevice.ScissorRectangle = scissorRectangle;
-                    spriteBatch.Draw(SpriteSheet, Position, sourceRectangle, Tint, Rotation, RotationOffset, Scale, SpriteEffect, 0);
-                }
-                spriteBatch.End();
+                sampleRegion = new ImageRegion(0, 0, texture.Width, texture.Height);
             }
-            else
+
+            return this;
+        }
+
+
+        public virtual Sprite SetPosition(Vector3 position)
+        {
+            this.position = position;
+
+            return this;
+        }
+
+        public Sprite SetPosition(float x, float y, float z)
+        {
+            return SetPosition(new Vector3(x, y, z));
+        }
+
+        public virtual Sprite SetTranslation(Vector3 translation)
+        {
+            this.translation = translation;
+
+            return this;
+        }
+
+        public Sprite SetTranslation(float x, float y, float z)
+        {
+            return SetTranslation(new Vector3(x, y, z));
+        }
+
+        public virtual Sprite SetScale(Vector3 scale)
+        {
+            this.scale = scale;
+
+            return this;
+        }
+
+        public Sprite SetScale(float x, float y, float z)
+        {
+            return SetScale(new Vector3(x, y, z));
+        }
+
+        public virtual Sprite SetOrigin(Vector3 origin)
+        {
+            this.origin = origin;
+
+            return this;
+        }
+
+        public Sprite SetOrigin(float x, float y, float z)
+        {
+            return SetOrigin(new Vector3(x, y, z));
+        }
+
+        public virtual Sprite SetRotation(Vector3 rotation)
+        {
+            this.rotation = rotation;
+
+            return this;
+        }
+
+        public Sprite SetRotation(float roll, float pitch, float yaw)
+        {
+            return SetRotation(new Vector3(roll, pitch, yaw));
+        }
+
+        public virtual Sprite SetTint(Color tint)
+        {
+            this.tint = tint;
+
+            return this;
+        }
+
+        public Sprite SetTint(int r, int g, int b, float a = 1)
+        {
+            return SetTint(new Color(r, g, b) * a);
+        }
+
+        public virtual Sprite SetSampleRegion(ImageRegion sampleRegion)
+        {
+            this.sampleRegion = sampleRegion;
+
+            return this;
+        }
+
+        public Sprite SetSampleRegion(int x, int y, int width, int height)
+        {
+            return SetSampleRegion(new ImageRegion(x, y, width, height));
+        }
+
+        public virtual Sprite SetSpriteMirroring(SpriteMirroringType mirroringType)
+        {
+            spriteMirroring = mirroringType;
+
+            return this;
+        }
+
+        public virtual Sprite SetRenderOptions(RenderOptions options)
+        {
+            renderOptions = options;
+
+            return this;
+        }
+
+        public Sprite SetCenter(float x, float y)
+        {
+            position = new Vector3(x - Width * 0.5f, y + Height * 0.5f, position.Z);
+
+            return this;
+        }
+
+        internal VertexTransform GetVertexTransform()
+        {
+            Vector3 scale = new Vector3(Width * this.scale.X, Height * this.scale.Y, this.scale.Z);
+
+            return new VertexTransform(position + translation, scale, origin, rotation);
+        }
+
+        internal VertexColor GetVertexColor()
+        {
+            return new VertexColor(tint);
+        }
+
+        internal VertexTexture[] GetTextureCoords()
+        {
+            Vector2 topLeft = new Vector2((float)MathExt.RemapRange(sampleRegion.X, 0, texture.Width, 0, 1), (float)MathExt.RemapRange(sampleRegion.Y, 0, texture.Height, 0, 1));
+            Vector2 topRight = topLeft + new Vector2(texelWidth * sampleRegion.Width, 0);
+            Vector2 bottomRight = topLeft + new Vector2(texelWidth * sampleRegion.Width, texelHeight * sampleRegion.Height);
+            Vector2 bottomLeft = topLeft + new Vector2(0, texelHeight * sampleRegion.Height);
+
+            Vector2[] corners = new Vector2[] { topLeft, bottomLeft, bottomRight, topRight };
+
+            if ((spriteMirroring & SpriteMirroringType.FlipHorizontally) != SpriteMirroringType.None)
             {
-                spriteBatch.Begin(SpriteSortMode.Deferred, BlendState, SamplerState, null, null, Effect, camera.SpriteTransform);
-                {
-                    spriteBatch.Draw(SpriteSheet, Position, sourceRectangle, Tint, Rotation, RotationOffset, Scale, SpriteEffect, 0);
-                }
-                spriteBatch.End();
+                Vector2 temp = corners[0];
+                corners[0] = corners[3];
+                corners[3] = temp;
+
+                temp = corners[1];
+                corners[1] = corners[2];
+                corners[2] = temp;
             }
+
+            if ((spriteMirroring & SpriteMirroringType.FlipVertically) != SpriteMirroringType.None)
+            {
+                Vector2 temp = corners[0];
+                corners[0] = corners[1];
+                corners[1] = temp;
+
+                temp = corners[3];
+                corners[3] = corners[2];
+                corners[2] = temp;
+            }
+
+            return new VertexTexture[]
+            {
+                new VertexTexture(corners[0]),
+                new VertexTexture(corners[1]),
+                new VertexTexture(corners[2]),
+                new VertexTexture(corners[3])
+            };
         }
     }
 }

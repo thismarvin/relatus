@@ -10,6 +10,6 @@ namespace Relatus
     public interface IPartitionable
     {
         int Identifier { get; set; }
-        RectangleF Bounds { get; set; }
+        RectangleF Span { get; set; }
     }
 }

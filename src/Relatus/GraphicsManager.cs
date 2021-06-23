@@ -1,8 +1,5 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Relatus
 {
@@ -12,23 +9,18 @@ namespace Relatus
     public static class GraphicsManager
     {
         public static RasterizerState DefaultRasterizerState { get; private set; }
-        public static RasterizerState ScissorRasterizerState { get; private set; }
         public static RasterizerState DebugRasterizerState { get; private set; }
-        public static SpriteBatch SpriteBatch { get; private set; }
         public static Texture2D SimpleTexture { get; private set; }
-        public static BasicEffect BasicEffect { get; private set; }
+        public static Texture2D SimpleNormalTexture { get; private set; }
 
-        public static RasterizerState RasterizerState => DebugManager.ShowWireFrame ? DebugRasterizerState : DefaultRasterizerState;
+        private static readonly GraphicsDevice graphicsDevice;
 
         static GraphicsManager()
         {
+            graphicsDevice = Engine.Graphics.GraphicsDevice;
+
             DefaultRasterizerState = new RasterizerState()
             {
-                CullMode = CullMode.CullClockwiseFace
-            };
-            ScissorRasterizerState = new RasterizerState()
-            {
-                ScissorTestEnable = true,
                 CullMode = CullMode.CullClockwiseFace
             };
             DebugRasterizerState = new RasterizerState
@@ -37,25 +29,20 @@ namespace Relatus
                 CullMode = CullMode.None
             };
 
-            SpriteBatch = new SpriteBatch(Engine.Graphics.GraphicsDevice);
-
-            SimpleTexture = new Texture2D(Engine.Graphics.GraphicsDevice, 1, 1);
+            SimpleTexture = new Texture2D(graphicsDevice, 1, 1);
             SimpleTexture.SetData(new[] { Color.White });
 
-            BasicEffect = new BasicEffect(Engine.Graphics.GraphicsDevice)
-            {
-                VertexColorEnabled = true,
-            };
+            SimpleNormalTexture = new Texture2D(graphicsDevice, 1, 1);
+            SimpleNormalTexture.SetData(new[] { ColorExt.CreateFromHex(0x7f7fff) });
         }
 
         internal static void UnloadContent()
         {
             DefaultRasterizerState.Dispose();
-            ScissorRasterizerState.Dispose();
             DebugRasterizerState.Dispose();
-            SpriteBatch.Dispose();
+
             SimpleTexture.Dispose();
-            BasicEffect.Dispose();
+            SimpleNormalTexture.Dispose();
         }
     }
 }
