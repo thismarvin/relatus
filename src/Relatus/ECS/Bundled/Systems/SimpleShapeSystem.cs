@@ -102,7 +102,7 @@ namespace Relatus.ECS.Bundled
 
             vertexBufferBindings = new VertexBufferBinding[]
             {
-                new VertexBufferBinding(geometry.VertexBuffer),
+                new VertexBufferBinding(geometry.VertexPositionBuffer),
                 new VertexBufferBinding(transformBuffer, 0, 1),
                 new VertexBufferBinding(colorBuffer, 0, 1)
             };
@@ -128,8 +128,7 @@ namespace Relatus.ECS.Bundled
 
             CreateVertexBufferBindings();
 
-            graphicsDevice.RasterizerState = GraphicsManager.RasterizerState;
-            graphicsDevice.SamplerStates[0] = renderOptions.SamplerState;
+            graphicsDevice.RasterizerState = renderOptions.RasterizerState;
             graphicsDevice.BlendState = renderOptions.BlendState;
             graphicsDevice.DepthStencilState = renderOptions.DepthStencilState;
             graphicsDevice.SetVertexBuffers(vertexBufferBindings);
@@ -141,14 +140,14 @@ namespace Relatus.ECS.Bundled
 
             if (renderOptions.Effect == null)
             {
-                graphicsDevice.DrawInstancedPrimitives(PrimitiveType.TriangleList, 0, 0, geometry.TotalTriangles, (int)factory.EntityCapacity);
+                graphicsDevice.DrawInstancedPrimitives(PrimitiveType.TriangleList, 0, 0, geometry.Mesh.TotalTriangles, (int)factory.EntityCapacity);
             }
             else
             {
                 foreach (EffectPass pass in renderOptions.Effect.CurrentTechnique.Passes)
                 {
                     pass.Apply();
-                    graphicsDevice.DrawInstancedPrimitives(PrimitiveType.TriangleList, 0, 0, geometry.TotalTriangles, (int)factory.EntityCapacity);
+                    graphicsDevice.DrawInstancedPrimitives(PrimitiveType.TriangleList, 0, 0, geometry.Mesh.TotalTriangles, (int)factory.EntityCapacity);
                 }
             }
         }

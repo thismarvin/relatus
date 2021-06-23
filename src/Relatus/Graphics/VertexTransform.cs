@@ -1,8 +1,5 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Relatus.Graphics
 {
@@ -12,7 +9,7 @@ namespace Relatus.Graphics
         public Vector3 Scale { get; private set; }
         public Vector3 Origin { get; private set; }
         public Vector3 Rotation { get; private set; }
-        
+
         public VertexDeclaration VertexDeclaration => vertexDeclaration;
 
         private static readonly VertexDeclaration vertexDeclaration;
@@ -34,6 +31,14 @@ namespace Relatus.Graphics
             Scale = scale;
             Origin = origin;
             Rotation = rotation;
+        }
+
+        public VertexTransform(Transform transform)
+        {
+            Translation = transform.Translation;
+            Scale = transform.Scale;
+            Origin = transform.Origin;
+            Rotation = transform.EulerAngles.ToVector3();
         }
     }
 }

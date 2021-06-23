@@ -3,25 +3,25 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Relatus.Graphics
 {
-    public struct VertexTexture : IVertexType
+    public struct VertexNormal : IVertexType
     {
-        public Vector2 TextureCoordinates { get; set; }
+        public Vector3 Normal { get; set; }
 
         public VertexDeclaration VertexDeclaration => vertexDeclaration;
 
         private static readonly VertexDeclaration vertexDeclaration;
 
-        static VertexTexture()
+        static VertexNormal()
         {
             vertexDeclaration = new VertexDeclaration
             (
-                new VertexElement(0, VertexElementFormat.Vector2, VertexElementUsage.TextureCoordinate, 0)
+                new VertexElement(0, VertexElementFormat.Vector3, VertexElementUsage.Normal, 0)
             );
         }
 
-        public VertexTexture(Vector2 textureCoordinates)
+        public VertexNormal(Vector3 normal)
         {
-            TextureCoordinates = textureCoordinates;
+            Normal = normal;
         }
     }
 }

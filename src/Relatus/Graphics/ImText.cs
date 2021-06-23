@@ -1,4 +1,5 @@
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Relatus.Utilities;
 
 namespace Relatus.Graphics
@@ -26,6 +27,7 @@ namespace Relatus.Graphics
                     .SetSampleRegion(characterData.ImageRegion)
                     .SetRenderOptions(new RenderOptions()
                     {
+                        DepthStencilState = DepthStencilState.None,
                         Effect = shader.Effect
                     })
                 .SetPosition(xOffset + characterData.XOffset, position.Y - characterData.YOffset, position.Z);

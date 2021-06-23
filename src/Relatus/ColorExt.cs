@@ -14,7 +14,7 @@ namespace Relatus
         /// <param name="hex">The base sixteen value that represents the desired color.</param>
         /// <param name="alpha">The opacity of the color. (Note that the final color will be premultiplied by this value).</param>
         /// <returns>A new <see cref="Color"/> from a given hexidecimal value.</returns>
-        public static Color CreateFromHex(int hex, float alpha = 1)
+        public static Color CreateFromHex(uint hex, float alpha = 1)
         {
             int r = ValidateColorValue(((hex & 0xff0000) >> 16));
             int g = ValidateColorValue(((hex & 0xff00) >> 8));
@@ -37,7 +37,7 @@ namespace Relatus
             if (!Regex.IsMatch(formatted, "^[\\da-f]{6}$"))
                 throw new RelatusException("The given string is not a valid color.", new ArgumentException());
 
-            int asInt = Convert.ToInt32(formatted, 16);
+            uint asInt = (uint)Convert.ToInt32(formatted, 16);
 
             return CreateFromHex(asInt, alpha);
         }

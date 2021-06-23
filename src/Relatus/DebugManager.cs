@@ -21,7 +21,7 @@ namespace Relatus
         static DebugManager()
         {
             camera = new OrthographicCamera()
-                .SetProjection(WindowManager.WindowWidth, WindowManager.WindowHeight, 0.5f, 2);
+                .SetProjection(WindowManager.WindowWidth, WindowManager.WindowHeight, 0.25f, 8);
             camera.SetPosition(WindowManager.WindowWidth * 0.5f, -WindowManager.WindowHeight * 0.5f, 1);
 
             WindowManager.WindowResize += HandleResize;
@@ -32,7 +32,7 @@ namespace Relatus
 
         private static void HandleResize(object sender, EventArgs args)
         {
-            camera.SetProjection(WindowManager.WindowWidth, WindowManager.WindowHeight, 0.5f, 2);
+            camera.SetProjection(WindowManager.WindowWidth, WindowManager.WindowHeight, 0.25f, 8);
             camera.SetPosition(WindowManager.WindowWidth * 0.5f, -WindowManager.WindowHeight * 0.5f, 1);
         }
 
@@ -69,7 +69,6 @@ namespace Relatus
 
             Sketch.SpriteBatcher
                 .AttachCamera(camera)
-                .SetBatchSize(1)
                 .Begin()
                     .AddRange(ImText.Create(4, -4, $"{Math.Round(WindowManager.FPS)} FPS", font, fontShader))
                 .End();

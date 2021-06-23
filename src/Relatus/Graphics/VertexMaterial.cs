@@ -1,27 +1,26 @@
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Relatus.Graphics
 {
-    public struct VertexColor : IVertexType
+    public struct VertexMaterial : IVertexType
     {
-        public Color Color { get; set; }
+        public float Shininess { get; private set; }
 
         public VertexDeclaration VertexDeclaration => vertexDeclaration;
 
         private static readonly VertexDeclaration vertexDeclaration;
 
-        static VertexColor()
+        static VertexMaterial()
         {
             vertexDeclaration = new VertexDeclaration
             (
-                new VertexElement(0, VertexElementFormat.Color, VertexElementUsage.Color, 0)
+                new VertexElement(0, VertexElementFormat.Single, VertexElementUsage.TextureCoordinate, 1)
             );
         }
 
-        public VertexColor(Color color)
+        public VertexMaterial(float shininess)
         {
-            Color = color;
+            Shininess = shininess;
         }
     }
 }

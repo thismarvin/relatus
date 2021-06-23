@@ -9,13 +9,6 @@ namespace Relatus.Graphics
         private readonly List<List<Sprite>> sprites;
         private int index;
 
-        private static readonly GraphicsDevice graphicsDevice;
-
-        static SpriteBatcher()
-        {
-            graphicsDevice = Engine.Graphics.GraphicsDevice;
-        }
-
         internal SpriteBatcher()
         {
             sprites = new List<List<Sprite>>();
@@ -33,15 +26,18 @@ namespace Relatus.Graphics
             return this;
         }
 
-        public override Batcher<Sprite> Add(Sprite sprite)
+        public override Batcher<Sprite> Add(params Sprite[] sprites)
         {
-            sprites[^1].Add(sprite);
-            index++;
-
-            if (index >= batchSize)
+            for (int i = 0; i < sprites.Length; i++)
             {
-                sprites.Add(new List<Sprite>((int)batchSize));
-                index = 0;
+                this.sprites[^1].Add(sprites[i]);
+                index++;
+
+                if (index >= batchSize)
+                {
+                    this.sprites.Add(new List<Sprite>((int)batchSize));
+                    index = 0;
+                }
             }
 
             return this;

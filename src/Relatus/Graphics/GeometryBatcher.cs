@@ -33,15 +33,18 @@ namespace Relatus.Graphics
             return this;
         }
 
-        public override Batcher<Geometry> Add(Geometry polygon)
+        public override Batcher<Geometry> Add(params Geometry[] geometry)
         {
-            polygons[^1].Add(polygon);
-            index++;
-
-            if (index >= batchSize)
+            for (int i = 0; i < geometry.Length; i++)
             {
-                polygons.Add(new List<Geometry>((int)batchSize));
-                index = 0;
+                polygons[^1].Add(geometry[i]);
+                index++;
+
+                if (index >= batchSize)
+                {
+                    polygons.Add(new List<Geometry>((int)batchSize));
+                    index = 0;
+                }
             }
 
             return this;

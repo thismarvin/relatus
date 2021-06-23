@@ -117,6 +117,8 @@ namespace Relatus
 
         internal static void Draw()
         {
+            graphicsDevice.Clear(Color.Black);
+
             float x = WindowManager.WindowWidth * 0.5f;
             float y = -WindowManager.WindowHeight * 0.5f;
 
@@ -166,6 +168,10 @@ namespace Relatus
             for (int i = 0; i < decommissioned.Count; i++)
             {
                 decommissioned[i].Dispose();
+            }
+            for (int i = 0; i < layers.Count; i++)
+            {
+                layers[i].Texture.Dispose();
             }
             decommissioned.Clear();
             layers.Clear();

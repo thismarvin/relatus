@@ -14,7 +14,7 @@ namespace Relatus.Graphics
         }
 
         public abstract Batcher<T> Begin();
-        public abstract Batcher<T> Add(T entry);
+        public abstract Batcher<T> Add(params T[] entry);
         public abstract Batcher<T> End();
 
         public Batcher<T> SetBatchExecution(BatchExecution execution)

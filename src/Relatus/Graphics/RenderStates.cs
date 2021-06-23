@@ -2,28 +2,32 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Relatus.Graphics
 {
-    public class RenderOptions
+    public class RenderStates
     {
         public RasterizerState RasterizerState { get; set; }
         public BlendState BlendState { get; set; }
         public DepthStencilState DepthStencilState { get; set; }
-        public Effect Effect { get; set; }
 
-        public RenderOptions()
+        public static readonly RenderStates Default;
+
+        static RenderStates()
+        {
+            Default = new RenderStates();
+        }
+
+        public RenderStates()
         {
             RasterizerState = GraphicsManager.DefaultRasterizerState;
             BlendState = BlendState.AlphaBlend;
             DepthStencilState = DepthStencilState.Default;
-            Effect = null;
         }
 
-        public bool Equals(RenderOptions other)
+        public bool Equals(RenderStates other)
         {
             return
                 RasterizerState == other.RasterizerState &&
                 BlendState == other.BlendState &&
-                DepthStencilState == other.DepthStencilState &&
-                Effect == other.Effect;
+                DepthStencilState == other.DepthStencilState;
         }
     }
 }
